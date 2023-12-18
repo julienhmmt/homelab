@@ -1,0 +1,5 @@
+---
+# requirements.yml
+
+- src: https://github.com/julienhmmt/nodeexporter
+  version: 1.0.0

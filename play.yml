@@ -1,0 +1,6 @@
+---
+
+- name: Apply Node Exporter role to hosts
+  hosts: all
+  roles:
+    - name: nodeexporter
