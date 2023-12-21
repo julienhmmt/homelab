@@ -1,3 +1,7 @@
 .DS_Store
 .cache/
 .tox/
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate*
+tfplan
