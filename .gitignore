@@ -2,6 +2,7 @@
 .cache/
 .tox/
 .terraform/
-.terraform.lock.hcl
+.terraform.*
 terraform.tfstate*
 tfplan
+*.backup
