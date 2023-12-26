@@ -1,23 +1,38 @@
+module "provider_config" {
+  source = "../provider_configuration"
+}
+
 # see https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password.html. It will download "hashicorp/random" provider
-resource "random_password" "pveexporter_root_password1" {
+resource "random_password" "nodeexporter_root_password1" {
   length           = 24
   override_special = "_%@"
   special          = true
 }
 
-output "pveexporter_root_password1" {
-  value     = random_password.pveexporter_root_password1.result
+output "nodeexporter_root_password1" {
+  value     = random_password.nodeexporter_root_password1.result
   sensitive = true
 }
 
-resource "proxmox_virtual_environment_container" "pveexporter_1" {
-  description   = "Used only for PVE Exporter. Managed by Terraform"
+# location of containers templates
+resource "proxmox_virtual_environment_file" "debian_container_template" {
+  content_type = "vztmpl"
+  datastore_id = var.ct_datastore_template_location
+  node_name    = "w3p241"
+
+  source_file {
+    path = var.ct_source_file_path
+  }
+}
+
+resource "proxmox_virtual_environment_container" "nodeexporter_1" {
+  description   = "Used only for Node_Exporter. Managed by Terraform"
   node_name     = "w3p241"
   pool_id       = "infra"
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 241224
+  vm_id         = 241221
 
   cpu {
     architecture = "amd64"
@@ -40,7 +55,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
   }
 
   initialization {
-    hostname = "pveexporter-w3p241"
+    hostname = "nodeexporter-w3p241"
 
     dns {
       domain = var.dns_domain
@@ -49,13 +64,13 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
 
     ip_config {
       ipv4 {
-        address = "192.168.1.224/24"
+        address = "192.168.1.221/24"
         gateway = var.gateway
       }
     }
     user_account {
       keys     = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10"]
-      password = random_password.pveexporter_root_password1.result
+      password = random_password.nodeexporter_root_password1.result
     }
   }
   network_interface {
@@ -70,25 +85,26 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
 }
 
 ###
-resource "random_password" "pveexporter_root_password2" {
+# see https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password.html. It will download "hashicorp/random" provider
+resource "random_password" "nodeexporter_root_password2" {
   length           = 24
   override_special = "_%@"
   special          = true
 }
 
-output "pveexporter_root_password2" {
-  value     = random_password.pveexporter_root_password2.result
+output "nodeexporter_root_password2" {
+  value     = random_password.nodeexporter_root_password2.result
   sensitive = true
 }
 
-resource "proxmox_virtual_environment_container" "pveexporter_2" {
-  description   = "Used only for PVE Exporter. Managed by Terraform"
+resource "proxmox_virtual_environment_container" "nodeexporter_2" {
+  description   = "Used only for Node_Exporter. Managed by Terraform"
   node_name     = "w3p242"
   pool_id       = "infra"
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 242225
+  vm_id         = 242222
 
   cpu {
     architecture = "amd64"
@@ -111,7 +127,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_2" {
   }
 
   initialization {
-    hostname = "pveexporter-w3p242"
+    hostname = "nodeexporter-w3p242"
 
     dns {
       domain = var.dns_domain
@@ -120,13 +136,13 @@ resource "proxmox_virtual_environment_container" "pveexporter_2" {
 
     ip_config {
       ipv4 {
-        address = "192.168.1.225/24"
+        address = "192.168.1.222/24"
         gateway = var.gateway
       }
     }
     user_account {
       keys     = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10"]
-      password = random_password.pveexporter_root_password2.result
+      password = random_password.nodeexporter_root_password2.result
     }
   }
   network_interface {
@@ -141,25 +157,26 @@ resource "proxmox_virtual_environment_container" "pveexporter_2" {
 }
 
 ###
-resource "random_password" "pveexporter_root_password3" {
+# see https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password.html. It will download "hashicorp/random" provider
+resource "random_password" "nodeexporter_root_password3" {
   length           = 24
   override_special = "_%@"
   special          = true
 }
 
-output "pveexporter_root_password3" {
-  value     = random_password.pveexporter_root_password3.result
+output "nodeexporter_root_password3" {
+  value     = random_password.nodeexporter_root_password3.result
   sensitive = true
 }
 
-resource "proxmox_virtual_environment_container" "pveexporter_3" {
-  description   = "Used only for PVE Exporter. Managed by Terraform"
+resource "proxmox_virtual_environment_container" "nodeexporter_3" {
+  description   = "Used only for Node_Exporter. Managed by Terraform"
   node_name     = "w3p243"
   pool_id       = "infra"
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 243226
+  vm_id         = 243223
 
   cpu {
     architecture = "amd64"
@@ -182,7 +199,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_3" {
   }
 
   initialization {
-    hostname = "pveexporter-w3p243"
+    hostname = "nodeexporter-w3p243"
 
     dns {
       domain = var.dns_domain
@@ -191,13 +208,13 @@ resource "proxmox_virtual_environment_container" "pveexporter_3" {
 
     ip_config {
       ipv4 {
-        address = "192.168.1.226/24"
+        address = "192.168.1.223/24"
         gateway = var.gateway
       }
     }
     user_account {
       keys     = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10"]
-      password = random_password.pveexporter_root_password3.result
+      password = random_password.nodeexporter_root_password3.result
     }
   }
   network_interface {
