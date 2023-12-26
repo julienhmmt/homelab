@@ -14,6 +14,9 @@ variable "ct_disk_size" {
 variable "ct_nic_rate_limit" {
   type = number
 }
+variable "ct_memory" {
+  type = number
+}
 variable "ct_source_file_path" {
   type = string
 }
