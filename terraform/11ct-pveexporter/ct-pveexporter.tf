@@ -1,3 +1,5 @@
+// Container PVE Exporter
+
 # see https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password.html. It will download "hashicorp/random" provider
 resource "random_password" "pveexporter_root_password1" {
   length           = 24
@@ -44,7 +46,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
 
     dns {
       domain = var.dns_domain
-      server = var.dns_server
+      servers = var.dns_servers
     }
 
     ip_config {
@@ -115,7 +117,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_2" {
 
     dns {
       domain = var.dns_domain
-      server = var.dns_server
+      servers = var.dns_servers
     }
 
     ip_config {
@@ -186,7 +188,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_3" {
 
     dns {
       domain = var.dns_domain
-      server = var.dns_server
+      servers = var.dns_servers
     }
 
     ip_config {

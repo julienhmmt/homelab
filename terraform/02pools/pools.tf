@@ -1,4 +1,3 @@
-
 resource "proxmox_virtual_environment_pool" "infra" {
   comment = "Managed by Terraform"
   pool_id = "infra"
