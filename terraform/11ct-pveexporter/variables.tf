@@ -23,8 +23,8 @@ variable "ct_source_file_path" {
 variable "dns_domain" {
   type = string
 }
-variable "dns_server" {
-  type = string
+variable "dns_servers" {
+  type = list(string)
 }
 variable "gateway" {
   type = string

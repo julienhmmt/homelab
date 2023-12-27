@@ -56,8 +56,8 @@ resource "proxmox_virtual_environment_container" "nodeexporter_1" {
     hostname = "nodeexporter-w3p241"
 
     dns {
-      domain = var.dns_domain
-      server = var.dns_server
+      domain  = var.dns_domain
+      servers = var.dns_servers
     }
 
     ip_config {
@@ -128,8 +128,8 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
     hostname = "nodeexporter-w3p242"
 
     dns {
-      domain = var.dns_domain
-      server = var.dns_server
+      domain  = var.dns_domain
+      servers = var.dns_servers
     }
 
     ip_config {
@@ -200,8 +200,8 @@ resource "proxmox_virtual_environment_container" "nodeexporter_3" {
     hostname = "nodeexporter-w3p243"
 
     dns {
-      domain = var.dns_domain
-      server = var.dns_server
+      domain  = var.dns_domain
+      servers = var.dns_servers
     }
 
     ip_config {

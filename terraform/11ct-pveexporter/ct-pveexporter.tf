@@ -46,7 +46,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
 
     dns {
       domain = var.dns_domain
-      server = var.dns_server
+      servers = var.dns_servers
     }
 
     ip_config {
@@ -117,7 +117,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_2" {
 
     dns {
       domain = var.dns_domain
-      server = var.dns_server
+      servers = var.dns_servers
     }
 
     ip_config {
@@ -188,7 +188,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_3" {
 
     dns {
       domain = var.dns_domain
-      server = var.dns_server
+      servers = var.dns_servers
     }
 
     ip_config {
