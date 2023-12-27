@@ -1,6 +1,4 @@
-module "provider_config" {
-  source = "../provider_configuration"
-}
+// Container PVE Exporter
 
 # see https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password.html. It will download "hashicorp/random" provider
 resource "random_password" "pveexporter_root_password1" {
