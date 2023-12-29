@@ -1,6 +1,7 @@
 ---
 
 - name: Apply Node Exporter role to hosts
-  hosts: all
+  hosts: lxc-nodeexporter
   roles:
     - name: nodeexporter
+      tags: nodeexporter
