@@ -1,5 +1,5 @@
 data "proxmox_virtual_environment_role" "terraform_role" {
-  role_id = "Terraform"
+  role_id = "PVEAdmin"
 }
 
 output "terraform_role_privileges" {
