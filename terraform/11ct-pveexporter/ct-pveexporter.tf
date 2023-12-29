@@ -12,6 +12,16 @@ output "pveexporter_root_password1" {
   sensitive = true
 }
 
+resource "proxmox_virtual_environment_file" "debian_container_template" {
+  content_type = "vztmpl"
+  datastore_id = var.ct_datastore_template_location
+  node_name    = "w3p241"
+
+  source_file {
+    path = var.ct_source_file_path
+  }
+}
+
 resource "proxmox_virtual_environment_container" "pveexporter_1" {
   description   = "Used only for PVE Exporter. Managed by Terraform"
   node_name     = "w3p241"
@@ -19,7 +29,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 241224
+  vm_id         = 241004
 
   cpu {
     architecture = "amd64"
@@ -45,13 +55,13 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
     hostname = "pveexporter-w3p241"
 
     dns {
-      domain = var.dns_domain
+      domain  = var.dns_domain
       servers = var.dns_servers
     }
 
     ip_config {
       ipv4 {
-        address = "192.168.1.224/24"
+        address = "172.16.1.4/16"
         gateway = var.gateway
       }
     }
@@ -90,7 +100,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_2" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 242225
+  vm_id         = 242004
 
   cpu {
     architecture = "amd64"
@@ -116,13 +126,13 @@ resource "proxmox_virtual_environment_container" "pveexporter_2" {
     hostname = "pveexporter-w3p242"
 
     dns {
-      domain = var.dns_domain
+      domain  = var.dns_domain
       servers = var.dns_servers
     }
 
     ip_config {
       ipv4 {
-        address = "192.168.1.225/24"
+        address = "172.16.2.4/16"
         gateway = var.gateway
       }
     }
@@ -161,7 +171,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_3" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 243226
+  vm_id         = 243004
 
   cpu {
     architecture = "amd64"
@@ -187,13 +197,13 @@ resource "proxmox_virtual_environment_container" "pveexporter_3" {
     hostname = "pveexporter-w3p243"
 
     dns {
-      domain = var.dns_domain
+      domain  = var.dns_domain
       servers = var.dns_servers
     }
 
     ip_config {
       ipv4 {
-        address = "192.168.1.226/24"
+        address = "172.16.3.4/16"
         gateway = var.gateway
       }
     }
