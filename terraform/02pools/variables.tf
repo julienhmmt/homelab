@@ -1,9 +1,6 @@
 variable "pve_api_token" {
   type = string
 }
-variable "pve_api_user" {
-  type = string
-}
 variable "pve_host_address" {
   type = string
 }
