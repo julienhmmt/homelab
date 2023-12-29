@@ -30,7 +30,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_1" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 241221
+  vm_id         = 241003
 
   cpu {
     architecture = "amd64"
@@ -62,7 +62,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_1" {
 
     ip_config {
       ipv4 {
-        address = "192.168.1.221/24"
+        address = "172.16.1.3/16"
         gateway = var.gateway
       }
     }
@@ -102,7 +102,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 242222
+  vm_id         = 242003
 
   cpu {
     architecture = "amd64"
@@ -134,7 +134,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
 
     ip_config {
       ipv4 {
-        address = "192.168.1.222/24"
+        address = "172.16.2.3/24"
         gateway = var.gateway
       }
     }
@@ -174,7 +174,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_3" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 243223
+  vm_id         = 243003
 
   cpu {
     architecture = "amd64"
@@ -206,7 +206,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_3" {
 
     ip_config {
       ipv4 {
-        address = "192.168.1.223/24"
+        address = "172.16.3.3/16"
         gateway = var.gateway
       }
     }
