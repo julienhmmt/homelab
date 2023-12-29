@@ -134,7 +134,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
 
     ip_config {
       ipv4 {
-        address = "172.16.2.3/24"
+        address = "172.16.2.3/16"
         gateway = var.gateway
       }
     }
