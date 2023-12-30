@@ -6,3 +6,11 @@
     - name: nodeexporter
       tags: nodeexporter
 
+- name: Apply PVE Exporter role to CT
+  hosts: lxc-pveexporter
+  roles:
+    - name: pveexporter
+      tags: pveexporter
+      vars:
+        pve_exporter_token_name: "pveexporter"
+        pve_exporter_token_value: "fce38aea-236a-4d0b-9f29-561a90629537"
