@@ -15,5 +15,8 @@ ct-pe-w3p241 ansible_host=172.16.1.4
 ct-pe-w3p242 ansible_host=172.16.2.4
 ct-pe-w3p243 ansible_host=172.16.3.4
 
-[pbs]
-w3p244 ansible_host=172.16.1.244
+[pve-pbs]
+w3p244 ansible_host=172.16.1.4
+
+[lxc-nodeexporter]
+ct-ne-w3p241 ansible_host=172.16.1.3

@@ -1,7 +1,8 @@
 ---
 
-- name: Apply Node Exporter role to hosts
+- name: Apply Node Exporter role to PVE hosts into CT
   hosts: lxc-nodeexporter
   roles:
     - name: nodeexporter
       tags: nodeexporter
+
