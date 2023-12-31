@@ -1,9 +1,21 @@
+variable "boot_command" {
+  type = string
+}
+
+variable "boot_wait" {
+  type = integer
+}
+
 variable "bridge_name" {
   type = string
 }
 
 variable "iso_checksum" {
   type = string
+}
+
+variable "iso_download_pve" {
+  type = boolean
 }
 
 variable "iso_storage_pool" {
@@ -15,29 +27,43 @@ variable "iso_url" {
   type = string
 }
 
-variable "proxmox_api_url" {
-  type    = string
-  default = ""
-}
-
 variable "proxmox_api_token_id" {
-  type    = string
-  default = ""
+  type = string
 }
 
 variable "proxmox_api_token_secret" {
   type      = string
-  default   = ""
   sensitive = true
+}
+
+variable "proxmox_api_url" {
+  type = string
 }
 
 variable "proxmox_node" {
   type = string
 }
 
-variable "storage_pool" {
+variable "qemu_agent_activation" {
+  type    = boolean
+  default = true
+}
+
+variable "scsi_controller_type" {
+  type = string
+}
+
+variable "ssh_timeout" {
+  type = string
+}
+
+variable "tags" {
+  type = string
+}
+
+variable "template_cpu_type" {
   type    = string
-  default = "datastore"
+  default = "kvm64"
 }
 
 variable "template_disk_format" {
@@ -56,17 +82,17 @@ variable "template_name" {
 }
 
 variable "template_nb_core" {
-  type    = string
-  default = "1"
+  type    = integer
+  default = 1
 }
 
 variable "template_nb_cpu" {
-  type    = number
+  type    = integer
   default = 1
 }
 
 variable "template_nb_ram" {
-  type    = number
+  type    = integer
   default = 1024
 }
 
@@ -75,18 +101,18 @@ variable "template_ssh_username" {
   default = "user"
 }
 
+variable "template_storage_pool" {
+  type    = string
+  default = "local"
+}
+
 variable "template_sudo_password" {
   type      = string
   default   = "password"
   sensitive = true
 }
 
-variable "template_type_cpu" {
-  type    = string
-  default = "kvm64"
-}
-
 variable "template_vm_id" {
-  type    = number
+  type    = integer
   default = 99999
 }
