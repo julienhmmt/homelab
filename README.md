@@ -30,13 +30,15 @@ source .tox/py3-ansible/bin/activate
 
 ### Packer
 
-Used to generate an Ubuntu Jammy template with cloud-init.
+Used to generate an Ubuntu Jammy template with cloud-init. Inspiration from "https://github.com/marcinbojko/proxmox-kvm-packer/".
 
 In the folder "_packer_", do:
 
 ```bash
-packer init
+packer init ubuntults.pkr.hcl
 packer fmt -diff ubuntults.pkr.hcl
+packer fmt -diff variables.auto.pkrvars.hcl
+packer validate -var-file variables.auto.pkrvars.hcl ubuntults.pkr.hcl
 packer build ubuntults.pkr.hcl
 ```
 
