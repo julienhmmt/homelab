@@ -19,6 +19,11 @@ variable "boot_wait" {
   type = string
 }
 
+variable "bridge_firewall" {
+  type    = bool
+  default = false
+}
+
 variable "bridge_name" {
   type = string
 }
@@ -166,8 +171,6 @@ source "proxmox-iso" "ubuntujammy" {
   cores                    = "${var.template_nb_core}"
   cpu_type                 = "${var.template_cpu_type}"
   http_directory           = "http"
-  http_port_min            = "8100"
-  http_port_max            = "8100"
   insecure_skip_tls_verify = true
   iso_url                  = "${var.iso_url}"
   iso_checksum             = "${var.iso_checksum}"
@@ -202,7 +205,7 @@ source "proxmox-iso" "ubuntujammy" {
 
   network_adapters {
     bridge   = "${var.bridge_name}"
-    firewall = true
+    firewall = "${var.bridge_firewall}"
     model    = "${var.network_model}"
   }
 }
