@@ -1,9 +1,13 @@
+variable "bios_type" {
+  type = string
+}
+
 variable "boot_command" {
   type = string
 }
 
 variable "boot_wait" {
-  type = integer
+  type = string
 }
 
 variable "bridge_name" {
@@ -25,6 +29,16 @@ variable "iso_storage_pool" {
 
 variable "iso_url" {
   type = string
+}
+
+variable "machine_default_type" {
+  type    = string
+  default = "pc"
+}
+
+variable "os_type" {
+  type    = string
+  default = "l26"
 }
 
 variable "proxmox_api_token_id" {
@@ -66,6 +80,16 @@ variable "template_cpu_type" {
   default = "kvm64"
 }
 
+variable "template_description" {
+  type    = string
+  default = "Ubuntu Jammy (22.04) Packer Template"
+}
+
+variable "template_disk_discard" {
+  type    = boolean
+  default = true
+}
+
 variable "template_disk_format" {
   type    = string
   default = "qcow2"
@@ -74,6 +98,11 @@ variable "template_disk_format" {
 variable "template_disk_size" {
   type    = string
   default = "16G"
+}
+
+variable "template_disk_type" {
+  type    = string
+  default = "scsi"
 }
 
 variable "template_name" {
