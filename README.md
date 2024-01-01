@@ -36,10 +36,10 @@ In the folder "_packer_", do:
 
 ```bash
 packer init ubuntults.pkr.hcl
-packer fmt -diff ubuntults.pkr.hcl
-packer fmt -diff variables.auto.pkrvars.hcl
-packer validate -var-file variables.auto.pkrvars.hcl ubuntults.pkr.hcl
-packer build ubuntults.pkr.hcl
+packer fmt -diff -recursive ubuntults.pkr.hcl
+packer fmt -diff -recursive custom.pkrvars.hcl
+packer validate -var-file=custom.pkrvars.hcl ubuntults.pkr.hcl
+packer build -var-file=custom.pkrvars.hcl ubuntults.pkr.hcl
 ```
 
 ### Terraform
