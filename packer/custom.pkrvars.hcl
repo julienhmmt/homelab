@@ -1,5 +1,5 @@
 bios_type                = "seabios"
-boot_command             = "<wait3>c<wait3>linux /casper/vmlinuz quiet autoinstall net.ifnames=0 biosdevname=0 ip=dhcp ipv6.disable=1 ds='nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ubuntu/22.04/proxmox/' <enter><wait5>initrd /casper/initrd<wait5><enter>boot<wait5s><enter>"
+boot_command             = "<wait3>c<wait3>linux /casper/vmlinuz quiet autoinstall ip=dhcp ds='nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/' <enter><wait5>initrd /casper/initrd<wait5><enter>boot<wait5s><enter>"
 boot_wait                = "10s"
 bridge_name              = "vmbr0"
 iso_checksum             = "file:https://releases.ubuntu.com/22.04/SHA256SUMS"

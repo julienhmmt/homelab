@@ -170,7 +170,7 @@ source "proxmox-iso" "ubuntujammy" {
   boot_wait                = "${var.boot_wait}"
   cores                    = "${var.template_nb_core}"
   cpu_type                 = "${var.template_cpu_type}"
-  http_directory           = "http"
+  http_directory           = "autoinstall"
   insecure_skip_tls_verify = true
   iso_url                  = "${var.iso_url}"
   iso_checksum             = "${var.iso_checksum}"
