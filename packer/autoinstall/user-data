@@ -1,59 +1,35 @@
 #cloud-config
 autoinstall:
-  # https://cloudinit.readthedocs.io/en/latest/reference/examples.html
-  # https://ubuntu.com/server/docs/install/autoinstall-reference
   version: 1
-
+  identity:
+    hostname: ubuntu-pckr
+    username: ubuntu
+    password: ubuntu
+  ssh:
+    install-server: yes
+    authorized-keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
   locale: en_US
-
   keyboard:
     layout: fr
-    variant: fr
-
-  identity:
-    hostname: "pckr-ubuntu"
-    password: "ubuntu"
-    username: "ubuntu"
-
-  ssh:
-    install-server: true
-    authorized-keys: ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10"]
-    allow-pw: false
-    disable_root: true
-    ssh_quiet_keygen: true
-    allow_public_ssh_keys: true
-
-  packages:
-    - qemu-guest-agent
-    - sudo
-
+  network:
+    network:
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: true
   storage:
-    version: 1
-    config:
-      - {type: disk, id: root_disk, serial: 0QEMU_QEMU_HARDDISK_drive-scsi0, ptable: gpt, wipe: superblock, grub_device: true}
-
-      - {type: partition, id: bios_grub_part, device: root_disk, number: 1, size: 1MB, flag: bios_grub}
-      - {type: partition, id: boot_part     , device: root_disk, number: 2, size: 512MB , wipe: superblock}
-      - {type: partition, id: root_part     , device: root_disk, number: 3, size: -1 , wipe: superblock}
-    
-      - {type: lvm_volgroup , id: ubuntu_vg , name: ubuntu_vg, devices: [root_part]}
-
-      - {type: lvm_partition, id: var_lvm , name: var_lvm , volgroup: ubuntu_vg, size: 8GB}
-      - {type: lvm_partition, id: home_lvm, name: home_lvm, volgroup: ubuntu_vg, size: 4GB}
-      - {type: lvm_partition, id: root_lvm, name: root_lvm, volgroup: ubuntu_vg}
-      
-      - {type: format, id: boot_fs    , volume: boot_part, fstype: ext4}
-      - {type: format, id: var_fs     , volume: var_lvm  , fstype: ext4}
-      - {type: format, id: home_fs    , volume: home_lvm , fstype: ext4}
-      - {type: format, id: root_fs    , volume: root_lvm , fstype: ext4}
-      
-      - {type: mount , id: boot_mount , device: boot_fs  , path: /boot}
-      - {type: mount , id: var_mount  , device: var_fs   , path: /var}
-      - {type: mount , id: home_mount , device: home_fs  , path: /home}
-      - {type: mount , id: root_mount , device: root_fs  , path: /}
-
+    layout:
+      name: direct
+    grub:
+      install_devices: ['/dev/sda']
   user-data:
-    package_upgrade: false
+    packages:
+      - htop
+      - openssh-server
+      - qemu-guest-agent
+      - sudo
+      - vim
     timezone: Europe/Paris
     users:
       - name: "jho"
