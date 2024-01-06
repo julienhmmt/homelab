@@ -174,7 +174,7 @@ source "proxmox-iso" "ubuntujammy" {
   insecure_skip_tls_verify = true
   iso_url                  = "${var.iso_url}"
   iso_checksum             = "${var.iso_checksum}"
-  iso_download_pve         = true
+  iso_download_pve         = "${var.iso_download_pve}"
   iso_storage_pool         = "${var.iso_storage_pool}"
   machine                  = "${var.machine_default_type}"
   memory                   = "${var.template_nb_ram}"
@@ -212,7 +212,4 @@ source "proxmox-iso" "ubuntujammy" {
 
 build {
   sources = ["source.proxmox-iso.ubuntujammy"]
-  provisioner "shell" {
-    inline = ["while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done", "sudo rm -f /etc/cloud/cloud.cfg.d/99-installer.cfg", "sudo cloud-init clean", "sudo passwd -d ubuntu"]
-  }
 }
