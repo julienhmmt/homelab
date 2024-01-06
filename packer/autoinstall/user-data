@@ -2,13 +2,14 @@
 autoinstall:
   version: 1
   identity:
-    hostname: ubuntu-pckr
-    username: ubuntu
-    password: ubuntu
+    hostname: pckr-ubuntu
+    password: $6$T.ZLkcX/zg/JcXuc$n6Qk7fcxKNo1HJUEisxxy0M2I2Fu30ndSFfSl8GGdNh4aw5gWcP0jXNcuPiXMwmE7LAirjgravo2lOSpjk37B/ # pouetpouet
+    username: jho
   ssh:
-    install-server: yes
-    authorized-keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    allow_public_ssh_keys: true
+    allow-pw: true
+    install-server: true
+    ssh_quiet_keygen: true
   locale: en_US
   keyboard:
     layout: fr
@@ -16,17 +17,23 @@ autoinstall:
     network:
       version: 2
       ethernets:
-        eth0:
-          dhcp4: true
+        enp6s18:
+          addresses:
+            - 172.16.10.10/16
+          gateway4: 172.16.0.1
+          nameservers:
+            search:
+              - "local.hommet.net"
+            addresses:
+              - 172.16.0.1
   storage:
     layout:
       name: direct
-    grub:
-      install_devices: ['/dev/sda']
+    swap:
+      size: 0
   user-data:
     packages:
       - htop
-      - openssh-server
       - qemu-guest-agent
       - sudo
       - vim
@@ -35,6 +42,7 @@ autoinstall:
       - name: "jho"
         groups: [adm, sudo]
         lock-passwd: false
-        sudo: ALL=(ALL) NOPASSWD:ALL
         shell: /bin/bash
-        passwd: "pouetpouet"
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+        sudo: ALL=(ALL) NOPASSWD:ALL
