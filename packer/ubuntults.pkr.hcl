@@ -28,21 +28,17 @@ variable "bridge_name" {
   type = string
 }
 
-variable "iso_checksum" {
-  type = string
+variable "cloud_init" {
+  type = bool
 }
 
-variable "iso_download_pve" {
-  type = bool
+variable "iso_file" {
+  type = string
 }
 
 variable "iso_storage_pool" {
   type    = string
   default = "local"
-}
-
-variable "iso_url" {
-  type = string
 }
 
 variable "machine_default_type" {
@@ -86,6 +82,10 @@ variable "scsi_controller_type" {
   type = string
 }
 
+variable "ssh_private_key_file" {
+  type = string
+}
+
 variable "ssh_timeout" {
   type = string
 }
@@ -94,70 +94,74 @@ variable "tags" {
   type = string
 }
 
-variable "template_cpu_type" {
+variable "io_thread" {
+  type = bool
+}
+
+variable "cpu_type" {
   type    = string
   default = "kvm64"
 }
 
-variable "template_description" {
-  type    = string
-  default = "Ubuntu Jammy (22.04) Packer Template"
+variable "vm_info" {
+  type = string
 }
 
-variable "template_disk_discard" {
+variable "disk_discard" {
   type    = bool
   default = true
 }
 
-variable "template_disk_format" {
+variable "disk_format" {
   type    = string
   default = "qcow2"
 }
 
-variable "template_disk_size" {
+variable "disk_size" {
   type    = string
   default = "16G"
 }
 
-variable "template_disk_type" {
+variable "disk_type" {
   type    = string
   default = "scsi"
 }
 
-variable "template_nb_core" {
+variable "nb_core" {
   type    = number
   default = 1
 }
 
-variable "template_nb_cpu" {
+variable "nb_cpu" {
   type    = number
   default = 1
 }
 
-variable "template_nb_ram" {
+variable "nb_ram" {
   type    = number
   default = 1024
 }
 
-variable "template_ssh_username" {
+variable "ssh_username" {
+  type = string
+}
+
+variable "ssh_handshake_attempts" {
+  type = number
+}
+
+variable "storage_pool" {
   type    = string
-  default = "user"
+  default = "local-lvm"
 }
 
-variable "template_storage_pool" {
-  type    = string
-  default = "local"
-}
-
-variable "template_sudo_password" {
-  type      = string
-  default   = "password"
-  sensitive = true
-}
-
-variable "template_vm_id" {
+variable "vm_id" {
   type    = number
   default = 99999
+}
+
+variable "vm_name" {
+  type = string
 }
 
 locals {
@@ -168,39 +172,42 @@ source "proxmox-iso" "ubuntujammy" {
   bios                     = "${var.bios_type}"
   boot_command             = ["${var.boot_command}"]
   boot_wait                = "${var.boot_wait}"
-  cores                    = "${var.template_nb_core}"
-  cpu_type                 = "${var.template_cpu_type}"
+  cloud_init               = "${var.cloud_init}"
+  cloud_init_storage_pool  = "${var.storage_pool}"
+  communicator             = "ssh"
+  cores                    = "${var.nb_core}"
+  cpu_type                 = "${var.cpu_type}"
   http_directory           = "autoinstall"
   insecure_skip_tls_verify = true
-  iso_url                  = "${var.iso_url}"
-  iso_checksum             = "${var.iso_checksum}"
-  iso_download_pve         = "${var.iso_download_pve}"
-  iso_storage_pool         = "${var.iso_storage_pool}"
+  iso_file                 = "${var.iso_file}"
   machine                  = "${var.machine_default_type}"
-  memory                   = "${var.template_nb_ram}"
+  memory                   = "${var.nb_ram}"
   node                     = "${var.proxmox_node}"
   os                       = "${var.os_type}"
   proxmox_url              = "${var.proxmox_api_url}"
   qemu_agent               = "${var.qemu_agent_activation}"
   scsi_controller          = "${var.scsi_controller_type}"
-  ssh_username             = "${var.template_ssh_username}"
-  ssh_password             = "${var.template_sudo_password}"
+  sockets                  = "${var.nb_cpu}"
+  ssh_handshake_attempts   = "${var.ssh_handshake_attempts}"
+  ssh_private_key_file     = "${var.ssh_private_key_file}"
+  ssh_pty                  = true
   ssh_timeout              = "${var.ssh_timeout}"
-  sockets                  = "${var.template_nb_cpu}"
+  ssh_username             = "${var.ssh_username}"
   tags                     = "${var.tags}"
-  template_description     = "${var.template_description}.${local.packer_timestamp}"
+  template_description     = "${var.vm_info} - ${local.packer_timestamp}"
   token                    = "${var.proxmox_api_token_secret}"
   unmount_iso              = true
   username                 = "${var.proxmox_api_token_id}"
-  vm_id                    = "${var.template_vm_id}"
-  vm_name                  = "pckr-ubuntu"
+  vm_id                    = "${var.vm_id}"
+  vm_name                  = "${var.vm_name}"
 
   disks {
-    discard      = "${var.template_disk_discard}"
-    disk_size    = "${var.template_disk_size}"
-    format       = "${var.template_disk_format}"
-    storage_pool = "${var.template_storage_pool}"
-    type         = "${var.template_disk_type}"
+    discard      = "${var.disk_discard}"
+    disk_size    = "${var.disk_size}"
+    format       = "${var.disk_format}"
+    io_thread    = "${var.io_thread}"
+    storage_pool = "${var.storage_pool}"
+    type         = "${var.disk_type}"
   }
 
   network_adapters {
