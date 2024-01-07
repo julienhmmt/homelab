@@ -1,15 +1,21 @@
 #cloud-config
 autoinstall:
   version: 1
+  early-commands:
+    - systemctl stop ssh
   identity:
-    hostname: pckr-ubuntu
-    password: $6$T.ZLkcX/zg/JcXuc$n6Qk7fcxKNo1HJUEisxxy0M2I2Fu30ndSFfSl8GGdNh4aw5gWcP0jXNcuPiXMwmE7LAirjgravo2lOSpjk37B/ # pouetpouet
-    username: jho
+    hostname: pcker-ubuntu
+    username: packer
+    password: $6$ivdcOXd6UFLcSX9G$5FwCQJcvF5bluELIKOlc3zWsk85eFh6nw5DM6lOkdC5KA9wnyrOkQKrHwkl3EU3QtCd.lzTagflOl1N1eQOiw0 #pouetpouet
+  refresh-installer:
+    update: false
+  packages:
+    - qemu-guest-agent
+    - sudo
   ssh:
-    allow_public_ssh_keys: true
-    allow-pw: true
+    authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
     install-server: true
-    ssh_quiet_keygen: true
   locale: en_US
   keyboard:
     layout: fr
@@ -18,31 +24,4 @@ autoinstall:
       version: 2
       ethernets:
         enp6s18:
-          addresses:
-            - 172.16.10.10/16
-          gateway4: 172.16.0.1
-          nameservers:
-            search:
-              - "local.hommet.net"
-            addresses:
-              - 172.16.0.1
-  storage:
-    layout:
-      name: direct
-    swap:
-      size: 0
-  user-data:
-    packages:
-      - htop
-      - qemu-guest-agent
-      - sudo
-      - vim
-    timezone: Europe/Paris
-    users:
-      - name: "jho"
-        groups: [adm, sudo]
-        lock-passwd: false
-        shell: /bin/bash
-        ssh_authorized_keys:
-          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
-        sudo: ALL=(ALL) NOPASSWD:ALL
+          dhcp4: true

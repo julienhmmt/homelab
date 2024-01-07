@@ -82,7 +82,7 @@ variable "scsi_controller_type" {
   type = string
 }
 
-variable "ssh_private_key_file" {
+variable "ssh_password" {
   type = string
 }
 
@@ -189,7 +189,7 @@ source "proxmox-iso" "ubuntujammy" {
   scsi_controller          = "${var.scsi_controller_type}"
   sockets                  = "${var.nb_cpu}"
   ssh_handshake_attempts   = "${var.ssh_handshake_attempts}"
-  ssh_private_key_file     = "${var.ssh_private_key_file}"
+  ssh_password             = "${var.ssh_password}"
   ssh_pty                  = true
   ssh_timeout              = "${var.ssh_timeout}"
   ssh_username             = "${var.ssh_username}"
