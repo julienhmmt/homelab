@@ -1,0 +1,27 @@
+#cloud-config
+autoinstall:
+  version: 1
+  early-commands:
+    - systemctl stop ssh
+  identity:
+    hostname: pcker-ubuntu
+    username: packer
+    password: $6$ivdcOXd6UFLcSX9G$5FwCQJcvF5bluELIKOlc3zWsk85eFh6nw5DM6lOkdC5KA9wnyrOkQKrHwkl3EU3QtCd.lzTagflOl1N1eQOiw0 #pouetpouet
+  refresh-installer:
+    update: false
+  packages:
+    - qemu-guest-agent
+    - sudo
+  ssh:
+    authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    install-server: true
+  locale: en_US
+  keyboard:
+    layout: fr
+  network:
+    network:
+      version: 2
+      ethernets:
+        enp6s18:
+          dhcp4: true

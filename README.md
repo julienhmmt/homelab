@@ -28,6 +28,20 @@ tox
 source .tox/py3-ansible/bin/activate
 ```
 
+### Packer
+
+Used to generate an Ubuntu Jammy template with cloud-init. Inspiration from "https://github.com/marcinbojko/proxmox-kvm-packer/".
+
+In the folder "_packer_", do:
+
+```bash
+packer init ubuntults.pkr.hcl
+packer fmt -diff -recursive ubuntults.pkr.hcl
+packer fmt -diff -recursive custom.pkrvars.hcl
+packer validate -var-file=custom.pkrvars.hcl ubuntults.pkr.hcl
+packer build -var-file=custom.pkrvars.hcl ubuntults.pkr.hcl
+```
+
 ### Terraform
 
 Used to provision the infra.
