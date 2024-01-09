@@ -50,19 +50,19 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
     size         = var.vm_disk_size
   }
 
-#  initialization {
-#    datastore_id = var.datastore_id
-#    dns {
-#      domain  = var.cloudinit_dns_domain
-#      servers = var.cloudinit_dns_servers
-#    }
-#    ip_config {
-#      ipv4 {
-#        address = "172.16.241.10/16"
-#        gateway = "172.16.0.1"
-#      }
-#    }
-#  }
+  initialization {
+    datastore_id = var.datastore_id
+    dns {
+      domain  = var.cloudinit_dns_domain
+      servers = var.cloudinit_dns_servers
+    }
+    ip_config {
+      ipv4 {
+        address = "172.16.241.10/16"
+        gateway = "172.16.0.1"
+      }
+    }
+  }
 
   memory {
     dedicated = 6144
@@ -140,19 +140,19 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
     size         = var.vm_disk_size
   }
 
-#  initialization {
-#    datastore_id = var.datastore_id
-#    dns {
-#      domain  = var.cloudinit_dns_domain
-#      servers = var.cloudinit_dns_servers
-#    }
-#    ip_config {
-#      ipv4 {
-#        address = "172.16.242.10/16"
-#        gateway = "172.16.0.1"
-#      }
-#    }
-#  }
+  initialization {
+    datastore_id = var.datastore_id
+    dns {
+      domain  = var.cloudinit_dns_domain
+      servers = var.cloudinit_dns_servers
+    }
+    ip_config {
+      ipv4 {
+        address = "172.16.242.10/16"
+        gateway = "172.16.0.1"
+      }
+    }
+  }
 
   memory {
     dedicated = 6144
@@ -231,19 +231,19 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
     size         = var.vm_disk_size
   }
 
-#  initialization {
-#    datastore_id = var.datastore_id
-#    dns {
-#      domain  = var.cloudinit_dns_domain
-#      servers = var.cloudinit_dns_servers
-#    }
-#    ip_config {
-#      ipv4 {
-#        address = "172.16.243.10/16"
-#        gateway = "172.16.0.1"
-#      }
-#    }
-#  }
+  initialization {
+    datastore_id = var.datastore_id
+    dns {
+      domain  = var.cloudinit_dns_domain
+      servers = var.cloudinit_dns_servers
+    }
+    ip_config {
+      ipv4 {
+        address = "172.16.243.10/16"
+        gateway = "172.16.0.1"
+      }
+    }
+  }
 
   memory {
     dedicated = 6144
