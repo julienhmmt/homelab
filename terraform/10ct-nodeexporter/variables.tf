@@ -11,10 +11,10 @@ variable "ct_disk_size" {
   type    = string
   default = "20"
 }
-variable "ct_nic_rate_limit" {
+variable "ct_memory" {
   type = number
 }
-variable "ct_memory" {
+variable "ct_nic_rate_limit" {
   type = number
 }
 variable "ct_source_file_path" {

@@ -8,12 +8,12 @@ resource "proxmox_virtual_environment_pool" "modeles" {
   pool_id = "modeles"
 }
 
-resource "proxmox_virtual_environment_pool" "prod" {
-  comment = "Managed by Terraform"
-  pool_id = "production"
-}
-
 resource "proxmox_virtual_environment_pool" "preprod" {
   comment = "Managed by Terraform"
   pool_id = "pre-production"
+}
+
+resource "proxmox_virtual_environment_pool" "prod" {
+  comment = "Managed by Terraform"
+  pool_id = "production"
 }
