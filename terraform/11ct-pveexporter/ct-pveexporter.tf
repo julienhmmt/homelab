@@ -22,6 +22,19 @@ resource "proxmox_virtual_environment_file" "debian_container_template" {
   }
 }
 
+resource "proxmox_virtual_environment_hagroup" "ha_infra" {
+  group   = "ha_infra"
+  comment = "Managed by Terraform. Group for HA, specially infra CT & VM"
+  nodes = {
+    node1 = null
+    node2 = 2
+    node3 = 1
+  }
+
+  restricted  = true
+  no_failback = false
+}
+
 resource "proxmox_virtual_environment_container" "pveexporter_1" {
   description   = "Used only for PVE Exporter. Managed by Terraform"
   node_name     = "w3p241"
@@ -81,16 +94,9 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
   }
 }
 
-data "proxmox_virtual_environment_hagroup" "ha_group_infra" {
-  group = "ha_infra"
-}
-
 resource "proxmox_virtual_environment_haresource" "pveexporter_ct" {
   comment = "Managed by Terraform"
-  depends_on = [
-    data.proxmox_virtual_environment_hagroup.ha_group_infra
-  ]
-  group        = data.proxmox_virtual_environment_hagroup.ha_group_infra.id
+  group        = "ha_infra"
   max_relocate = 1
   max_restart  = 1
   resource_id  = "ct:${split(":", proxmox_virtual_environment_container.pveexporter_1.vm_id)[0]}"
