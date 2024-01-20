@@ -95,7 +95,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
 }
 
 resource "proxmox_virtual_environment_haresource" "pveexporter_ct" {
-  comment = "Managed by Terraform"
+  comment      = "Managed by Terraform"
   group        = "ha_infra"
   max_relocate = 1
   max_restart  = 1

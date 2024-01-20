@@ -32,7 +32,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
   }
 
   cdrom {
-    enabled = false
+    enabled   = false
     interface = "ide3"
   }
 
@@ -122,7 +122,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
   }
 
   cdrom {
-    enabled = false
+    enabled   = false
     interface = "ide3"
   }
 
@@ -213,7 +213,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
   }
 
   cdrom {
-    enabled = false
+    enabled   = false
     interface = "ide3"
   }
 
@@ -285,34 +285,34 @@ resource "proxmox_virtual_environment_haresource" "ha_vm_rke2_master" {
   depends_on = [
     proxmox_virtual_environment_hagroup.ha_vm_rke2
   ]
-  comment     = "Managed by Terraform."
-  group       = proxmox_virtual_environment_hagroup.ha_vm_rke2.group
+  comment      = "Managed by Terraform."
+  group        = proxmox_virtual_environment_hagroup.ha_vm_rke2.group
   max_relocate = 1
-  max_restart = 2
-  resource_id = "vm:241010"
-  state       = "started"
+  max_restart  = 2
+  resource_id  = "vm:241010"
+  state        = "started"
 }
 
 resource "proxmox_virtual_environment_haresource" "ha_vm_rke2_worker1" {
   depends_on = [
     proxmox_virtual_environment_hagroup.ha_vm_rke2
   ]
-  comment     = "Managed by Terraform."
-  group       = proxmox_virtual_environment_hagroup.ha_vm_rke2.group
+  comment      = "Managed by Terraform."
+  group        = proxmox_virtual_environment_hagroup.ha_vm_rke2.group
   max_relocate = 1
-  max_restart = 2
-  resource_id = "vm:242010"
-  state       = "started"
+  max_restart  = 2
+  resource_id  = "vm:242010"
+  state        = "started"
 }
 
 resource "proxmox_virtual_environment_haresource" "ha_vm_rke2_worker" {
   depends_on = [
     proxmox_virtual_environment_hagroup.ha_vm_rke2
   ]
-  comment     = "Managed by Terraform."
-  group       = proxmox_virtual_environment_hagroup.ha_vm_rke2.group
+  comment      = "Managed by Terraform."
+  group        = proxmox_virtual_environment_hagroup.ha_vm_rke2.group
   max_relocate = 1
-  max_restart = 2
-  resource_id = "vm:243010"
-  state       = "started"
+  max_restart  = 2
+  resource_id  = "vm:243010"
+  state        = "started"
 }
