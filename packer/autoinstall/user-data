@@ -10,59 +10,35 @@ autoinstall:
     - arches: [amd64]
       uri: http://archive.ubuntu.com/ubuntu
   storage:
-    layout:
-      name: lvm
-      match:
-        size: largest
-    # config:
-    #   # disk
-    #   - id: disk-0
-    #     type: disk
-    #     ptable: gpt
-    #     wipe: superblock
-    #   # partitions physiques
-    #   - id: disk0-boot
-    #     type: partition
-    #     number: 1
-    #     size: 512M
-    #     device: disk0
-    #     flag: boot
-    #     name: boot
-    #   - id: disk0-lvm
-    #     type: partition
-    #     number: 2
-    #     device: disk0
-    #     flag: lvm
-    #   # LVM
-    #   - id: sys-lv
-    #     type: lv
-    #     name: sys
-    #     volgroup: monverre
-    #     size: 12G
-    #   - id: home-lv
-    #     type: lv
-    #     name: home
-    #     volgroup: monverre
-    #     size: 8G
-    #   - id: tmp-lv
-    #     type: lv
-    #     name: tmp
-    #     volgroup: monverre
-    #     size: 2G
-    # volgroups:
-    #   - name: monverre
-    #     devices:
-    #       - /dev/disk/by-id/disk-0
-    # filesystems:
-    #   - name: /dev/monverre/sys
-    #     mount: /
-    #     fstype: xfs
-    #   - name: /dev/monverre/home
-    #     mount: /home
-    #     fstype: xfs
-    #   - name: /dev/monverre/tmp
-    #     mount: /tmp
-    #     fstype: xfs
+    config:
+    # Partition table
+    - { ptable: gpt, path: /dev/sda, wipe: superblock, preserve: false, name: '', grub_device: false, type: disk, id: disk-sda }
+
+    # Linux boot partition (512MB)
+    - { device: disk-sda, size: 536870912, wipe: superblock, flag: '', number: 2, preserve: false, grub_device: true, type: partition, id: partition-0 }
+    - { fstype: ext4, volume: partition-0, preserve: false, type: format, id: format-0 }
+
+    # Partition for LVM, VG
+    - { device: disk-sda, size: -1, wipe: superblock, flag: '', number: 3, preserve: false, grub_device: false, type: partition, id: partition-1 }
+    - { name: monverre, devices: [ partition-1 ], preserve: false, type: lvm_volgroup, id: lvm_volgroup-0 }
+
+    # LV for root (12GB)
+    - { name: sys, volgroup: lvm_volgroup-0, size: 12884901888, wipe: superblock, preserve: false, type: lvm_partition, id: lvm_partition-0 }
+    - { fstype: ext4, volume: lvm_partition-0, preserve: false, type: format, id: format-1 }
+
+    # LV for home (4GB)
+    - { name: home, volgroup: lvm_volgroup-0, size: 4294967296, wipe: superblock, preserve: false, type: lvm_partition, id: lvm_partition-1 }
+    - { fstype: ext4, volume: lvm_partition-1, preserve: false, type: format, id: format-2 }
+
+    # LV for tmp (2GB)
+    - { name: tmp, volgroup: lvm_volgroup-0, size: 2147483648, wipe: superblock, preserve: false, type: lvm_partition, id: lvm_partition-2 }
+    - { fstype: ext4, volume: lvm_partition-2, preserve: false, type: format, id: format-3 }
+
+    # Mount points
+    - { path: /, device: format-1, type: mount, id: mount-1, options: "errors=remount-ro" }
+    - { path: /boot, device: format-0, type: mount, id: mount-0, options: "nodev,nosuid,noexec,errors=remount-ro" }
+    - { path: /home, device: format-2, type: mount, id: mount-2, options: "nodev,nosuid,rw,errors=remount-ro" }
+    - { path: /tmp, device: format-3, type: mount, id: mount-3, options: "nodev,nosuid,noexec,rw,errors=remount-ro" }
     swap:
       size: 0
   ssh:
@@ -89,6 +65,7 @@ autoinstall:
         shell: /bin/bash
         ssh_authorized_keys:
           - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ2Ix43cC1d1HOxaBajyj+bG0DGKKfvYRbEKQtEixZjqdAlq+z/zq6rIQYYJTthRTk7WbMix2aLyGPMIW0DmZRM= jho@Mac-mini-de-Julien.local
+          - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOQIx6EMuJra28ZLI475WPoj8uIYKgty8i+ua8P/PHJYWnwwrJng2ZlmZ/xPlNmqNeoPrnxJNTRoACzYDyWhrvk= jho@MBAJHO.local
   packages:
     - qemu-guest-agent
     - sudo
