@@ -7,6 +7,10 @@ packer {
   }
 }
 
+variable "boot" {
+  type = string
+}
+
 variable "bios_type" {
   type = string
 }
@@ -82,7 +86,7 @@ variable "scsi_controller_type" {
   type = string
 }
 
-variable "ssh_password" {
+variable "ssh_private_key_file" {
   type = string
 }
 
@@ -170,6 +174,7 @@ locals {
 
 source "proxmox-iso" "ubuntujammy" {
   bios                     = "${var.bios_type}"
+  boot                     = "${var.boot}"
   boot_command             = ["${var.boot_command}"]
   boot_wait                = "${var.boot_wait}"
   cloud_init               = "${var.cloud_init}"
@@ -189,10 +194,10 @@ source "proxmox-iso" "ubuntujammy" {
   scsi_controller          = "${var.scsi_controller_type}"
   sockets                  = "${var.nb_cpu}"
   ssh_handshake_attempts   = "${var.ssh_handshake_attempts}"
-  ssh_password             = "${var.ssh_password}"
   ssh_pty                  = true
   ssh_timeout              = "${var.ssh_timeout}"
   ssh_username             = "${var.ssh_username}"
+  ssh_private_key_file     = "${var.ssh_private_key_file}"
   tags                     = "${var.tags}"
   template_description     = "${var.vm_info} - ${local.packer_timestamp}"
   token                    = "${var.proxmox_api_token_secret}"
@@ -215,8 +220,44 @@ source "proxmox-iso" "ubuntujammy" {
     firewall = "${var.bridge_firewall}"
     model    = "${var.network_model}"
   }
+
+  vga {
+    type = "virtio"
+  }
 }
 
 build {
   sources = ["source.proxmox-iso.ubuntujammy"]
+
+  # Waiting for Cloud-Init to finish
+  provisioner "shell" {
+    inline = ["cloud-init status --wait"]
+  }
+
+  # Provisioning the VM Template for Cloud-Init Integration in Proxmox #1
+  provisioner "shell" {
+    execute_command = "echo -e '<user>' | sudo -S -E bash '{{ .Path }}'"
+    inline = [
+      "echo 'Starting Stage: Provisioning the VM Template for Cloud-Init Integration in Proxmox'",
+      "sudo rm /etc/ssh/ssh_host_*",
+      "sudo truncate -s 0 /etc/machine-id",
+      "sudo apt -y autoremove --purge",
+      "sudo apt -y clean",
+      "sudo apt -y autoclean",
+      "sudo cloud-init clean",
+      "sudo rm -f /etc/cloud/cloud.cfg.d/subiquity-disable-cloudinit-networking.cfg",
+      "sudo rm -f /etc/netplan/00-installer-config.yaml",
+      "sudo sync",
+      "echo 'Done Stage: Provisioning the VM Template for Cloud-Init Integration in Proxmox'"
+    ]
+  }
+
+  # Provisioning the VM Template for Cloud-Init Integration in Proxmox #2
+  provisioner "file" {
+    source      = "autoinstall/99-pve.cfg"
+    destination = "/tmp/99-pve.cfg"
+  }
+  provisioner "shell" {
+    inline = ["sudo cp /tmp/99-pve.cfg /etc/cloud/cloud.cfg.d/99-pve.cfg"]
+  }
 }

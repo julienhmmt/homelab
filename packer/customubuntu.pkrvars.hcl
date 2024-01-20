@@ -1,4 +1,5 @@
 bios_type                = "seabios"
+boot                     = "c"
 boot_command             = "<esc><wait>e<wait><down><down><down><end><bs><bs><bs><bs><wait>autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ ---<wait><f10><wait>"
 boot_wait                = "10s"
 bridge_name              = "vmbr0"
@@ -6,7 +7,7 @@ bridge_firewall          = false
 cloud_init               = true
 cpu_type                 = "x86-64-v2-AES"
 disk_discard             = true
-disk_format              = "qcow2"
+disk_format              = "raw"
 disk_size                = "12G"
 disk_type                = "scsi"
 iso_file                 = "stoCephfs:iso/ubuntu-22.04.3-live-server-amd64.iso"
@@ -24,9 +25,9 @@ proxmox_node             = "w3p243"
 qemu_agent_activation    = true
 scsi_controller_type     = "virtio-scsi-pci"
 ssh_handshake_attempts   = 6
-ssh_password             = "pouetpouet"
+ssh_private_key_file     = "packerbuilder"
 ssh_timeout              = "35m"
-ssh_username             = "packer"
+ssh_username             = "jho"
 storage_pool             = "stoCeph"
 tags                     = "template"
 vm_id                    = 99999
