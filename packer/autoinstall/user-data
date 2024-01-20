@@ -5,7 +5,58 @@ autoinstall:
     update: false
   storage:
     layout:
-      name: direct
+      name: lvm
+      match:
+        size: largest
+    # config:
+    #   # disk
+    #   - id: disk-0
+    #     type: disk
+    #     ptable: gpt
+    #     wipe: superblock
+    #   # partitions physiques
+    #   - id: disk0-boot
+    #     type: partition
+    #     number: 1
+    #     size: 512M
+    #     device: disk0
+    #     flag: boot
+    #     name: boot
+    #   - id: disk0-lvm
+    #     type: partition
+    #     number: 2
+    #     device: disk0
+    #     flag: lvm
+    #   # LVM
+    #   - id: sys-lv
+    #     type: lv
+    #     name: sys
+    #     volgroup: monverre
+    #     size: 12G
+    #   - id: home-lv
+    #     type: lv
+    #     name: home
+    #     volgroup: monverre
+    #     size: 8G
+    #   - id: tmp-lv
+    #     type: lv
+    #     name: tmp
+    #     volgroup: monverre
+    #     size: 2G
+    # volgroups:
+    #   - name: monverre
+    #     devices:
+    #       - /dev/disk/by-id/disk-0
+    # filesystems:
+    #   - name: /dev/monverre/sys
+    #     mount: /
+    #     fstype: xfs
+    #   - name: /dev/monverre/home
+    #     mount: /home
+    #     fstype: xfs
+    #   - name: /dev/monverre/tmp
+    #     mount: /tmp
+    #     fstype: xfs
     swap:
       size: 0
   ssh:
@@ -35,3 +86,4 @@ autoinstall:
   packages:
     - qemu-guest-agent
     - sudo
+    - xfsprogs
