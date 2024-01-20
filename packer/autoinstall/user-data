@@ -2,7 +2,13 @@
 autoinstall:
   version: 1
   refresh-installer:
-    update: false
+    update: true
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+    - arches: [amd64]
+      uri: http://archive.ubuntu.com/ubuntu
   storage:
     layout:
       name: lvm
