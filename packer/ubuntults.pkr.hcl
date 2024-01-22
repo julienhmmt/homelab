@@ -251,13 +251,4 @@ build {
       "echo 'Done Stage: Provisioning the VM Template for Cloud-Init Integration in Proxmox'"
     ]
   }
-
-  # Provisioning the VM Template for Cloud-Init Integration in Proxmox #2
-  provisioner "file" {
-    source      = "autoinstall/99-pve.cfg"
-    destination = "/tmp/99-pve.cfg"
-  }
-  provisioner "shell" {
-    inline = ["sudo cp /tmp/99-pve.cfg /etc/cloud/cloud.cfg.d/99-pve.cfg"]
-  }
 }
