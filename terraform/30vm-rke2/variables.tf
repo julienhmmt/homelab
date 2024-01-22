@@ -10,6 +10,12 @@ variable "cloudinit_dns_domain" {
 variable "cloudinit_dns_servers" {
   type = list(string)
 }
+variable "cloudinit_ssh_keys" {
+  type = list(string)
+}
+variable "cloudinit_user_account" {
+  type = string
+}
 variable "datastore_id" {
   type = string
 }
@@ -27,6 +33,9 @@ variable "tmp_dir" {
 }
 variable "vm_bridge" {
   type = string
+}
+variable "vm_cpu_cores_number" {
+  type = number
 }
 variable "vm_cpu_type" {
   type = string

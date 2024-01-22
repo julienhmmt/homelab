@@ -1,15 +1,17 @@
+// VM Master
+
 resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
   description     = var.vm_description
   keyboard_layout = "fr"
   machine         = "q35"
   migrate         = true
-  name            = "yggdrasil"
+  name            = "MasterNode"
   node_name       = "w3p241"
   pool_id         = "production"
-  scsi_hardware   = "virtio-scsi-pci"
+  scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "rke2", "production", "master"]
+  tags            = ["linux", "rke2", "production", "master", "ubuntu"]
   vm_id           = 241010
 
   clone {
@@ -20,23 +22,13 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
     vm_id        = var.clone_vm_id
   }
 
-  audio_device {
-    device  = "intel-hda"
-    driver  = "spice"
-    enabled = false
-  }
-
   agent {
     enabled = true
     trim    = true
   }
 
-  cdrom {
-    enabled   = false
-    interface = "ide3"
-  }
-
   cpu {
+    cores   = var.vm_cpu_cores_number
     numa    = true
     sockets = var.vm_socket_number
     type    = var.vm_cpu_type
@@ -47,6 +39,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
     discard      = "on"
     file_format  = var.disk_file_format
     interface    = "scsi0"
+    iothread     = true
     size         = var.vm_disk_size
   }
 
@@ -61,6 +54,10 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
         address = "172.16.241.10/16"
         gateway = "172.16.0.1"
       }
+    }
+    user_account {
+      keys     = var.cloudinit_ssh_keys
+      username = var.cloudinit_user_account
     }
   }
 
@@ -93,13 +90,13 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
   keyboard_layout = "fr"
   machine         = "q35"
   migrate         = true
-  name            = "darnassus"
+  name            = "WorkerNode1"
   node_name       = "w3p242"
   pool_id         = "production"
-  scsi_hardware   = "virtio-scsi-pci"
+  scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "rke2", "production", "slave"]
+  tags            = ["linux", "rke2", "production", "slave", "ubuntu"]
   vm_id           = 242010
 
   clone {
@@ -110,23 +107,13 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
     vm_id        = var.clone_vm_id
   }
 
-  audio_device {
-    device  = "intel-hda"
-    driver  = "spice"
-    enabled = false
-  }
-
   agent {
     enabled = true
     trim    = true
   }
 
-  cdrom {
-    enabled   = false
-    interface = "ide3"
-  }
-
   cpu {
+    cores   = var.vm_cpu_cores_number
     numa    = true
     sockets = var.vm_socket_number
     type    = var.vm_cpu_type
@@ -137,6 +124,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
     discard      = "on"
     file_format  = var.disk_file_format
     interface    = "scsi0"
+    iothread     = true
     size         = var.vm_disk_size
   }
 
@@ -151,6 +139,10 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
         address = "172.16.242.10/16"
         gateway = "172.16.0.1"
       }
+    }
+    user_account {
+      keys     = var.cloudinit_ssh_keys
+      username = var.cloudinit_user_account
     }
   }
 
@@ -184,13 +176,13 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
   keyboard_layout = "fr"
   machine         = "q35"
   migrate         = true
-  name            = "darnassous"
+  name            = "WorkerNode2"
   node_name       = "w3p243"
   pool_id         = "production"
-  scsi_hardware   = "virtio-scsi-pci"
+  scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "rke2", "production", "slave"]
+  tags            = ["linux", "rke2", "production", "slave", "ubuntu"]
   vm_id           = 243010
 
   clone {
@@ -201,23 +193,13 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
     vm_id        = var.clone_vm_id
   }
 
-  audio_device {
-    device  = "intel-hda"
-    driver  = "spice"
-    enabled = false
-  }
-
   agent {
     enabled = true
     trim    = true
   }
 
-  cdrom {
-    enabled   = false
-    interface = "ide3"
-  }
-
   cpu {
+    cores   = var.vm_cpu_cores_number
     numa    = true
     sockets = var.vm_socket_number
     type    = var.vm_cpu_type
@@ -228,6 +210,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
     discard      = "on"
     file_format  = var.disk_file_format
     interface    = "scsi0"
+    iothread     = true
     size         = var.vm_disk_size
   }
 
@@ -242,6 +225,10 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
         address = "172.16.243.10/16"
         gateway = "172.16.0.1"
       }
+    }
+    user_account {
+      keys     = var.cloudinit_ssh_keys
+      username = var.cloudinit_user_account
     }
   }
 
