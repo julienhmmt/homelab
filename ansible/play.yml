@@ -1,12 +1,14 @@
 ---
 
-- name: Apply Node Exporter role to PVE hosts into CT
-  hosts: lxc-nodeexporter
+- name: Apply Node Exporter role
+  hosts:
+    - lxc-nodeexporter
+    - k3s
   roles:
     - name: nodeexporter
       tags: nodeexporter
 
-- name: Apply PVE Exporter role to CT
+- name: Apply PVE Exporter role
   hosts: lxc-pveexporter
   roles:
     - name: pveexporter
