@@ -1,6 +1,6 @@
 // VM Master
 
-resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
+resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
   description     = var.vm_description
   keyboard_layout = "fr"
   machine         = "q35"
@@ -11,7 +11,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "rke2", "production", "master", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "master", "ubuntu"]
   vm_id           = 241010
 
   clone {
@@ -85,7 +85,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
 }
 
 // VM 2
-resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
+resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
   description     = var.vm_description
   keyboard_layout = "fr"
   machine         = "q35"
@@ -96,7 +96,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "rke2", "production", "slave", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "slave", "ubuntu"]
   vm_id           = 242010
 
   clone {
@@ -171,7 +171,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
 
 
 // VM 3
-resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
+resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
   description     = var.vm_description
   keyboard_layout = "fr"
   machine         = "q35"
@@ -182,7 +182,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "rke2", "production", "slave", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "slave", "ubuntu"]
   vm_id           = 243010
 
   clone {
