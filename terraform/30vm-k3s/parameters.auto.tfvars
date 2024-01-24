@@ -9,7 +9,9 @@ disk_file_format       = "raw"
 pve_api_token          = "terrabot@pve!tf=d104178f-a39c-4d81-8064-a4aaa2b7a7fe"
 pve_host_address       = "https://172.16.1.2:8006"
 tmp_dir                = "/tmp"
-vm_bridge              = "vmbr0"
+vm_bridge_ceph         = "vmbr15"
+vm_bridge_lan          = "vmbr0"
+vm_bridge_vlan_ceph_id = 15
 vm_cpu_cores_number    = 2
 vm_cpu_type            = "x86-64-v2-AES"
 vm_description         = "Managed by terraform."

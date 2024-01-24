@@ -31,8 +31,14 @@ variable "pve_host_address" {
 variable "tmp_dir" {
   type = string
 }
-variable "vm_bridge" {
+variable "vm_bridge_ceph" {
   type = string
+}
+variable "vm_bridge_lan" {
+  type = string
+}
+variable "vm_bridge_vlan_ceph_id" {
+  type = number
 }
 variable "vm_cpu_cores_number" {
   type = number

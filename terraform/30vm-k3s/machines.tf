@@ -49,10 +49,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
       domain  = var.cloudinit_dns_domain
       servers = var.cloudinit_dns_servers
     }
-    ip_config {
+    ip_config { // net0 - LAN
       ipv4 {
         address = "172.16.241.10/16"
         gateway = "172.16.0.1"
+      }
+    }
+    ip_config { // net1 - CEPH
+      ipv4 {
+        address = "172.16.254.4/28"
       }
     }
     user_account {
@@ -67,8 +72,14 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
   }
 
   network_device {
-    bridge = var.vm_bridge
+    bridge = var.vm_bridge_lan
     model  = "virtio"
+  }
+
+  network_device {
+    bridge  = var.vm_bridge_ceph
+    model   = "virtio"
+    vlan_id = var.vm_bridge_vlan_ceph_id
   }
 
   operating_system {
@@ -134,10 +145,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
       domain  = var.cloudinit_dns_domain
       servers = var.cloudinit_dns_servers
     }
-    ip_config {
+    ip_config { // net0 - LAN
       ipv4 {
         address = "172.16.242.10/16"
         gateway = "172.16.0.1"
+      }
+    }
+    ip_config { // net1 - CEPH
+      ipv4 {
+        address = "172.16.254.5/28"
       }
     }
     user_account {
@@ -152,8 +168,14 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
   }
 
   network_device {
-    bridge = var.vm_bridge
+    bridge = var.vm_bridge_lan
     model  = "virtio"
+  }
+
+  network_device {
+    bridge  = var.vm_bridge_ceph
+    model   = "virtio"
+    vlan_id = var.vm_bridge_vlan_ceph_id
   }
 
   operating_system {
@@ -220,10 +242,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
       domain  = var.cloudinit_dns_domain
       servers = var.cloudinit_dns_servers
     }
-    ip_config {
+    ip_config { // net0 - LAN
       ipv4 {
         address = "172.16.243.10/16"
         gateway = "172.16.0.1"
+      }
+    }
+    ip_config { // net1 - CEPH
+      ipv4 {
+        address = "172.16.254.6/28"
       }
     }
     user_account {
@@ -238,8 +265,14 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
   }
 
   network_device {
-    bridge = var.vm_bridge
+    bridge = var.vm_bridge_lan
     model  = "virtio"
+  }
+
+  network_device {
+    bridge  = var.vm_bridge_ceph
+    model   = "virtio"
+    vlan_id = var.vm_bridge_vlan_ceph_id
   }
 
   operating_system {
