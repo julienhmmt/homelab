@@ -62,7 +62,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p241" {
   }
 
   memory {
-    dedicated = 6144
+    dedicated = 8192
     floating  = 4096
   }
 
@@ -147,7 +147,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p242" {
   }
 
   memory {
-    dedicated = 6144
+    dedicated = 8192
     floating  = 4096
   }
 
@@ -233,7 +233,7 @@ resource "proxmox_virtual_environment_vm" "rke2vm1_w3p243" {
   }
 
   memory {
-    dedicated = 6144
+    dedicated = 8192
     floating  = 4096
   }
 
