@@ -251,4 +251,12 @@ build {
       "echo 'Done Stage: Provisioning the VM Template for Cloud-Init Integration in Proxmox'"
     ]
   }
+
+  # Load ceph module for cephfs mounting for k3s
+  provisioner "shell" {
+    execute_command = "echo -e '<user>' | sudo -S -E bash '{{ .Path }}'"
+    inline = [
+      "echo 'ceph' > /etc/modules-load.d/ceph.conf"
+    ]
+  }
 }

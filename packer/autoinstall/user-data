@@ -70,6 +70,7 @@ autoinstall:
           - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ2Ix43cC1d1HOxaBajyj+bG0DGKKfvYRbEKQtEixZjqdAlq+z/zq6rIQYYJTthRTk7WbMix2aLyGPMIW0DmZRM= jho@Mac-mini-de-Julien.local
           - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOQIx6EMuJra28ZLI475WPoj8uIYKgty8i+ua8P/PHJYWnwwrJng2ZlmZ/xPlNmqNeoPrnxJNTRoACzYDyWhrvk= jho@MBAJHO.local
   packages:
+    - libcephfs2
     - linux-image-virtual-hwe-22.04
     - qemu-guest-agent
     - sudo
