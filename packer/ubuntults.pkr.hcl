@@ -256,7 +256,11 @@ build {
   provisioner "shell" {
     execute_command = "echo -e '<user>' | sudo -S -E bash '{{ .Path }}'"
     inline = [
-      "echo 'ceph' > /etc/modules-load.d/ceph.conf"
+      "sudo echo 'ceph' > /etc/modules-load.d/ceph.conf",
+      "sudo mkdir -m /mnt/cephfs",
+      "sudo mkdir -p -m 755 /etc/ceph",
+      "sudo echo -e '# minimal ceph.conf for c9fbb927-816b-475d-9fc0-85c10a14fa34\n[global]\nfsid = c9fbb927-816b-475d-9fc0-85c10a14fa34\nmon_host = [v2:172.16.254.1:3300/0,v1:172.16.254.1:6789/0] [v2:172.16.254.3:3300/0,v1:172.16.254.3:6789/0]' > /etc/ceph/ceph.conf",
+      "sudo chmod 644 /etc/ceph/ceph.conf"
     ]
   }
 }
