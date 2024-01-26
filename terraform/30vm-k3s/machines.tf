@@ -1,11 +1,11 @@
-// VM Master
+// VM Master1
 
 resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
   description     = var.vm_description
   keyboard_layout = "fr"
   machine         = "q35"
   migrate         = true
-  name            = "MasterNode"
+  name            = "MasterNode1"
   node_name       = "w3p241"
   pool_id         = "production"
   scsi_hardware   = "virtio-scsi-single"
@@ -95,19 +95,20 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
   serial_device {}
 }
 
-// VM 2
+// MasterNode2
+
 resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
   description     = var.vm_description
   keyboard_layout = "fr"
   machine         = "q35"
   migrate         = true
-  name            = "WorkerNode1"
+  name            = "MasterNode2"
   node_name       = "w3p242"
   pool_id         = "production"
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "slave", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "master", "ubuntu"]
   vm_id           = 242010
 
   clone {
@@ -192,19 +193,20 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
 }
 
 
-// VM 3
+// MasterNode3
+
 resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
   description     = var.vm_description
   keyboard_layout = "fr"
   machine         = "q35"
   migrate         = true
-  name            = "WorkerNode2"
+  name            = "MasterNode3"
   node_name       = "w3p243"
   pool_id         = "production"
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "slave", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "master", "ubuntu"]
   vm_id           = 243010
 
   clone {
