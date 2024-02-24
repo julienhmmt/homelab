@@ -42,7 +42,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 241004
+  vm_id         = 241002
 
   cpu {
     architecture = "amd64"
@@ -74,7 +74,7 @@ resource "proxmox_virtual_environment_container" "pveexporter_1" {
 
     ip_config {
       ipv4 {
-        address = "172.16.1.4/16"
+        address = "172.16.241.3/16"
         gateway = var.gateway
       }
     }
