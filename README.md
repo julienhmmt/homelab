@@ -6,9 +6,9 @@ Hey, welcome on board! This README is still (and will be) in draft... Look what 
 
 This repository is intended to be used into my homelab. It is an automatisation of things as most as possible and create a Kubernetes cluster. Goals are multiple:
 
-- learn and use terraform
-- learn and use ansible
-- learn and use kubernetes (rke2)
+- learn and use terraform/opentofu into my Proxmox hosts
+- learn and use ansible to configure roles and settings in VM and CT
+- learn and use kubernetes to deploy many containerized apps
 
 ## Architecture
 
@@ -42,6 +42,11 @@ packer validate -var-file=custom.pkrvars.hcl ubuntults.pkr.hcl
 packer build -var-file=custom.pkrvars.hcl ubuntults.pkr.hcl
 ```
 
+I wrote a document to give you information about the workflow :
+
+- french version : <https://j.hommet.net/packer-et-proxmox/>
+- english version : <https://j.hommet.net/use-packer-on-proxmox-vm-templates/>
+
 ### Terraform
 
 Used to provision the infra.
@@ -58,6 +63,15 @@ terraform plan -out tfplan
 terraform apply tfplan
 ```
 
+Commands are the same between Terraform v1.6.x and OpenTofu v1.6.x.
+
+I wrote a document on my website to give you more information about this part :
+
+- french version "terraform et conteneurs LXC pour Proxmox" : <https://j.hommet.net/terraform-ct-pour-proxmox/>
+- french version "terraform et VM pour Proxmox" : <https://j.hommet.net/terraform-opentofu-creer-vm-proxmox/>
+- english version "terraform and LXC containers for Proxmox : <https://j.hommet.net/use-terraform-to-create-pve-lxc/>
+- english version "terraform and VM for Proxmox" : TODO
+
 ### Ansible
 
 Used to configure services.
@@ -68,5 +82,11 @@ In the folder, do:
 
 ```bash
 ansible-galaxy install -r requirements.yml --force-with-deps
-ansible-playbook play.yml --check --diff --ssh-common-args='-o StrictHostKeyChecking=no' --tags __change__
+ansible-playbook play.yml --check --diff --ssh-common-args='-o StrictHostKeyChecking=no' --tags __change__ --limit=__change__
+# For LXC, you maybe need to force the ansible_user to root, like this:
+ansible-playbook play.yml --check --diff --ssh-common-args='-o StrictHostKeyChecking=no' --tags __change__ --limit=__change__ -e ansible_user=root
 ```
+
+## Usage
+
+Fell free to re-use this repository and fits it to your needs. There's many things to do...
