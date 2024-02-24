@@ -30,7 +30,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_1" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 241003
+  vm_id         = 241001
 
   cpu {
     architecture = "amd64"
@@ -53,7 +53,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_1" {
   }
 
   initialization {
-    hostname = "nodeexporter-w3p241"
+    hostname = "ne-w3p241"
 
     dns {
       domain  = var.dns_domain
@@ -62,7 +62,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_1" {
 
     ip_config {
       ipv4 {
-        address = "172.16.1.3/16"
+        address = "172.16.241.2/16"
         gateway = var.gateway
       }
     }
@@ -95,6 +95,16 @@ output "nodeexporter_root_password2" {
   sensitive = true
 }
 
+resource "proxmox_virtual_environment_file" "debian_container_template2" {
+  content_type = "vztmpl"
+  datastore_id = var.ct_datastore_template_location
+  node_name    = "w3p242"
+
+  source_file {
+    path = var.ct_source_file_path
+  }
+}
+
 resource "proxmox_virtual_environment_container" "nodeexporter_2" {
   description   = "Used only for Node_Exporter. Managed by Terraform"
   node_name     = "w3p242"
@@ -102,7 +112,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 242003
+  vm_id         = 242001
 
   cpu {
     architecture = "amd64"
@@ -125,7 +135,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
   }
 
   initialization {
-    hostname = "nodeexporter-w3p242"
+    hostname = "ne-w3p242"
 
     dns {
       domain  = var.dns_domain
@@ -134,7 +144,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
 
     ip_config {
       ipv4 {
-        address = "172.16.2.3/16"
+        address = "172.16.242.2/16"
         gateway = var.gateway
       }
     }
@@ -167,6 +177,16 @@ output "nodeexporter_root_password3" {
   sensitive = true
 }
 
+resource "proxmox_virtual_environment_file" "debian_container_template3" {
+  content_type = "vztmpl"
+  datastore_id = var.ct_datastore_template_location
+  node_name    = "w3p243"
+
+  source_file {
+    path = var.ct_source_file_path
+  }
+}
+
 resource "proxmox_virtual_environment_container" "nodeexporter_3" {
   description   = "Used only for Node_Exporter. Managed by Terraform"
   node_name     = "w3p243"
@@ -174,7 +194,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_3" {
   start_on_boot = true
   tags          = ["linux", "infra", "monitoring"]
   unprivileged  = true
-  vm_id         = 243003
+  vm_id         = 243001
 
   cpu {
     architecture = "amd64"
@@ -197,7 +217,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_3" {
   }
 
   initialization {
-    hostname = "nodeexporter-w3p243"
+    hostname = "ne-w3p243"
 
     dns {
       domain  = var.dns_domain
@@ -206,7 +226,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_3" {
 
     ip_config {
       ipv4 {
-        address = "172.16.3.3/16"
+        address = "172.16.243.2/16"
         gateway = var.gateway
       }
     }
