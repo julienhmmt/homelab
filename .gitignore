@@ -6,3 +6,4 @@
 terraform.tfstate*
 tfplan
 *.backup
+.vscode/
