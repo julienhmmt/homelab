@@ -1,7 +1,7 @@
 ct_bridge                      = "vmbr0"
-ct_datastore_storage_location  = "stoCeph"
-ct_datastore_template_location = "stoCephfs"
-ct_disk_size                   = "20"
+ct_datastore_storage_location  = "local"
+ct_datastore_template_location = "local"
+ct_disk_size                   = "10"
 ct_memory                      = 128
 ct_nic_rate_limit              = 10
 ct_source_file_path            = "http://download.proxmox.com/images/system/debian-12-standard_12.2-1_amd64.tar.zst"
@@ -10,5 +10,5 @@ dns_servers                    = ["172.16.0.1"]
 gateway                        = "172.16.0.1"
 os_type                        = "debian"
 pve_api_token                  = "terrabot@pve!tf=d104178f-a39c-4d81-8064-a4aaa2b7a7fe"
-pve_host_address               = "https://172.16.1.2:8006"
+pve_host_address               = "https://172.16.241.1:8006"
 tmp_dir                        = "/var/tmp"
