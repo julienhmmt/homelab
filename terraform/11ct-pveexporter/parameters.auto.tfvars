@@ -9,6 +9,6 @@ dns_domain                     = "local.hommet.net"
 dns_servers                    = ["172.16.0.1"]
 gateway                        = "172.16.0.1"
 os_type                        = "debian"
-pve_api_token                  = "terrabot@pve!tf=d104178f-a39c-4d81-8064-a4aaa2b7a7fe"
+pve_api_token                  = "terrabot@pve!magic=e74b78f1-19fb-4cd3-aa31-b0c23edcf712"
 pve_host_address               = "https://172.16.241.1:8006"
 tmp_dir                        = "/var/tmp"
