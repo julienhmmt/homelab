@@ -28,7 +28,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_1" {
   node_name     = "w3p241"
   pool_id       = "infra"
   start_on_boot = true
-  tags          = ["linux", "infra", "monitoring"]
+  tags          = ["debian12", "infra", "linux", "monitoring"]
   unprivileged  = true
   vm_id         = 241001
 
@@ -110,7 +110,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_2" {
   node_name     = "w3p242"
   pool_id       = "infra"
   start_on_boot = true
-  tags          = ["linux", "infra", "monitoring"]
+  tags          = ["debian12", "infra", "linux", "monitoring"]
   unprivileged  = true
   vm_id         = 242001
 
@@ -192,7 +192,7 @@ resource "proxmox_virtual_environment_container" "nodeexporter_3" {
   node_name     = "w3p243"
   pool_id       = "infra"
   start_on_boot = true
-  tags          = ["linux", "infra", "monitoring"]
+  tags          = ["debian12", "infra", "linux", "monitoring"]
   unprivileged  = true
   vm_id         = 243001
 
