@@ -43,6 +43,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
     size         = var.vm_disk_size
   }
 
+  disk { # stockage for k3s (longhorn)
+    datastore_id = var.datastore_id
+    discard      = "on"
+    file_format  = var.disk_file_format
+    interface    = "scsi1"
+    iothread     = true
+    size         = 64
+  }
+
   initialization {
     datastore_id = var.datastore_id
     dns {
@@ -141,6 +150,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
     size         = var.vm_disk_size
   }
 
+  disk { # stockage for k3s (longhorn)
+    datastore_id = var.datastore_id
+    discard      = "on"
+    file_format  = var.disk_file_format
+    interface    = "scsi1"
+    iothread     = true
+    size         = 64
+  }
+
   initialization {
     datastore_id = var.datastore_id
     dns {
@@ -237,6 +255,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
     interface    = "scsi0"
     iothread     = true
     size         = var.vm_disk_size
+  }
+
+  disk { # stockage for k3s (longhorn)
+    datastore_id = var.datastore_id
+    discard      = "on"
+    file_format  = var.disk_file_format
+    interface    = "scsi1"
+    iothread     = true
+    size         = 64
   }
 
   initialization {
