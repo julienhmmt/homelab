@@ -2,7 +2,7 @@
 
 resource "proxmox_virtual_environment_hagroup" "ha_vm_k3s" {
   group   = "ha_vm_k3s"
-  comment = "Managed by Terraform. Group for HA specially for k3s CT & VM"
+  comment = "Managed by Terraform. Group for HA specially for k3s VM"
   nodes = {
     node1 = null
     node2 = 2
@@ -13,7 +13,7 @@ resource "proxmox_virtual_environment_hagroup" "ha_vm_k3s" {
   no_failback = false
 }
 
-resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_master" {
+resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_master1" {
   depends_on = [
     proxmox_virtual_environment_hagroup.ha_vm_k3s
   ]
@@ -25,7 +25,7 @@ resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_master" {
   state        = "started"
 }
 
-resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_worker1" {
+resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_master2" {
   depends_on = [
     proxmox_virtual_environment_hagroup.ha_vm_k3s
   ]
@@ -37,7 +37,7 @@ resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_worker1" {
   state        = "started"
 }
 
-resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_worker2" {
+resource "proxmox_virtual_environment_haresource" "ha_vm_k3s_master3" {
   depends_on = [
     proxmox_virtual_environment_hagroup.ha_vm_k3s
   ]
