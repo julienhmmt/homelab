@@ -1,6 +1,9 @@
 ---
 
 - name: Apply Node Exporter role
+  become: true
+  become_method: sudo
+  become_user: root
   hosts:
     - lxc-nodeexporter
     - k3s
