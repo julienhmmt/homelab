@@ -19,6 +19,9 @@ variable "cloudinit_user_account" {
 variable "datastore_id" {
   type = string
 }
+variable "net_rate_limit" {
+  type = number
+}
 variable "disk_file_format" {
   type = string
 }
@@ -31,14 +34,11 @@ variable "pve_host_address" {
 variable "tmp_dir" {
   type = string
 }
-variable "vm_bridge_ceph" {
-  type = string
-}
 variable "vm_bridge_lan" {
   type = string
 }
-variable "vm_bridge_vlan_ceph_id" {
-  type = number
+variable "vm_bridge_monitoring" {
+  type = string
 }
 variable "vm_cpu_cores_number" {
   type = number

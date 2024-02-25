@@ -1,17 +1,17 @@
-clone_node_name        = "w3p243"
-clone_vm_id            = 99999
+clone_node_name        = "w3p241"
+clone_vm_id            = 99998 # debian12
 cloudinit_dns_domain   = "local.hommet.net"
 cloudinit_dns_servers  = ["172.16.0.1"]
 cloudinit_ssh_keys     = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10"]
 cloudinit_user_account = "jho"
-datastore_id           = "stoCeph"
+datastore_id           = "vm"
 disk_file_format       = "raw"
+net_rate_limit         = 100
 pve_api_token          = "terrabot@pve!magic=e74b78f1-19fb-4cd3-aa31-b0c23edcf712"
 pve_host_address       = "https://172.16.241.1:8006"
 tmp_dir                = "/tmp"
-vm_bridge_ceph         = "vmbr15"
 vm_bridge_lan          = "vmbr0"
-vm_bridge_vlan_ceph_id = 15
+vm_bridge_monitoring   = "netmonit"
 vm_cpu_cores_number    = 2
 vm_cpu_type            = "x86-64-v2-AES"
 vm_description         = "Managed by terraform."

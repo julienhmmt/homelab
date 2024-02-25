@@ -11,7 +11,7 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "master", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "master", "debian12"]
   vm_id           = 241010
 
   clone {
@@ -55,9 +55,9 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
         gateway = "172.16.0.1"
       }
     }
-    ip_config { // net1 - CEPH
+    ip_config { // net1 - MONITORING
       ipv4 {
-        address = "172.16.254.4/28"
+        address = "dhcp"
       }
     }
     user_account {
@@ -72,14 +72,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
   }
 
   network_device {
-    bridge = var.vm_bridge_lan
-    model  = "virtio"
+    bridge     = var.vm_bridge_lan
+    model      = "virtio"
+    rate_limit = var.net_rate_limit
   }
 
   network_device {
-    bridge  = var.vm_bridge_ceph
-    model   = "virtio"
-    vlan_id = var.vm_bridge_vlan_ceph_id
+    bridge     = var.vm_bridge_monitoring
+    model      = "virtio"
+    rate_limit = var.net_rate_limit
   }
 
   operating_system {
@@ -108,7 +109,7 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "master", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "master", "debian12"]
   vm_id           = 242010
 
   clone {
@@ -152,9 +153,9 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
         gateway = "172.16.0.1"
       }
     }
-    ip_config { // net1 - CEPH
+    ip_config { // net1 - monitoring
       ipv4 {
-        address = "172.16.254.5/28"
+        address = "dhcp"
       }
     }
     user_account {
@@ -169,14 +170,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
   }
 
   network_device {
-    bridge = var.vm_bridge_lan
-    model  = "virtio"
+    bridge     = var.vm_bridge_lan
+    model      = "virtio"
+    rate_limit = var.net_rate_limit
   }
 
   network_device {
-    bridge  = var.vm_bridge_ceph
-    model   = "virtio"
-    vlan_id = var.vm_bridge_vlan_ceph_id
+    bridge     = var.vm_bridge_monitoring
+    model      = "virtio"
+    rate_limit = var.net_rate_limit
   }
 
   operating_system {
@@ -194,7 +196,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
 
 
 // MasterNode3
-
 resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
   description     = var.vm_description
   keyboard_layout = "fr"
@@ -206,7 +207,7 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "master", "ubuntu"]
+  tags            = ["linux", "k3s", "production", "master", "debian12"]
   vm_id           = 243010
 
   clone {
@@ -250,9 +251,9 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
         gateway = "172.16.0.1"
       }
     }
-    ip_config { // net1 - CEPH
+    ip_config { // net1 - monitoring
       ipv4 {
-        address = "172.16.254.6/28"
+        address = "dhcp"
       }
     }
     user_account {
@@ -267,14 +268,15 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
   }
 
   network_device {
-    bridge = var.vm_bridge_lan
-    model  = "virtio"
+    bridge     = var.vm_bridge_lan
+    model      = "virtio"
+    rate_limit = var.net_rate_limit
   }
 
   network_device {
-    bridge  = var.vm_bridge_ceph
-    model   = "virtio"
-    vlan_id = var.vm_bridge_vlan_ceph_id
+    bridge     = var.vm_bridge_monitoring
+    model      = "virtio"
+    rate_limit = var.net_rate_limit
   }
 
   operating_system {
