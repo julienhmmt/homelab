@@ -43,15 +43,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
     size         = var.vm_disk_size
   }
 
-  disk { # stockage for k3s (longhorn)
-    datastore_id = var.datastore_id
-    discard      = "on"
-    file_format  = var.disk_file_format
-    interface    = "scsi1"
-    iothread     = true
-    size         = 64
-  }
-
   initialization {
     datastore_id = var.datastore_id
     dns {
@@ -62,11 +53,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
       ipv4 {
         address = "172.16.241.10/16"
         gateway = "172.16.0.1"
-      }
-    }
-    ip_config { // net1 - MONITORING
-      ipv4 {
-        address = "dhcp"
       }
     }
     user_account {
@@ -85,13 +71,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
     model      = "virtio"
     rate_limit = var.net_rate_limit
   }
-
-  network_device {
-    bridge     = var.vm_bridge_monitoring
-    model      = "virtio"
-    rate_limit = var.net_rate_limit
-  }
-
   operating_system {
     type = "l26"
   }
@@ -150,15 +129,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
     size         = var.vm_disk_size
   }
 
-  disk { # stockage for k3s (longhorn)
-    datastore_id = var.datastore_id
-    discard      = "on"
-    file_format  = var.disk_file_format
-    interface    = "scsi1"
-    iothread     = true
-    size         = 64
-  }
-
   initialization {
     datastore_id = var.datastore_id
     dns {
@@ -169,11 +139,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
       ipv4 {
         address = "172.16.242.10/16"
         gateway = "172.16.0.1"
-      }
-    }
-    ip_config { // net1 - monitoring
-      ipv4 {
-        address = "dhcp"
       }
     }
     user_account {
@@ -189,12 +154,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
 
   network_device {
     bridge     = var.vm_bridge_lan
-    model      = "virtio"
-    rate_limit = var.net_rate_limit
-  }
-
-  network_device {
-    bridge     = var.vm_bridge_monitoring
     model      = "virtio"
     rate_limit = var.net_rate_limit
   }
@@ -257,15 +216,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
     size         = var.vm_disk_size
   }
 
-  disk { # stockage for k3s (longhorn)
-    datastore_id = var.datastore_id
-    discard      = "on"
-    file_format  = var.disk_file_format
-    interface    = "scsi1"
-    iothread     = true
-    size         = 64
-  }
-
   initialization {
     datastore_id = var.datastore_id
     dns {
@@ -276,11 +226,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
       ipv4 {
         address = "172.16.243.10/16"
         gateway = "172.16.0.1"
-      }
-    }
-    ip_config { // net1 - monitoring
-      ipv4 {
-        address = "dhcp"
       }
     }
     user_account {
@@ -296,12 +241,6 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
 
   network_device {
     bridge     = var.vm_bridge_lan
-    model      = "virtio"
-    rate_limit = var.net_rate_limit
-  }
-
-  network_device {
-    bridge     = var.vm_bridge_monitoring
     model      = "virtio"
     rate_limit = var.net_rate_limit
   }

@@ -37,9 +37,6 @@ variable "tmp_dir" {
 variable "vm_bridge_lan" {
   type = string
 }
-variable "vm_bridge_monitoring" {
-  type = string
-}
 variable "vm_cpu_cores_number" {
   type = number
 }

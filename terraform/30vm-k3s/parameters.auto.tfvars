@@ -11,7 +11,6 @@ pve_api_token          = "terrabot@pve!magic=e74b78f1-19fb-4cd3-aa31-b0c23edcf71
 pve_host_address       = "https://172.16.241.1:8006"
 tmp_dir                = "/tmp"
 vm_bridge_lan          = "vmbr0"
-vm_bridge_monitoring   = "netmonit"
 vm_cpu_cores_number    = 2
 vm_cpu_type            = "x86-64-v2-AES"
 vm_description         = "Managed by terraform."
