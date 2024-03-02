@@ -2,9 +2,8 @@
 autoinstall:
   version: 1
   refresh-installer:
-    update: true
+    update: false
   apt:
-    geoip: true
     preserve_sources_list: false
     primary:
     - arches: [amd64]
@@ -63,7 +62,7 @@ autoinstall:
         enp6s18:
           dhcp4: true
   user-data:
-    package_upgrade: true
+    package_upgrade: false
     timezone: Europe/Berlin
     users:
       - name: jho
