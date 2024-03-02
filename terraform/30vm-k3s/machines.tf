@@ -11,7 +11,7 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p241" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "master", "debian12"]
+  tags            = ["linux", "k3s", "production", "master", "ubuntu24"]
   vm_id           = 241010
 
   clone {
@@ -97,7 +97,7 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p242" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "master", "debian12"]
+  tags            = ["linux", "k3s", "production", "master", "ubuntu24"]
   vm_id           = 242010
 
   clone {
@@ -184,7 +184,7 @@ resource "proxmox_virtual_environment_vm" "vm1_w3p243" {
   scsi_hardware   = "virtio-scsi-single"
   started         = true
   tablet_device   = false
-  tags            = ["linux", "k3s", "production", "master", "debian12"]
+  tags            = ["linux", "k3s", "production", "master", "ubuntu24"]
   vm_id           = 243010
 
   clone {

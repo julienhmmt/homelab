@@ -1,5 +1,5 @@
-clone_node_name        = "w3p241"
-clone_vm_id            = 99998 # debian12
+clone_node_name        = "w3p243"
+clone_vm_id            = 99999 # ubuntu24
 cloudinit_dns_domain   = "local.hommet.net"
 cloudinit_dns_servers  = ["172.16.0.1"]
 cloudinit_ssh_keys     = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10"]
