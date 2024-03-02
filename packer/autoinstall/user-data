@@ -21,8 +21,8 @@ autoinstall:
 
     # Linux boot partition (512MB)
     - { device: vdisk, size: 536870912, number: 1, flag: boot, type: partition, id: boot-partition }
-    - { fstype: ext2, volume: boot-partition, type: format, id: boot-format }
-    - { path: /boot, device: boot-format, type: mount, id: mount-boot }
+    - { fstype: ext4, volume: boot-partition, type: format, id: boot-format }
+    - { path: /boot, device: boot-format, type: mount, id: mount-boot, options: "rw,nodev,nosuid,noexec" }
 
     # Partition for LVM
     - { device: vdisk, size: -1, number: 2,type: partition, id: lvm-partition }
@@ -30,18 +30,23 @@ autoinstall:
 
     # LV for root (12GB)
     - { name: sys, volgroup: lvm_volgroup-0, size: 12884901888, wipe: superblock, preserve: false, type: lvm_partition, id: lvm_partition-sys }
-    - { fstype: xfs, volume: lvm_partition-sys, type: format, id: format-lvm-sys }
-    - { path: /, device: format-lvm-sys, type: mount, id: mount-lvm-sys, options: "discard" }
+    - { fstype: ext4, volume: lvm_partition-sys, type: format, id: format-lvm-sys }
+    - { path: /, device: format-lvm-sys, type: mount, id: mount-lvm-sys }
 
     # LV for home (4GB)
     - { name: home, volgroup: lvm_volgroup-0, size: 4294967296, wipe: superblock, preserve: false, type: lvm_partition, id: lvm_partition-home }
     - { fstype: ext4, volume: lvm_partition-home, type: format, id: format-lvm-home }
-    - { path: /home, device: format-lvm-home, type: mount, id: mount-lvm-home, options: "rw,nodev,nosuid" }
+    - { path: /home, device: format-lvm-home, type: mount, id: mount-lvm-home, options: "rw,nodev,nosuid,noexec" }
 
     # LV for tmp (2GB)
     - { name: tmp, volgroup: lvm_volgroup-0, size: 2147483648, wipe: superblock, preserve: false, type: lvm_partition, id: lvm_partition-tmp }
     - { fstype: ext4, volume: lvm_partition-tmp, type: format, id: format-lvm-tmp }
     - { path: /tmp, device: format-lvm-tmp, type: mount, id: mount-lvm-tmp, options: "rw,nodev,nosuid" }
+
+    # LV for longhorn storage (8GB)
+    - { name: longhorn, volgroup: lvm_volgroup-0, size: 2147483648, wipe: superblock, preserve: false, type: lvm_partition, id: lvm_partition-longhorn }
+    - { fstype: ext4, volume: lvm_partition-longhorn, type: format, id: format-lvm-longhorn }
+    - { path: /var/lib/longhorn, device: format-lvm-longhorn, type: mount, id: mount-lvm-longhorn, options: "rw,nodev,nosuid" }
     swap:
       size: 0
   ssh:
