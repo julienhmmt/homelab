@@ -50,6 +50,8 @@ autoinstall:
       size: 0
   ssh:
     allow_public_ssh_keys: true
+    allow-pw: true
+    disable-root: false
     install-server: true
     ssh_quiet_keygen: true
   locale: en_US
@@ -61,22 +63,19 @@ autoinstall:
       ethernets:
         enp6s18:
           dhcp4: true
-  user-data:
-    package_upgrade: false
-    timezone: Europe/Berlin
-    users:
-      - name: jho
-        groups: [adm, sudo]
-        lock-passwd: false
-        sudo: ALL=(ALL) NOPASSWD:ALL
-        shell: /bin/bash
-        ssh_authorized_keys:
-          - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ2Ix43cC1d1HOxaBajyj+bG0DGKKfvYRbEKQtEixZjqdAlq+z/zq6rIQYYJTthRTk7WbMix2aLyGPMIW0DmZRM= jho@Mac-mini-de-Julien.local
-          - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOQIx6EMuJra28ZLI475WPoj8uIYKgty8i+ua8P/PHJYWnwwrJng2ZlmZ/xPlNmqNeoPrnxJNTRoACzYDyWhrvk= jho@MBAJHO.local
   packages:
-    - libcephfs2
     - linux-image-virtual-hwe-22.04
     - qemu-guest-agent
     - sudo
     - wireguard
-    - xfsprogs
+  user-data:
+    package_upgrade: false
+    timezone: Europe/Paris
+    users:
+      - name: packer
+        groups: [adm, sudo]
+        lock-passwd: false
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        shell: /bin/bash
+        # password crypted with sha512. default value = "packer"
+        passwd: $6$lhHsNpj6wyEXs7sn$cOf53uNhEBuNOGeYBMZkCrRS.WzsnwkhY0caiAbbXw4AwumP.7W7e8n0r71vbDey7AMYNsLI5ZEaeqKr.DtYM/
