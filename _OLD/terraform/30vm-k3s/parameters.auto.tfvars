@@ -8,7 +8,7 @@ datastore_id           = "vm"
 disk_file_format       = "raw"
 net_rate_limit         = 100
 pve_api_token          = "terrabot@pve!magic=e74b78f1-19fb-4cd3-aa31-b0c23edcf712"
-pve_host_address       = "https://172.16.241.1:8006"
+pve_host_address       = "https://192.168.1.1:8006"
 tmp_dir                = "/tmp"
 vm_bridge_lan          = "vmbr0"
 vm_cpu_cores_number    = 2
