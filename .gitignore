@@ -1,10 +1,10 @@
-*.backup
+_OLD/
 .DS_Store
 .cache/
-.terraform.*
+.idea/
 .terraform/
 .tox/
 .vscode/
 key.txt
 terraform.tfstate*
-tfplan
+otplan
