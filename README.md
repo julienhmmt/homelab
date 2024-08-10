@@ -57,6 +57,19 @@ errors: No known data errors
 
 In the Proxmox webUI, I added this ZFS storage (Datacenter > Storage > button "add" > ZFS and I wrote the ZFS pool name `local-zfs`).
 
+## SOPS and age
+
+These tools are used to hide some sensible values. My homelab is a no critical infrastructure nor have sensible datas, but it's a good way to hide some values.
+
+```bash
+# generate the age key pair, used for encryption and decryption
+age-keygen -o key.txt
+```
+
+The file `.sops.yaml` is used to configure sops with your age pubkey, some rules for encryption or descryption (files, methods...).
+
+I stored my PVE secrets in the file `pve_secrets.yaml`, an example is given in the file `pve_secrets.yaml.example`. Encrypt the file with the command `sops -e -i pve_secrets.yaml`. To decrypt you have to type `sops -d -i pve_secrets.yaml`.
+
 ## OpenTofu
 
 ```bash

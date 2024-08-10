@@ -1,9 +1,10 @@
+*.backup
 .DS_Store
 .cache/
-.tox/
-.terraform/
 .terraform.*
+.terraform/
+.tox/
+.vscode/
+key.txt
 terraform.tfstate*
 tfplan
-*.backup
-.vscode/
