@@ -35,7 +35,7 @@ ct = {
     startup_order    = 2
     startup_up_delay = 5
     swap             = 0
-    tags             = ["ct", "debian12", "prod"]
+    tags             = ["ct", "debian12", "monitoring", "prod"]
     unprivileged     = true
   }
 
@@ -79,12 +79,12 @@ ct = {
     unprivileged     = true
   }
 
-  "haproxypublic" = {
+  "haproxy" = {
     cpu_cores        = 1
-    description      = "Managed by OpenTofu. HAProxy for public access from the web."
+    description      = "Managed by OpenTofu. HAProxy for public and internal access."
     disk_size        = 16
     domain           = "khepri.internal"
-    hostname         = "haproxypublic"
+    hostname         = "haproxy"
     id               = 1205
     ipv4             = "192.168.1.205/24"
     net_mac_address  = "BC:24:11:CA:FE:05"
@@ -116,26 +116,6 @@ ct = {
     startup_up_delay = 5
     swap             = 0
     tags             = ["ct", "debian12", "prod"]
-    unprivileged     = true
-  }
-
-  "haproxyinternal" = {
-    cpu_cores        = 1
-    description      = "Managed by OpenTofu. HAProxy for public access from the web."
-    disk_size        = 16
-    domain           = "khepri.internal"
-    hostname         = "haproxyinternal"
-    id               = 1207
-    ipv4             = "192.168.1.207/24"
-    net_mac_address  = "BC:24:11:CA:FE:07"
-    net_rate_limit   = 0
-    pool_id          = "prod"
-    ram              = 512
-    start_on_boot    = true
-    startup_order    = 3
-    startup_up_delay = 5
-    swap             = 0
-    tags             = ["ct", "debian12", "prod", "rp"]
     unprivileged     = true
   }
 }
