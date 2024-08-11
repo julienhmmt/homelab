@@ -70,11 +70,11 @@ ct = {
     net_mac_address  = "BC:24:11:CA:FE:04"
     net_rate_limit   = 0
     pool_id          = "prod"
-    ram              = 1024
+    ram              = 2048
     start_on_boot    = true
     startup_order    = 1
     startup_up_delay = 5
-    swap             = 0
+    swap             = 2048
     tags             = ["ct", "db", "debian12", "prod"]
     unprivileged     = true
   }
