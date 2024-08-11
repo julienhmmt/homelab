@@ -14,8 +14,8 @@ terraform {
 provider "proxmox" {
   api_token = data.sops_file.pve_secrets.data["pve_api_token"]
   endpoint  = data.sops_file.pve_secrets.data["pve_endpoint"]
-  insecure   = true # because self-signed TLS certificate is in use
-  tmp_dir    = "/var/tmp/"
+  insecure  = true # because self-signed TLS certificate is in use
+  tmp_dir   = "/var/tmp/"
 
   ssh {
     agent    = true
