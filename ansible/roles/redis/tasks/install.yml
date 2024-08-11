@@ -1,0 +1,34 @@
+---
+# file: roles/redis/tasks/main.yml
+
+- name: Ping hosts
+  ansible.builtin.ping:
+
+- name: Create the redis group
+  ansible.builtin.group:
+    name: "{{ redis_group }}"
+    state: present
+    system: true
+
+- name: Create a user for redis
+  ansible.builtin.user:
+    name: "{{ redis_user }}"
+    group: "{{ redis_group }}"
+    system: true
+    shell: "/bin/false"
+    state: present
+
+- name: Install redis from apt
+  ansible.builtin.apt:
+    clean: true
+    name: "redis-server"
+    state: "present"
+    update_cache: true
+
+# - name: Create redis configuration path
+#   ansible.builtin.file:
+#     path: "/etc/redis"
+#     state: directory
+#     owner: "{{ redis_user }}"
+#     group: "{{ redis_group }}"
+#     mode: "u=rwx,g=rw,o=r"

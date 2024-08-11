@@ -1,0 +1,11 @@
+---
+
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Test if redis-server is started and enabled
+      ansible.builtin.systemd:
+        enabled: true
+        name: redis-server
+        state: started
+      changed_when: false

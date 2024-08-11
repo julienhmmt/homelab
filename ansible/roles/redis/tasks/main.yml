@@ -1,0 +1,14 @@
+---
+
+- name: Installation of redis-server
+  ansible.builtin.include_tasks: install.yml
+
+- name: Configuration of redis-server
+  ansible.builtin.include_tasks: config.yml
+
+- name: Ensure redis-server is started and enabled
+  ansible.builtin.systemd:
+    daemon-reload: true
+    enabled: true
+    name: "redis-server"
+    state: "started"

@@ -1,0 +1,7 @@
+---
+# file: roles/redis/vars/main.yml
+
+redis_group: "redis"
+redis_user: "redis"
+# redis_maxmemory_bytes: "1073741824"
+# redis_maxmemory_policy: "allkeys-lru"

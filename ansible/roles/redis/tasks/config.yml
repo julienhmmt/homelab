@@ -1,0 +1,28 @@
+---
+
+- name: Configuration - enforce sysctl vm.overcommit_memory value
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: "1"
+    state: present
+  when: not ansible_facts['virtualization_type'] in ['docker', 'podman', 'openvz']
+
+- name: Configuration - disable huge pages
+  ansible.builtin.shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+  when: not ansible_facts['virtualization_type'] in ['docker', 'podman', 'openvz']
+
+# - name: Configuration - copy redis config file
+#   ansible.builtin.template:
+#     src: redis.conf.j2
+#     dest: "/etc/redis/redis.conf"
+#     mode: "u=rw,g=r,o="
+#   notify: Restart redis-server
+
+# - name: Configuration - copy systemd template
+#   ansible.builtin.template:
+#     src: redis-server.service.j2
+#     dest: "/lib/systemd/system/redis-server.service"
+#     owner: "{{ redis_user }}"
+#     group: "{{ redis_group }}"
+#     mode: "u=rw,g=r,o=r"
+#   notify: Restart redis-server

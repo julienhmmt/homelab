@@ -1,0 +1,30 @@
+[all]
+
+[pve]
+pve1 ansible_host=192.168.1.1
+
+[lxc]
+cloudflaretunnel
+haproxy
+influxdb
+netdata
+redis
+vault
+
+[cloudflaretunnel]
+cloudflaretunnel ansible_host=192.168.1.206
+
+[haproxy]
+haproxy ansible_host=192.168.1.205
+
+[influxdb]
+influxdb ansible_host=192.168.1.203
+
+[netdata]
+netdata ansible_host=192.168.1.202
+
+[redis]
+redis ansible_host=192.168.1.204
+
+[vault]
+vault ansible_host=192.168.1.201

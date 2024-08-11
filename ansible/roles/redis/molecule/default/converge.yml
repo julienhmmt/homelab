@@ -1,0 +1,15 @@
+---
+
+- name: Converge
+  hosts: all
+  gather_facts: true
+  vars:
+    redis_group: "redis"
+    redis_user: "redis"
+    # redis_maxmemory_bytes: "1073741824" # 1,7 Gb
+    # redis_maxmemory_policy: "allkeys-lru"
+  tasks:
+    - name: Include the redis role
+      ansible.builtin.include_role:
+        name: redis
+        tasks_from: main.yml

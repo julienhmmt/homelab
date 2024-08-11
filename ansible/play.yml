@@ -1,0 +1,11 @@
+---
+
+- name: Apply redis-server role
+  become: true
+  become_method: sudo
+  become_user: root
+  hosts:
+    - redis
+  roles:
+    - name: redis
+      tags: redis
