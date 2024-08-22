@@ -1,8 +1,0 @@
----
-# requirements.yml
-
-- src: https://github.com/julienhmmt/nodeexporter
-  version: 1.0.0
-
-- src: https://github.com/julienhmmt/pveexporter
-  version: 1.0.0

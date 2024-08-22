@@ -19,25 +19,25 @@ ct = {
     unprivileged     = true
   }
 
-  "netdata" = {
-    cpu_cores        = 1
-    description      = "Managed by OpenTofu. PVE supervision"
-    disk_size        = 16
-    domain           = "khepri.internal"
-    hostname         = "netdata"
-    id               = 1202
-    ipv4             = "192.168.1.202/24"
-    net_mac_address  = "BC:24:11:CA:FE:02"
-    net_rate_limit   = 100
-    pool_id          = "prod"
-    ram              = 512
-    start_on_boot    = true
-    startup_order    = 2
-    startup_up_delay = 5
-    swap             = 0
-    tags             = ["ct", "debian12", "monitoring", "prod"]
-    unprivileged     = true
-  }
+  # "netdata" = {
+  #   cpu_cores        = 1
+  #   description      = "Managed by OpenTofu. PVE supervision"
+  #   disk_size        = 16
+  #   domain           = "khepri.internal"
+  #   hostname         = "netdata"
+  #   id               = 1202
+  #   ipv4             = "192.168.1.202/24"
+  #   net_mac_address  = "BC:24:11:CA:FE:02"
+  #   net_rate_limit   = 100
+  #   pool_id          = "prod"
+  #   ram              = 512
+  #   start_on_boot    = true
+  #   startup_order    = 2
+  #   startup_up_delay = 5
+  #   swap             = 0
+  #   tags             = ["ct", "debian12", "monitoring", "prod"]
+  #   unprivileged     = true
+  # }
 
   "influxdb" = {
     cpu_cores        = 1
