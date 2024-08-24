@@ -1,0 +1,10 @@
+---
+
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Test if netdata is started and enabled
+      ansible.builtin.systemd:
+        enabled: true
+        name: netdata
+        state: started

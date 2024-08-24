@@ -1,0 +1,11 @@
+---
+
+- name: Converge
+  hosts: all
+  gather_facts: true
+  # vars:
+  tasks:
+    - name: Include the netdata role
+      ansible.builtin.include_role:
+        name: netdata
+        tasks_from: main.yml

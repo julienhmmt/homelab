@@ -21,7 +21,7 @@ haproxy ansible_host=192.168.1.205
 influxdb ansible_host=192.168.1.203
 
 [netdata]
-netdata ansible_host=192.168.1.202
+pve
 
 [redis]
 redis ansible_host=192.168.1.204

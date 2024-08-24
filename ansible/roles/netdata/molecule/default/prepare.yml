@@ -1,0 +1,22 @@
+---
+
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install python3-minimal for ansible
+      ansible.builtin.shell: "test -e /usr/bin/python3 || (apt update -y && apt install python3-minimal -y --no-install-recommends)"
+      changed_when: false
+
+    - name: Install minimal system tools
+      ansible.builtin.apt:
+        install_recommends: false
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - ca-certificates
+        - curl
+        - openssl
+        - sudo
+        - tar

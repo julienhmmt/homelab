@@ -1,0 +1,25 @@
+---
+
+dependency:
+  name: galaxy
+
+driver:
+  name: podman
+
+platforms:
+  - name: mol-deb12-netdata
+    image: geerlingguy/docker-debian12-ansible
+    command: /lib/systemd/systemd
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+
+provisioner:
+  name: ansible
+
+scenario:
+  name: default
+
+verifier:
+  name: ansible

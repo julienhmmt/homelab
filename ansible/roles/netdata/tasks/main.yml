@@ -1,0 +1,15 @@
+---
+
+- name: Use apt to install Netdata
+  ansible.builtin.apt:
+    name: netdata
+    install_recommends: false
+    state: present
+    update_cache: true
+
+- name: Check if opt-out file is here
+  ansible.builtin.file:
+    group: root
+    mode: u=rw,g=r,o=r
+    owner: root
+    path: /etc/netdata/.opt-out-from-anonymous-statistics
