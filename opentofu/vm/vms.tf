@@ -24,6 +24,7 @@ resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest"
 resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   depends_on = [
     proxmox_virtual_environment_download_file.archlinux_cloudimg_latest,
+    proxmox_virtual_environment_file.meta_cloud_config,
     proxmox_virtual_environment_file.cloud_config,
     random_password.vm_root_password
   ]
@@ -33,14 +34,16 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   bios                = "ovmf"
   description         = each.value.description
   keyboard_layout     = "fr"
-  name                = each.value.hostname
-  node_name           = "pve1"
   machine             = "q35"
   migrate             = true
+  name                = each.value.hostname
+  node_name           = "pve1"
   on_boot             = each.value.start_on_boot
   pool_id             = each.value.pool_id
+  scsi_hardware = "virtio-scsi-single"
   started             = each.value.started
   stop_on_destroy     = true
+  tablet_device       = false
   tags                = each.value.tags
   timeout_create      = 180
   timeout_shutdown_vm = 30
@@ -66,9 +69,11 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
 
   disk {
     datastore_id = "local-zfs"
-    file_id      = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
-    interface    = "scsi1"
     discard      = "on"
+    file_id      = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
+    iothread     = true
+    interface    = "virtio0"
+    size         = each.value.disk_size
   }
 
   efi_disk {
@@ -78,7 +83,6 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
 
   initialization {
     datastore_id = "local-zfs"
-    interface    = "scsi0"
 
     dns {
       domain  = "khepri.internal"
@@ -118,11 +122,20 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
     down_delay = 60
   }
 
-  tpm_state {
-    version = "v2.0"
-  }
-
   serial_device {}
+}
+
+resource "proxmox_virtual_environment_file" "meta_cloud_config" {
+  for_each = var.cloud_config_metadata
+
+  content_type = "snippets"
+  datastore_id = "local"
+  node_name    = "pve1"
+
+  source_raw {
+    data      = each.value
+    file_name = "${each.key}_ci_meta-data.yml"
+  }
 }
 
 resource "proxmox_virtual_environment_file" "cloud_config" {

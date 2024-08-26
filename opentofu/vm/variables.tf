@@ -6,7 +6,6 @@ variable "vm" {
     domain           = string
     firewall_enabled = bool
     hostname         = string
-    id               = number
     ipv4_address     = string
     net_mac_address  = string
     net_rate_limit   = number
@@ -18,6 +17,10 @@ variable "vm" {
     tags             = list(string)
     vm_id            = number
   }))
+}
+
+variable "cloud_config_metadata" {
+  type = map(string)
 }
 
 variable "cloud_config_scripts" {
