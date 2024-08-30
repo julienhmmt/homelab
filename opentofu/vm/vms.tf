@@ -12,18 +12,18 @@ output "vm_root_password" {
 }
 
 # location of containers templates
-resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest" {
+resource "proxmox_virtual_environment_download_file" "ubuntu_cloudimg_latest" {
   content_type = "iso"
   datastore_id = "local"
-  file_name    = "Arch-Linux-x86_64-cloudimg.qcow2.img"
+  file_name    = "noble-server-cloudimg-amd64.img"
   node_name    = "pve1"
   overwrite    = true
-  url          = "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+  url          = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
 }
 
-resource "proxmox_virtual_environment_vm" "archlinux_vm" {
+resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   depends_on = [
-    proxmox_virtual_environment_download_file.archlinux_cloudimg_latest,
+    proxmox_virtual_environment_download_file.ubuntu_cloudimg_latest,
     proxmox_virtual_environment_file.meta_cloud_config,
     proxmox_virtual_environment_file.cloud_config,
     random_password.vm_root_password
@@ -40,7 +40,7 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   node_name           = "pve1"
   on_boot             = each.value.start_on_boot
   pool_id             = each.value.pool_id
-  scsi_hardware = "virtio-scsi-single"
+  scsi_hardware       = "virtio-scsi-single"
   started             = each.value.started
   stop_on_destroy     = true
   tablet_device       = false
@@ -68,11 +68,12 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   }
 
   disk {
+    cache        = "none"
     datastore_id = "local-zfs"
     discard      = "on"
-    file_id      = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
+    file_id      = proxmox_virtual_environment_download_file.ubuntu_cloudimg_latest.id
     iothread     = true
-    interface    = "virtio0"
+    interface    = "scsi0"
     size         = each.value.disk_size
   }
 
