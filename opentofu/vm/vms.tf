@@ -56,10 +56,6 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     trim    = true
   }
 
-  audio_device {
-    enabled = false
-  }
-
   cpu {
     architecture = "x86_64"
     cores        = each.value.cpu_cores
