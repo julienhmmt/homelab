@@ -12,17 +12,18 @@ output "vm_root_password" {
 }
 
 # location of containers templates
-# resource "proxmox_virtual_environment_download_file" "ubuntu_cloudimg_latest" {
-#   content_type = "iso"
-#   datastore_id = "local"
-#   file_name    = "noble-server-cloudimg-amd64.img"
-#   node_name    = "pve1"
-#   overwrite    = true
-#   url          = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
-# }
+resource "proxmox_virtual_environment_download_file" "ubuntu_cloudimg_latest" {
+  content_type = "iso"
+  datastore_id = "local"
+  file_name    = "noble-server-cloudimg-amd64.img"
+  node_name    = "pve1"
+  overwrite    = true
+  url          = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+}
 
-resource "proxmox_virtual_environment_vm" "archlinux_vm" {
+resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   depends_on = [
+    proxmox_virtual_environment_download_file.ubuntu_cloudimg_latest,
     proxmox_virtual_environment_file.meta_cloud_config,
     proxmox_virtual_environment_file.cloud_config,
     random_password.vm_root_password
@@ -33,7 +34,7 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   bios                = "ovmf"
   description         = each.value.description
   keyboard_layout     = "fr"
-  machine             = "pc-q35-9.0"
+  machine             = "q35"
   migrate             = true
   name                = each.value.hostname
   node_name           = "pve1"
@@ -55,31 +56,21 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
     trim    = true
   }
 
-  clone {
-    datastore_id = "local-zfs"
-    full         = true
-    node_name    = "pve1"
-    retries      = 2
-    vm_id        = 102
-  }
-
   cpu {
     architecture = "x86_64"
     cores        = each.value.cpu_cores
-    numa         = true
     sockets      = 1
     type         = "host"
   }
 
   disk {
-    aio = "native"
     cache        = "none"
     datastore_id = "local-zfs"
     discard      = "on"
-    # file_id      = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
-    iothread  = true
-    interface = "scsi0"
-    size      = each.value.disk_size
+    file_id      = proxmox_virtual_environment_download_file.ubuntu_cloudimg_latest.id
+    iothread     = true
+    interface    = "scsi0"
+    size         = each.value.disk_size
   }
 
   efi_disk {
