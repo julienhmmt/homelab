@@ -12,18 +12,19 @@ output "vm_root_password" {
 }
 
 # location of containers templates
-# resource "proxmox_virtual_environment_download_file" "ubuntu_cloudimg_latest" {
+# resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest" {
 #   content_type = "iso"
 #   datastore_id = "local"
-#   file_name    = "noble-server-cloudimg-amd64.img"
+#   file_name    = "Arch-Linux-x86_64-cloudimg.qcow2.img"
 #   node_name    = "pve1"
 #   overwrite    = true
-#   url          = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+#   url          = "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
 # }
 
 resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   depends_on = [
     proxmox_virtual_environment_file.meta_cloud_config,
+    # proxmox_virtual_environment_file.network_cloud_config,
     proxmox_virtual_environment_file.cloud_config,
     random_password.vm_root_password
   ]
@@ -60,7 +61,7 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
     full         = true
     node_name    = "pve1"
     retries      = 2
-    vm_id        = 102
+    vm_id        = 100
   }
 
   cpu {
@@ -72,38 +73,33 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   }
 
   disk {
-    aio = "native"
+    aio          = "native"
     cache        = "none"
     datastore_id = "local-zfs"
     discard      = "on"
     # file_id      = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
     iothread  = true
     interface = "scsi0"
+    replicate = false
     size      = each.value.disk_size
   }
 
   efi_disk {
-    datastore_id = "local-zfs"
-    type         = "4m"
+    datastore_id      = "local-zfs"
+    pre_enrolled_keys = true
+    type              = "4m"
   }
 
   initialization {
     datastore_id = "local-zfs"
 
     dns {
-      domain  = "khepri.internal"
-      servers = ["192.168.1.2"]
+      domain  = each.value.domain
+      servers = each.value.dns_servers
     }
 
-    ip_config {
-      ipv4 {
-        address = each.value.ipv4_address
-        gateway = "192.168.1.254"
-      }
-      ipv6 {
-        address = "dhcp"
-      }
-    }
+    meta_data_file_id = proxmox_virtual_environment_file.meta_cloud_config[each.key].id
+    # network_data_file_id = proxmox_virtual_environment_file.network_cloud_config[each.key].id
     user_data_file_id = proxmox_virtual_environment_file.cloud_config[each.key].id
   }
 
@@ -122,17 +118,24 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
     type = "l26"
   }
 
+  serial_device {}
+
+  smbios {
+    family       = "VM"
+    manufacturer = "QEMU"
+    product      = "virtio"
+    version      = "1.0"
+  }
+
   startup {
     order      = each.value.startup_order
     up_delay   = 60
     down_delay = 60
   }
-
-  serial_device {}
 }
 
 resource "proxmox_virtual_environment_file" "meta_cloud_config" {
-  for_each = var.cloud_config_metadata
+  for_each = var.meta_config_metadata
 
   content_type = "snippets"
   datastore_id = "local"
@@ -143,6 +146,19 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
     file_name = "${each.key}_ci_meta-data.yml"
   }
 }
+
+# resource "proxmox_virtual_environment_file" "network_cloud_config" {
+#   for_each = var.network_config_metadata
+
+#   content_type = "snippets"
+#   datastore_id = "local"
+#   node_name    = "pve1"
+
+#   source_raw {
+#     data      = each.value
+#     file_name = "${each.key}_network_meta-data.yml"
+#   }
+# }
 
 resource "proxmox_virtual_environment_file" "cloud_config" {
   for_each = var.cloud_config_scripts

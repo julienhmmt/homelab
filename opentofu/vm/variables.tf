@@ -3,10 +3,10 @@ variable "vm" {
     cpu_cores        = number
     description      = string
     disk_size        = number
+    dns_servers      = list(string)
     domain           = string
     firewall_enabled = bool
     hostname         = string
-    ipv4_address     = string
     net_mac_address  = string
     net_rate_limit   = number
     pool_id          = string
@@ -19,9 +19,13 @@ variable "vm" {
   }))
 }
 
-variable "cloud_config_metadata" {
+variable "meta_config_metadata" {
   type = map(string)
 }
+
+# variable "network_config_metadata" {
+#   type = map(string)
+# }
 
 variable "cloud_config_scripts" {
   type = map(string)
