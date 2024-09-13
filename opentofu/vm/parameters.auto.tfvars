@@ -100,16 +100,6 @@ cloud_config_scripts = {
       - docker network create -d bridge socket_proxy --subnet 172.16.3.0/24
 
     write_files:
-      - path: /etc/docker/daemon.json
-        content: |
-          {
-            "log-driver": "json-file",
-            "log-opts": {
-              "max-size": "10m",
-              "max-file": "3"
-            }
-          }
-
       - path: /etc/sysctl.d/99-sysctl-performance.conf
         content: |
           net.core.somaxconn = 1024
@@ -149,6 +139,10 @@ cloud_config_scripts = {
               nofile:
                 soft: 8000
                 hard: 12000
+            logging:
+              options:
+                max-size: "10m"
+                max-file: "3"
           ###
           services:
             socket-proxy:
@@ -160,9 +154,10 @@ cloud_config_scripts = {
               environment:
                 - CONTAINERS=1
                 - IMAGES=1
+                - INFO=1
                 - NETWORKS=1
-                - VOLUMES=1
                 - SERVICES=1
+                - VOLUMES=1
               networks:
                 - socket_proxy
               mem_limit: 128m
@@ -233,7 +228,7 @@ cloud_config_scripts = {
               container_name: portainer
               image: portainer/portainer-ce:alpine
               restart: unless-stopped
-              command: "-H tcp://socket-proxy:2375"
+              command: -H tcp://socket-proxy:2375
               networks:
                 - socket_proxy
               volumes:
