@@ -6,6 +6,7 @@ resource "proxmox_virtual_environment_user" "proxmate_user" {
   }
 
   comment  = "Managed by OpenTofu. Used only by the application Proxmate for iOS."
+  enabled  = true
   password = data.sops_file.pve_secrets.data["proxmate_password"]
   user_id  = "proxmate@pve"
 }
