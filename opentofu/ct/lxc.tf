@@ -21,17 +21,25 @@ resource "proxmox_virtual_environment_file" "arch_container_template" {
     path = "http://download.proxmox.com/images/system/archlinux-base_20240911-1_amd64.tar.zst"
   }
 }
+resource "proxmox_virtual_environment_file" "debian_container_template" {
+  content_type = "vztmpl"
+  datastore_id = "iso"
+  node_name    = "proxmox"
+
+  source_file {
+    path = "http://download.proxmox.com/images/system/debian-12-standard_12.7-1_amd64.tar.zst"
+  }
+}
 
 resource "proxmox_virtual_environment_container" "ct" {
   depends_on = [
     proxmox_virtual_environment_file.arch_container_template,
-    # proxmox_virtual_environment_file.hook_script,
+    # proxmox_virtual_environment_file.debian_container_template,
     random_password.ct_root_password
   ]
   for_each = var.ct
 
   description         = each.value.description
-  # hook_script_file_id = each.value.hook_script_file_id
   node_name           = "proxmox"
   pool_id             = each.value.pool_id
   start_on_boot       = each.value.start_on_boot
@@ -91,6 +99,8 @@ resource "proxmox_virtual_environment_container" "ct" {
   operating_system {
     template_file_id = proxmox_virtual_environment_file.arch_container_template.id
     type             = "archlinux"
+    # template_file_id = proxmox_virtual_environment_file.debian_container_template.id
+    # type             = "debian"
   }
 
   startup {
@@ -102,17 +112,3 @@ resource "proxmox_virtual_environment_container" "ct" {
   timeout_delete = 120
   timeout_update = 60
 }
-
-# resource "proxmox_virtual_environment_file" "hook_script" {
-#   for_each = var.hook_scripts
-
-#   content_type = "snippets"
-#   datastore_id = "ct"
-#   file_mode    = "0700"
-#   node_name    = "proxmox"
-
-#   source_raw {
-#     data      = each.value
-#     file_name = each.key
-#   }
-# }

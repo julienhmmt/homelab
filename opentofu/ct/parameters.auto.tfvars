@@ -19,25 +19,25 @@ ct = {
     unprivileged        = true
   }
 
-  "redis" = {
-    cpu_cores           = 1
-    description         = "Managed by OpenTofu. Redis"
-    disk_size           = 16
-    domain              = "local.hommet.net"
-    hostname            = "redis"
-    id                  = 1202
-    ipv4                = "192.168.1.202/24"
-    net_mac_address     = "BC:24:11:CA:FE:02"
-    net_rate_limit      = 0
-    pool_id             = "prod"
-    ram                 = 2048
-    start_on_boot       = true
-    startup_order       = 1
-    startup_up_delay    = 5
-    swap                = 2048
-    tags                = ["arch", "ct", "db", "prod"]
-    unprivileged        = true
-  }
+  # "redis" = {
+  #   cpu_cores           = 1
+  #   description         = "Managed by OpenTofu. Redis"
+  #   disk_size           = 16
+  #   domain              = "local.hommet.net"
+  #   hostname            = "redis"
+  #   id                  = 1202
+  #   ipv4                = "192.168.1.202/24"
+  #   net_mac_address     = "BC:24:11:CA:FE:02"
+  #   net_rate_limit      = 0
+  #   pool_id             = "prod"
+  #   ram                 = 2048
+  #   start_on_boot       = true
+  #   startup_order       = 1
+  #   startup_up_delay    = 5
+  #   swap                = 2048
+  #   tags                = ["arch", "ct", "db", "prod"]
+  #   unprivileged        = true
+  # }
 
   #   "influxdb" = {
   #     cpu_cores           = 1

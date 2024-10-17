@@ -5,7 +5,6 @@ variable "ct" {
     description         = string
     disk_size           = number
     domain              = string
-    # hook_script_file_id = string
     hostname            = string
     id                  = number
     ipv4                = string
@@ -21,7 +20,3 @@ variable "ct" {
     unprivileged        = bool
   }))
 }
-
-# variable "hook_scripts" {
-#   type = map(string)
-# }
