@@ -1,23 +1,23 @@
-ct = {
-  "vault" = {
-    cpu_cores           = 1
-    description         = "Managed by OpenTofu. Hashicorp Vault, internal PKI + secrets manager"
-    disk_size           = 16
-    domain              = "local.hommet.net"
-    hostname            = "vault"
-    id                  = 1201
-    ipv4                = "192.168.1.201/24"
-    net_mac_address     = "BC:24:11:CA:FE:01"
-    net_rate_limit      = 100
-    pool_id             = "prod"
-    ram                 = 512
-    start_on_boot       = true
-    startup_order       = 1
-    startup_up_delay    = 5
-    swap                = 0
-    tags                = ["arch", "ct", "prod"]
-    unprivileged        = true
-  }
+# ct = {
+#   "vault" = {
+#     cpu_cores           = 1
+#     description         = "Managed by OpenTofu. Hashicorp Vault, internal PKI + secrets manager"
+#     disk_size           = 16
+#     domain              = "local.hommet.net"
+#     hostname            = "vault"
+#     id                  = 1201
+#     ipv4                = "192.168.1.201/24"
+#     net_mac_address     = "BC:24:11:CA:FE:01"
+#     net_rate_limit      = 100
+#     pool_id             = "prod"
+#     ram                 = 512
+#     start_on_boot       = true
+#     startup_order       = 1
+#     startup_up_delay    = 5
+#     swap                = 0
+#     tags                = ["arch", "ct", "prod"]
+#     unprivileged        = true
+#   }
 
   # "redis" = {
   #   cpu_cores           = 1
@@ -102,4 +102,4 @@ ct = {
   #     tags                = ["ct", "debian12", "iam", "prod"]
   #     unprivileged        = true
   #   }
-}
+# }
