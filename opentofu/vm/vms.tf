@@ -98,6 +98,13 @@ resource "proxmox_virtual_environment_vm" "debian_vm" {
       servers = each.value.dns_servers
     }
 
+    ip_config {
+      ipv4 {
+        address = each.value.ipv4
+        gateway = "192.168.1.254"
+      }
+    }
+
     meta_data_file_id = proxmox_virtual_environment_file.meta_cloud_config[each.key].id
     # network_data_file_id = proxmox_virtual_environment_file.network_cloud_config[each.key].id
     user_data_file_id = proxmox_virtual_environment_file.user_cloud_config[each.key].id
@@ -151,7 +158,7 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
 #   for_each = var.network_config_metadata
 
 #   content_type = "snippets"
-#   datastore_id = "local"
+#   datastore_id = "vm"
 #   node_name    = "proxmox"
 
 #   source_raw {

@@ -7,6 +7,7 @@ variable "vm" {
     domain           = string
     firewall_enabled = bool
     hostname         = string
+    ipv4             = string
     net_mac_address  = string
     net_rate_limit   = number
     pool_id          = string

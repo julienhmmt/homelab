@@ -7,6 +7,7 @@ vm = {
     domain           = "local.hommet.net"
     firewall_enabled = false
     hostname         = "docker01"
+    ipv4             = "192.168.1.201/24"
     net_mac_address  = "BC:24:11:CA:FE:01"
     net_rate_limit   = 200
     pool_id          = "prod"
@@ -26,6 +27,7 @@ vm = {
     domain           = "local.hommet.net"
     firewall_enabled = false
     hostname         = "k3s01"
+    ipv4             = "192.168.1.202/24"
     net_mac_address  = "BC:24:11:CA:FE:02"
     net_rate_limit   = 0
     pool_id          = "prod"
@@ -55,7 +57,7 @@ meta_config_metadata = {
 #     network:
 #       version: 2
 #       ethernets:
-#         enp6s18:
+#         enp*:
 #           match:
 #             macaddress: "BC:24:11:CA:FE:01"
 #           addresses:
@@ -64,7 +66,23 @@ meta_config_metadata = {
 #             - to: 0.0.0.0/0
 #               via: 192.168.1.254
 #           nameservers:
-#             addresses: [192.168.1.2, 1.1.1.1]
+#             addresses: [192.168.1.2, 1.1.1.1, 1.0.0.1]
+#   EOF
+
+#   "k3s01" = <<-EOF
+#     network:
+#       version: 2
+#       ethernets:
+#         enp*:
+#           match:
+#             macaddress: "BC:24:11:CA:FE:02"
+#           addresses:
+#             - 192.168.1.202/24
+#           routes:
+#             - to: 0.0.0.0/0
+#               via: 192.168.1.254
+#           nameservers:
+#             addresses: [192.168.1.2, 1.1.1.1, 1.0.0.1]
 #   EOF
 # }
 
@@ -104,7 +122,6 @@ cloud_config_scripts = {
       - rm -f /var/lib/dbus/machine-id
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
-      - systemctl restart NetworkManager
       - apt update && apt upgrade -y
       - apt install -y ca-certificates curl
       - install -m 0755 -d /etc/apt/keyrings
@@ -508,7 +525,6 @@ cloud_config_scripts = {
       - rm -f /var/lib/dbus/machine-id
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
-      - systemctl restart NetworkManager
       - apt update && apt upgrade -y
       - apt install -y ca-certificates curl
   EOF
