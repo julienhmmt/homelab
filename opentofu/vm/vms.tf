@@ -11,21 +11,29 @@ output "vm_root_password" {
   sensitive = true
 }
 
-# location of containers templates
-# resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest" {
-#   content_type = "iso"
-#   datastore_id = "local"
-#   file_name    = "Arch-Linux-x86_64-cloudimg.qcow2.img"
-#   node_name    = "pve1"
-#   overwrite    = true
-#   url          = "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
-# }
+# location of iso templates
+resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest" {
+  content_type = "iso"
+  datastore_id = "iso"
+  file_name    = "arch-linux-cloudimg-amd64.qcow2.img"
+  node_name    = "proxmox"
+  overwrite    = true
+  url          = "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+}
+resource "proxmox_virtual_environment_download_file" "debian12_cloudimg_latest" {
+  content_type = "iso"
+  datastore_id = "iso"
+  file_name    = "debian12-genericcloud-amd64.qcow2.img"
+  node_name    = "proxmox"
+  overwrite    = true
+  url          = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+}
 
-resource "proxmox_virtual_environment_vm" "archlinux_vm" {
+resource "proxmox_virtual_environment_vm" "debian_vm" {
   depends_on = [
     proxmox_virtual_environment_file.meta_cloud_config,
     # proxmox_virtual_environment_file.network_cloud_config,
-    proxmox_virtual_environment_file.cloud_config,
+    proxmox_virtual_environment_file.user_cloud_config,
     random_password.vm_root_password
   ]
 
@@ -37,7 +45,7 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   machine             = "pc-q35-9.0"
   migrate             = true
   name                = each.value.hostname
-  node_name           = "pve1"
+  node_name           = "proxmox"
   on_boot             = each.value.start_on_boot
   pool_id             = each.value.pool_id
   scsi_hardware       = "virtio-scsi-single"
@@ -56,14 +64,6 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
     trim    = true
   }
 
-  clone {
-    datastore_id = "local-zfs"
-    full         = true
-    node_name    = "pve1"
-    retries      = 2
-    vm_id        = 100
-  }
-
   cpu {
     architecture = "x86_64"
     cores        = each.value.cpu_cores
@@ -75,23 +75,23 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
   disk {
     aio          = "native"
     cache        = "none"
-    datastore_id = "local-zfs"
+    datastore_id = "vm"
     discard      = "on"
-    # file_id      = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
-    iothread  = true
-    interface = "scsi0"
-    replicate = false
-    size      = each.value.disk_size
+    file_id      = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id
+    iothread     = true
+    interface    = "scsi0"
+    replicate    = false
+    size         = each.value.disk_size
   }
 
   efi_disk {
-    datastore_id      = "local-zfs"
+    datastore_id      = "vm"
     pre_enrolled_keys = true
     type              = "4m"
   }
 
   initialization {
-    datastore_id = "local-zfs"
+    datastore_id = "vm"
 
     dns {
       domain  = each.value.domain
@@ -100,7 +100,7 @@ resource "proxmox_virtual_environment_vm" "archlinux_vm" {
 
     meta_data_file_id = proxmox_virtual_environment_file.meta_cloud_config[each.key].id
     # network_data_file_id = proxmox_virtual_environment_file.network_cloud_config[each.key].id
-    user_data_file_id = proxmox_virtual_environment_file.cloud_config[each.key].id
+    user_data_file_id = proxmox_virtual_environment_file.user_cloud_config[each.key].id
   }
 
   memory {
@@ -138,8 +138,8 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
   for_each = var.meta_config_metadata
 
   content_type = "snippets"
-  datastore_id = "local"
-  node_name    = "pve1"
+  datastore_id = "vm"
+  node_name    = "proxmox"
 
   source_raw {
     data      = each.value
@@ -152,7 +152,7 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
 
 #   content_type = "snippets"
 #   datastore_id = "local"
-#   node_name    = "pve1"
+#   node_name    = "proxmox"
 
 #   source_raw {
 #     data      = each.value
@@ -160,12 +160,12 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
 #   }
 # }
 
-resource "proxmox_virtual_environment_file" "cloud_config" {
+resource "proxmox_virtual_environment_file" "user_cloud_config" {
   for_each = var.cloud_config_scripts
 
   content_type = "snippets"
-  datastore_id = "local"
-  node_name    = "pve1"
+  datastore_id = "vm"
+  node_name    = "proxmox"
 
   source_raw {
     data      = each.value

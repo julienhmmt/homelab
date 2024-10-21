@@ -1,7 +1,7 @@
 vm = {
   "docker01" = {
     cpu_cores        = 2
-    description      = "Managed by OpenTofu. Tools installed: `cockpit`, `docker`, `docker-compose`. Used only for Ghost blog."
+    description      = "Managed by OpenTofu. Tools installed: `cockpit`, `docker`, `docker-compose`. Used for Rancher and Ghost blog (temp)."
     disk_size        = 64
     dns_servers      = ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
     domain           = "local.hommet.net"
@@ -14,8 +14,27 @@ vm = {
     start_on_boot    = true
     started          = true
     startup_order    = "2"
-    tags             = ["arch", "docker"]
+    tags             = ["debian12", "docker"]
     vm_id            = 1201
+  }
+
+  "k3s01" = {
+    cpu_cores        = 4
+    description      = "Managed by OpenTofu. Tools installed: `cockpit`, `k3s`. Lightweight kubernetes cluster."
+    disk_size        = 64
+    dns_servers      = ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
+    domain           = "local.hommet.net"
+    firewall_enabled = false
+    hostname         = "k3s01"
+    net_mac_address  = "BC:24:11:CA:FE:02"
+    net_rate_limit   = 0
+    pool_id          = "prod"
+    ram              = 8192
+    start_on_boot    = true
+    started          = true
+    startup_order    = "2"
+    tags             = ["debian12", "docker"]
+    vm_id            = 1202
   }
 }
 
@@ -23,6 +42,11 @@ meta_config_metadata = {
   "docker01" = <<-EOF
     instance-id: docker01-instance
     local-hostname: docker01
+  EOF
+
+  "k3s01" = <<-EOF
+    instance-id: k3s01-instance
+    local-hostname: k3s01
   EOF
 }
 
@@ -63,15 +87,12 @@ cloud_config_scripts = {
         sudo: ALL=(ALL) NOPASSWD:ALL
         groups: wheel
         shell: /bin/bash
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
 
     # Misc settings
     timezone: Europe/Paris
     locale: en_US
-
-    random_seed:
-      file: /var/lib/cloud/seed/random-seed
-      data: YXBwbGUgbW91bnRhaW4gZ2lyYWZmZSBvY2VhbiBjbG91ZCBqdW5nbGUgbXlzdGVyaWVzIHRodW5kZXIgaG9yaXpvbiBjYWN0dXM=
-      encoding: base64
 
     keyboard:
       layout: fr
@@ -82,15 +103,20 @@ cloud_config_scripts = {
       - systemd-machine-id-setup
       - rm -f /var/lib/dbus/machine-id
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
+      - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
       - systemctl restart NetworkManager
-      - pacman -Syu --noconfirm
-      - pacman -S --noconfirm docker docker-compose ufw
+      - apt update && apt upgrade -y
+      - apt install -y ca-certificates curl
+      - install -m 0755 -d /etc/apt/keyrings
+      - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+      - chmod a+r /etc/apt/keyrings/docker.asc
+      - echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null
+      - apt update && apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin ufw
       - systemctl enable docker
       - systemctl start docker
       - usermod -aG docker user
-      - mkdir -p /opt/docker/rancher/{data,auditlog}
+      - mkdir -p /opt/docker/rancher/auditlog
       - mkdir -p /opt/docker/traefik/{logs,traefikdynamic}
-      - mkdir -p /opt/docker/portainer/data
       - touch /opt/docker/traefik/{acme-dev.json,acme-prod.json}
       - touch /opt/docker/traefik/logs/{traefik.log,traefikAccess.log}
       - chmod 600 /opt/docker/traefik/{acme-dev.json,acme-prod.json}
@@ -98,6 +124,8 @@ cloud_config_scripts = {
       - docker network create -d bridge oueb --subnet 172.16.1.0/24
       - docker network create -d bridge monitoring --subnet 172.16.2.0/24
       - docker network create -d bridge socket_proxy --subnet 172.16.3.0/24
+      - docker volume create portainer_data
+      - docker volume create rancher_data
 
     write_files:
       - path: /etc/sysctl.d/99-sysctl-performance.conf
@@ -130,6 +158,7 @@ cloud_config_scripts = {
             privileged: false
             volumes:
               - /etc/localtime:/etc/localtime:ro
+              - /etc/timezone:/etc/timezone:ro
             security_opt:
               - no-new-privileges=true
             tmpfs:
@@ -208,11 +237,11 @@ cloud_config_scripts = {
               memswap_limit: 256m
               depends_on:
                 - socket-proxy
-          ###
+
             rancher:
               <<: *x-common
               container_name: rancher
-              image: rancher/rancher:v2.9.1
+              image: rancher/rancher:v2.9.2
               restart: always
               privileged: true
               networks:
@@ -221,8 +250,8 @@ cloud_config_scripts = {
                 - "AUDIT_LEVEL=1"
               volumes:
                 - /opt/docker/rancher/auditlog:/var/log/auditlog
-                - /opt/docker/rancher/data:/var/lib/rancher
-          ###
+                - rancher_data:/var/lib/rancher
+
             portainer:
               <<: *x-common
               container_name: portainer
@@ -232,13 +261,13 @@ cloud_config_scripts = {
               networks:
                 - socket_proxy
               volumes:
-                - /opt/docker/portainer/data:/data
+                - portainer_data:/data
               depends_on:
                 - socket-proxy
               mem_limit: 256m
               mem_reservation: 128m
               memswap_limit: 256m
-
+          ###
           networks:
             backend:
 
@@ -253,6 +282,70 @@ cloud_config_scripts = {
             socket_proxy:
               external: true
               name: socket_proxy
+          ###
+          volumes:
+            portainer_data:
+              driver: local
+            rancher_data:
+              driver: local
+
+      - path: /opt/docker/gitea-compose.yml
+        content: |
+          ---
+          x-common: &x-common
+            privileged: false
+            volumes:
+              - /etc/localtime:/etc/localtime:ro
+              - /etc/timezone:/etc/timezone:ro
+            security_opt:
+              - no-new-privileges=true
+            tmpfs:
+              - /tmp:rw,noexec,nosuid,size=32m
+            ulimits:
+              nproc: 6144
+              nofile:
+                soft: 8000
+                hard: 12000
+            logging:
+              options:
+                max-size: "10m"
+                max-file: "3"
+          ###
+          services:
+            gitea:
+              <<: *x-common
+              container_name: gitea
+              image: gitea/gitea:1.22.3
+              restart: unless-stopped
+              networks:
+                - oueb
+              ports:
+              environment:
+                - GITEA__mailer__ENABLED=false
+                - GITEA__security__SECRET_KEY=XfUsYgNqEPo1u8iNUCdqbm1IEZPDUKDivqtuzl3Vo7g=
+                - GITEA__security__INTERNAL_TOKEN=QmEC0jQKbnEObWrSqvGfcQdBEX95sdwFqZCY7fbrUr4=
+                - USER_UID=1000
+                - USER_GID=1000
+              volumes:
+                - gitea:/data
+                # - ./app.ini:/data/gitea/conf/app.ini
+              healthcheck:
+                test: ["CMD", "curl", "--fail", "http://localhost:3000/api/healthz"]
+                interval: 10s
+                timeout: 5s
+                retries: 3
+              mem_limit: 256m
+              mem_reservation: 128m
+              memswap_limit: 256m
+          ###
+          networks:
+            oueb:
+              external: true
+              name: oueb
+          ###
+          volumes:
+            gitea_data:
+              driver: local
 
       - path: /opt/docker/traefik/traefik.yml
         content: |
@@ -357,7 +450,7 @@ cloud_config_scripts = {
                 entryPoints:
                   - websecure
                 service: sc-rancher
-                rule: Host (`rancher.local.cloudathome.dev`)
+                rule: Host (`rancher.local.hommet.net`)
                 tls:
                   certResolver: prod
 
@@ -375,8 +468,48 @@ cloud_config_scripts = {
                 entryPoints:
                   - websecure
                 service: sc-portainer
-                rule: Host (`portainer.local.cloudathome.dev`)
+                rule: Host (`portainer.local.hommet.net`)
                 tls:
                   certResolver: prod
+  EOF
+
+  "k3s01" = <<-EOF
+    #cloud-config
+
+    hostname: k3s01
+    manage_etc_hosts: true
+
+    allow_public_ssh_keys: true
+    ssh_pwauth: true
+    ssh_quiet_keygen: true
+
+    # default password = user
+    users:
+      - name: user
+        passwd: $6$rounds=4096$saltsalt$Qx5vTv.3oeF4.hPtzS/bwQm9J8NX6hSt1XPe2vAaAHCVrnwo.UEjH/EWFu1UvFBVIKV1Q4vlJZBhM6HxPJI5e1
+        lock_passwd: false
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: wheel
+        shell: /bin/bash
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+
+    # Misc settings
+    timezone: Europe/Paris
+    locale: en_US
+
+    keyboard:
+      layout: fr
+      model: pc105
+
+    runcmd:
+      - rm -f /etc/machine-id
+      - systemd-machine-id-setup
+      - rm -f /var/lib/dbus/machine-id
+      - ln -s /etc/machine-id /var/lib/dbus/machine-id
+      - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
+      - systemctl restart NetworkManager
+      - apt update && apt upgrade -y
+      - apt install -y ca-certificates curl
   EOF
 }
