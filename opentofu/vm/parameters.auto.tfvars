@@ -123,7 +123,7 @@ cloud_config_scripts = {
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
       - apt update && apt upgrade -y
-      - apt install -y ca-certificates curl
+      - apt install -y ca-certificates curl qemu-guest-agent
       - install -m 0755 -d /etc/apt/keyrings
       - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
       - chmod a+r /etc/apt/keyrings/docker.asc
@@ -143,6 +143,8 @@ cloud_config_scripts = {
       - docker network create -d bridge socket_proxy --subnet 172.16.3.0/24
       - docker volume create portainer_data
       - docker volume create rancher_data
+      - systemctl start qemu-guest-agent
+      - echo "done" > /tmp/cloud-config.done
 
     write_files:
       - path: /etc/sysctl.d/99-sysctl-performance.conf
@@ -526,6 +528,8 @@ cloud_config_scripts = {
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
       - apt update && apt upgrade -y
-      - apt install -y ca-certificates curl
+      - apt install -y ca-certificates curl qemu-guest-agent
+      - systemctl start qemu-guest-agent
+      - echo "done" > /tmp/cloud-config.done
   EOF
 }
