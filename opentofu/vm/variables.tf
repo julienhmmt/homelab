@@ -2,6 +2,7 @@ variable "vm" {
   type = map(object({
     cpu_cores        = number
     description      = string
+    disk_datastore   = string
     disk_size        = number
     dns_servers      = list(string)
     domain           = string

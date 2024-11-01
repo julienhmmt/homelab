@@ -14,7 +14,7 @@ output "vm_root_password" {
 # location of iso templates
 resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest" {
   content_type = "iso"
-  datastore_id = "iso"
+  datastore_id = "local"
   file_name    = "arch-linux-cloudimg-amd64.qcow2.img"
   node_name    = "proxmox"
   overwrite    = true
@@ -22,7 +22,7 @@ resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest"
 }
 resource "proxmox_virtual_environment_download_file" "debian12_cloudimg_latest" {
   content_type = "iso"
-  datastore_id = "iso"
+  datastore_id = "local"
   file_name    = "debian12-genericcloud-amd64.qcow2.img"
   node_name    = "proxmox"
   overwrite    = true
@@ -31,7 +31,7 @@ resource "proxmox_virtual_environment_download_file" "debian12_cloudimg_latest" 
 
 resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg_latest" {
   content_type = "iso"
-  datastore_id = "iso"
+  datastore_id = "local"
   file_name    = "ubuntu-22.04-server-cloudimg-amd64.img"
   node_name    = "proxmox"
   overwrite    = true
@@ -40,7 +40,7 @@ resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg_latest" 
 
 resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" {
   content_type = "iso"
-  datastore_id = "iso"
+  datastore_id = "local"
   file_name    = "ubuntu-24.04-server-cloudimg-amd64.img"
   node_name    = "proxmox"
   overwrite    = true
@@ -93,7 +93,7 @@ resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" 
 #   disk {
 #     aio          = "native"
 #     cache        = "none"
-#     datastore_id = "vm"
+#     datastore_id = "each.value.disk_datastore"
 #     discard      = "on"
 #     file_id      = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id
 #     iothread     = true
