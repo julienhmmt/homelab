@@ -15,7 +15,7 @@ vm = {
     start_on_boot    = true
     started          = true
     startup_order    = "2"
-    tags             = ["debian12", "docker"]
+    tags             = ["docker", "ubuntu24"]
     vm_id            = 1201
   }
 
@@ -31,11 +31,11 @@ vm = {
     net_mac_address  = "BC:24:11:CA:FE:02"
     net_rate_limit   = 0
     pool_id          = "prod"
-    ram              = 8192
+    ram              = 12288
     start_on_boot    = true
     started          = true
     startup_order    = "2"
-    tags             = ["debian12", "docker"]
+    tags             = ["k3s", "ubuntu22"]
     vm_id            = 1202
   }
 }
