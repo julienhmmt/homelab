@@ -1,31 +1,34 @@
 vm = {
   "docker01" = {
-    cpu_cores        = 2
-    description      = "Managed by OpenTofu. Tools installed: `cockpit`, `docker`, `docker-compose`. Used for Rancher and Ghost blog (temp)."
-    disk_datastore   = "local-lvm"
-    disk_size        = 64
-    dns_servers      = ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
-    domain           = "local.hommet.net"
-    firewall_enabled = false
-    hostname         = "docker01"
-    ipv4             = "192.168.1.201/24"
-    net_mac_address  = "BC:24:11:CA:FE:01"
-    net_rate_limit   = 200
-    pool_id          = "prod"
-    ram              = 6144
-    start_on_boot    = true
-    started          = true
-    startup_order    = "2"
-    tags             = ["docker", "ubuntu24"]
-    vm_id            = 1201
+    cpu_cores          = 2
+    description        = "Managed by OpenTofu. Tools installed: `cockpit`, `docker`, `docker-compose`. Used for Rancher and Ghost blog (temp)."
+    disk_efi_datastore = "local-lvm"
+    disk_size          = 64
+    disk_vm_datastore  = "local-lvm"
+    dns_servers        = ["192.168.1.2"]
+    domain             = "local.hommet.net"
+    firewall_enabled   = false
+    hostname           = "docker01"
+    ipv4               = "192.168.1.201/24"
+    net_mac_address    = "BC:24:11:CA:FE:01"
+    net_rate_limit     = 200
+    pool_id            = "prod"
+    ram                = 6144
+    start_on_boot      = true
+    started            = true
+    startup_order      = "1"
+    tags               = ["docker", "ubuntu24"]
+    vm_id              = 1201
   }
 
   "k3s01" = {
-    cpu_cores        = 4
-    description      = "Managed by OpenTofu. Tools installed: `cockpit`, `k3s`. Lightweight kubernetes cluster."
-    disk_datastore   = "local-nvme"
-    disk_size        = 64
-    dns_servers      = ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
+    cpu_cores          = 4
+    description        = "Managed by OpenTofu. Tools installed: `cockpit`, `k3s`. Lightweight kubernetes cluster."
+    disk_efi_datastore = "local-nvme"
+    disk_size          = 64
+    disk_vm_datastore  = "local-nvme"
+    # dns_servers        = ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
+    dns_servers      = ["192.168.1.2"]
     domain           = "local.hommet.net"
     firewall_enabled = false
     hostname         = "k3s01"
@@ -117,15 +120,75 @@ cloud_config_scripts = {
     keyboard:
       layout: fr
       model: pc105
+    
+    bootcmd:
+      - apt update && apt install -y grub-efi
+
+    disk_setup:
+      /dev/sda:
+        table_type: gpt
+        layout: true
+        overwrite: false
+        partitions:
+          - label: EFI
+            number: 1
+            size: 512MiB
+            type: ef00  # EFI System Partition
+          - label: root
+            number: 2
+            size: 16GiB
+          - label: home
+            number: 3
+            size: 8GiB
+          - label: temp
+            number: 4
+            size: 8GiB
+          - label: var
+            number: 5
+            size: 16GiB
+
+    fs_setup:
+      - device: /dev/sda1
+        filesystem: vfat
+        label: EFI
+      - device: /dev/sda2
+        filesystem: btrfs
+        label: root
+      - device: /dev/sda3
+        filesystem: btrfs
+        label: home
+      - device: /dev/sda4
+        filesystem: btrfs
+        label: temp
+      - device: /dev/sda5
+        filesystem: btrfs
+        label: var
+
+    mounts:
+      - [ /dev/sda1, /boot/efi ]
+      - [ /dev/sda2, / ]
+      - [ /dev/sda3, /home, "btrfs", "defaults,nodev,nosuid" ]
+      - [ /dev/sda4, /tmp, “btrfs”, "defaults,ro,nosuid,noexec,nodev" ]
+      - [ /dev/sda5, /var ]
+
+    packages:
+      - btrfs-progs
+      - ca-certificates
+      - curl
+      - grub-efi
+      - inxi
+      - qemu-guest-agent
+      - screenfetch
+      - timeshift
 
     runcmd:
+      - btrfs device scan
       - rm -f /etc/machine-id
       - systemd-machine-id-setup
       - rm -f /var/lib/dbus/machine-id
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
       - apt update && apt upgrade -y
-      - apt install -y ca-certificates curl qemu-guest-agent
       - install -m 0755 -d /etc/apt/keyrings
       - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
       - chmod a+r /etc/apt/keyrings/docker.asc
@@ -145,7 +208,10 @@ cloud_config_scripts = {
       - docker network create -d bridge socket_proxy --subnet 172.16.3.0/24
       - docker volume create portainer_data
       - docker volume create rancher_data
-      - systemctl start qemu-guest-agent
+      - systemctl enable qemu-guest-agent
+      - chmod +x /etc/update-motd.d/01-custom
+      - grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=debian --recheck --no-floppy
+      - update-grub
       - echo "done" > /tmp/cloud-config.done
 
     write_files:
@@ -156,6 +222,17 @@ cloud_config_scripts = {
           net.ipv4.tcp_max_syn_backlog = 8096
           net.ipv4.tcp_slow_start_after_idle = 0
           net.ipv4.tcp_tw_reuse = 1
+
+      - path: /etc/default/grub.d/99-security.cfg
+        content: |
+          GRUB_CMDLINE_LINUX_DEFAULT="quiet splash nosmt spectre_v2=retpoline"
+
+      - path: /etc/update-motd.d/01-custom
+        content: |
+          #!/bin/sh
+          echo "Welcome to $(lsb_release -ds)"
+          screenfetch -n
+          inxi -S
 
       - path: /etc/logrotate.d/traefik
         content: |
@@ -531,7 +608,7 @@ cloud_config_scripts = {
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
       - apt update && apt upgrade -y
       - apt install -y ca-certificates curl qemu-guest-agent
-      - systemctl start qemu-guest-agent
+      - systemctl enable qemu-guest-agent
       - echo "done" > /tmp/cloud-config.done
   EOF
 }
