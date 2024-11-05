@@ -99,9 +99,14 @@ cloud_config_scripts = {
 
     hostname: docker01
     manage_etc_hosts: true
+    resize_rootfs: noblock
+    power_state: {mode: reboot}
+
+    ubuntu_pro:
+      enable: [fips, esm]
+      token: <ubuntu_pro_token>
 
     allow_public_ssh_keys: true
-    ssh_pwauth: true
     ssh_quiet_keygen: true
 
     # default password = user
@@ -117,57 +122,9 @@ cloud_config_scripts = {
     # Misc settings
     timezone: Europe/Paris
     locale: en_US
-    
-    # bootcmd:
-    #   - apt update && apt install -y grub-efi
 
-    # disk_setup:
-    #   /dev/sda:
-    #     table_type: gpt
-    #     layout: true
-    #     overwrite: false
-    #     partitions:
-    #       - label: EFI
-    #         number: 1
-    #         size: 512MiB
-    #         type: ef00  # EFI System Partition
-    #       - label: root
-    #         number: 2
-    #         size: 16GiB
-    #       - label: home
-    #         number: 3
-    #         size: 8GiB
-    #       - label: temp
-    #         number: 4
-    #         size: 8GiB
-    #       - label: var
-    #         number: 5
-    #         size: 16GiB
-
-    # fs_setup:
-    #   - device: /dev/sda1
-    #     filesystem: vfat
-    #     label: EFI
-    #   - device: /dev/sda2
-    #     filesystem: btrfs
-    #     label: root
-    #   - device: /dev/sda3
-    #     filesystem: btrfs
-    #     label: home
-    #   - device: /dev/sda4
-    #     filesystem: btrfs
-    #     label: temp
-    #   - device: /dev/sda5
-    #     filesystem: btrfs
-    #     label: var
-
-    # mounts:
-    #   - [ /dev/sda1, /boot/efi ]
-    #   - [ /dev/sda2, / ]
-    #   - [ /dev/sda3, /home, "btrfs", "defaults,nodev,nosuid" ]
-    #   - [ /dev/sda4, /tmp, “btrfs”, "defaults,ro,nosuid,noexec,nodev" ]
-    #   - [ /dev/sda5, /var ]
-
+    package_update: true
+    package_upgrade: true
     packages:
       # - btrfs-progs
       - ca-certificates
@@ -176,7 +133,9 @@ cloud_config_scripts = {
       # - inxi
       - qemu-guest-agent
       # - screenfetch
+      - systemd-timesyncd
       # - timeshift
+      - ufw
 
     runcmd:
       # - btrfs device scan
@@ -185,7 +144,6 @@ cloud_config_scripts = {
       - rm -f /var/lib/dbus/machine-id
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
-      - apt update && apt upgrade -y
       - install -m 0755 -d /etc/apt/keyrings
       - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
       - chmod a+r /etc/apt/keyrings/docker.asc
@@ -209,6 +167,15 @@ cloud_config_scripts = {
       # - chmod +x /etc/update-motd.d/01-custom
       # - grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=debian --recheck --no-floppy
       # - update-grub
+      - sed -i 's/[#]*PermitRootLogin yes/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
+      - sed -i 's/[#]*PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+      - sed -i 's/#HostKey \/etc\/ssh\/ssh_host_ed25519_key/HostKey \/etc\/ssh\/ssh_host_ed25519_key/g' /etc/ssh/sshd_config
+      - systemctl reload ssh
+      - ufw allow 6443/tcp #apiserver
+      - ufw allow from 10.42.0.0/16 to any #pods
+      - ufw allow from 10.43.0.0/16 to any #services
+      - ufw allow 22/tcp
+      - systemctl enable ufw
       - echo "done" > /tmp/cloud-config.done
       - reboot
 
@@ -574,9 +541,14 @@ cloud_config_scripts = {
 
     hostname: k3s01
     manage_etc_hosts: true
+    resize_rootfs: noblock
+    power_state: {mode: reboot}
+
+    ubuntu_pro:
+      enable: [fips, esm]
+      token: <ubuntu_pro_token>
 
     allow_public_ssh_keys: true
-    ssh_pwauth: true
     ssh_quiet_keygen: true
 
     # default password = user
@@ -588,10 +560,22 @@ cloud_config_scripts = {
         shell: /bin/bash
         ssh_authorized_keys:
           - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+      - name: etcd
+        no_create_home: true
+        shell: /dev/null
+        system: true
 
     # Misc settings
     timezone: Europe/Paris
     locale: en_US
+
+    package_update: true
+    package_upgrade: true
+    packages:
+      - curl
+      - qemu-guest-agent
+      - systemd-timesyncd
+      - ufw
 
     runcmd:
       - rm -f /etc/machine-id
@@ -599,9 +583,12 @@ cloud_config_scripts = {
       - rm -f /var/lib/dbus/machine-id
       - ln -s /etc/machine-id /var/lib/dbus/machine-id
       - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
-      - apt update && apt upgrade -y
-      - apt install -y ca-certificates curl qemu-guest-agent
       - systemctl enable qemu-guest-agent
+      - ufw allow 22/tcp
+      - ufw allow 6443/tcp #apiserver
+      - ufw allow from 10.42.0.0/16 to any #pods
+      - ufw allow from 10.43.0.0/16 to any #services
+      - systemctl enable ufw
       - echo "done" > /tmp/cloud-config.done
       - reboot
   EOF
