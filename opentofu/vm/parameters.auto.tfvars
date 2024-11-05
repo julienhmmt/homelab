@@ -14,6 +14,7 @@ vm = {
     net_rate_limit     = 200
     pool_id            = "prod"
     ram                = 6144
+    resource_iso       = "ubuntu24_cloudimg_latest"
     start_on_boot      = true
     started            = true
     startup_order      = "1"
@@ -37,6 +38,7 @@ vm = {
     net_rate_limit   = 0
     pool_id          = "prod"
     ram              = 12288
+    resource_iso     = "ubuntu22_cloudimg_latest"
     start_on_boot    = true
     started          = true
     startup_order    = "2"
@@ -105,7 +107,6 @@ cloud_config_scripts = {
     # default password = user
     users:
       - name: user
-        passwd: $6$rounds=4096$saltsalt$Qx5vTv.3oeF4.hPtzS/bwQm9J8NX6hSt1XPe2vAaAHCVrnwo.UEjH/EWFu1UvFBVIKV1Q4vlJZBhM6HxPJI5e1
         lock_passwd: false
         sudo: ALL=(ALL) NOPASSWD:ALL
         groups: wheel
@@ -116,73 +117,69 @@ cloud_config_scripts = {
     # Misc settings
     timezone: Europe/Paris
     locale: en_US
-
-    keyboard:
-      layout: fr
-      model: pc105
     
-    bootcmd:
-      - apt update && apt install -y grub-efi
+    # bootcmd:
+    #   - apt update && apt install -y grub-efi
 
-    disk_setup:
-      /dev/sda:
-        table_type: gpt
-        layout: true
-        overwrite: false
-        partitions:
-          - label: EFI
-            number: 1
-            size: 512MiB
-            type: ef00  # EFI System Partition
-          - label: root
-            number: 2
-            size: 16GiB
-          - label: home
-            number: 3
-            size: 8GiB
-          - label: temp
-            number: 4
-            size: 8GiB
-          - label: var
-            number: 5
-            size: 16GiB
+    # disk_setup:
+    #   /dev/sda:
+    #     table_type: gpt
+    #     layout: true
+    #     overwrite: false
+    #     partitions:
+    #       - label: EFI
+    #         number: 1
+    #         size: 512MiB
+    #         type: ef00  # EFI System Partition
+    #       - label: root
+    #         number: 2
+    #         size: 16GiB
+    #       - label: home
+    #         number: 3
+    #         size: 8GiB
+    #       - label: temp
+    #         number: 4
+    #         size: 8GiB
+    #       - label: var
+    #         number: 5
+    #         size: 16GiB
 
-    fs_setup:
-      - device: /dev/sda1
-        filesystem: vfat
-        label: EFI
-      - device: /dev/sda2
-        filesystem: btrfs
-        label: root
-      - device: /dev/sda3
-        filesystem: btrfs
-        label: home
-      - device: /dev/sda4
-        filesystem: btrfs
-        label: temp
-      - device: /dev/sda5
-        filesystem: btrfs
-        label: var
+    # fs_setup:
+    #   - device: /dev/sda1
+    #     filesystem: vfat
+    #     label: EFI
+    #   - device: /dev/sda2
+    #     filesystem: btrfs
+    #     label: root
+    #   - device: /dev/sda3
+    #     filesystem: btrfs
+    #     label: home
+    #   - device: /dev/sda4
+    #     filesystem: btrfs
+    #     label: temp
+    #   - device: /dev/sda5
+    #     filesystem: btrfs
+    #     label: var
 
-    mounts:
-      - [ /dev/sda1, /boot/efi ]
-      - [ /dev/sda2, / ]
-      - [ /dev/sda3, /home, "btrfs", "defaults,nodev,nosuid" ]
-      - [ /dev/sda4, /tmp, “btrfs”, "defaults,ro,nosuid,noexec,nodev" ]
-      - [ /dev/sda5, /var ]
+    # mounts:
+    #   - [ /dev/sda1, /boot/efi ]
+    #   - [ /dev/sda2, / ]
+    #   - [ /dev/sda3, /home, "btrfs", "defaults,nodev,nosuid" ]
+    #   - [ /dev/sda4, /tmp, “btrfs”, "defaults,ro,nosuid,noexec,nodev" ]
+    #   - [ /dev/sda5, /var ]
 
     packages:
-      - btrfs-progs
+      # - btrfs-progs
       - ca-certificates
       - curl
-      - grub-efi
-      - inxi
+      # - grub-efi
+      # - inxi
       - qemu-guest-agent
-      - screenfetch
-      - timeshift
+      # - screenfetch
+      # - timeshift
 
     runcmd:
-      - btrfs device scan
+      # - btrfs device scan
       - rm -f /etc/machine-id
       - systemd-machine-id-setup
       - rm -f /var/lib/dbus/machine-id
@@ -209,10 +206,11 @@ cloud_config_scripts = {
       - docker volume create portainer_data
       - docker volume create rancher_data
       - systemctl enable qemu-guest-agent
-      - chmod +x /etc/update-motd.d/01-custom
-      - grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=debian --recheck --no-floppy
-      - update-grub
+      # - chmod +x /etc/update-motd.d/01-custom
+      # - grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=debian --recheck --no-floppy
+      # - update-grub
       - echo "done" > /tmp/cloud-config.done
+      - reboot
 
     write_files:
       - path: /etc/sysctl.d/99-sysctl-performance.conf
@@ -223,16 +221,16 @@ cloud_config_scripts = {
           net.ipv4.tcp_slow_start_after_idle = 0
           net.ipv4.tcp_tw_reuse = 1
 
-      - path: /etc/default/grub.d/99-security.cfg
-        content: |
-          GRUB_CMDLINE_LINUX_DEFAULT="quiet splash nosmt spectre_v2=retpoline"
+      # - path: /etc/default/grub.d/99-security.cfg
+      #   content: |
+      #     GRUB_CMDLINE_LINUX_DEFAULT="quiet splash nosmt spectre_v2=retpoline"
 
-      - path: /etc/update-motd.d/01-custom
-        content: |
-          #!/bin/sh
-          echo "Welcome to $(lsb_release -ds)"
-          screenfetch -n
-          inxi -S
+      # - path: /etc/update-motd.d/01-custom
+      #   content: |
+      #     #!/bin/sh
+      #     echo "Welcome to $(lsb_release -ds)"
+      #     screenfetch -n
+      #     inxi -S
 
       - path: /etc/logrotate.d/traefik
         content: |
@@ -584,7 +582,6 @@ cloud_config_scripts = {
     # default password = user
     users:
       - name: user
-        passwd: $6$rounds=4096$saltsalt$Qx5vTv.3oeF4.hPtzS/bwQm9J8NX6hSt1XPe2vAaAHCVrnwo.UEjH/EWFu1UvFBVIKV1Q4vlJZBhM6HxPJI5e1
         lock_passwd: false
         sudo: ALL=(ALL) NOPASSWD:ALL
         groups: wheel
@@ -596,10 +593,6 @@ cloud_config_scripts = {
     timezone: Europe/Paris
     locale: en_US
 
-    keyboard:
-      layout: fr
-      model: pc105
-
     runcmd:
       - rm -f /etc/machine-id
       - systemd-machine-id-setup
@@ -610,5 +603,6 @@ cloud_config_scripts = {
       - apt install -y ca-certificates curl qemu-guest-agent
       - systemctl enable qemu-guest-agent
       - echo "done" > /tmp/cloud-config.done
+      - reboot
   EOF
 }

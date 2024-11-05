@@ -14,6 +14,7 @@ variable "vm" {
     net_rate_limit     = number
     pool_id            = string
     ram                = number
+    resource_iso       = string
     start_on_boot      = bool
     started            = bool
     startup_order      = string

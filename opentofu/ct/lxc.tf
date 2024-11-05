@@ -39,13 +39,13 @@ resource "proxmox_virtual_environment_container" "ct" {
   ]
   for_each = var.ct
 
-  description         = each.value.description
-  node_name           = "proxmox"
-  pool_id             = each.value.pool_id
-  start_on_boot       = each.value.start_on_boot
-  tags                = each.value.tags
-  unprivileged        = each.value.unprivileged
-  vm_id               = each.value.id
+  description   = each.value.description
+  node_name     = "proxmox"
+  pool_id       = each.value.pool_id
+  start_on_boot = each.value.start_on_boot
+  tags          = each.value.tags
+  unprivileged  = each.value.unprivileged
+  vm_id         = each.value.id
 
   cpu {
     architecture = "amd64"

@@ -94,7 +94,11 @@ resource "proxmox_virtual_environment_vm" "debian_vm" {
     cache        = "none"
     datastore_id = each.value.disk_vm_datastore
     discard      = "on"
-    file_id      = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id
+    file_id      = lookup({
+      "debian12_cloudimg_latest" = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id,
+      "ubuntu22_cloudimg_latest"  = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id,
+      "ubuntu24_cloudimg_latest"  = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
+    }, each.value.resource_iso)
     iothread     = true
     interface    = "scsi0"
     replicate    = false
