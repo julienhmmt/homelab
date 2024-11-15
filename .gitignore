@@ -1,9 +1,9 @@
-_OLD/
 .DS_Store
 .cache/
 .idea/
 .terraform/
 .tox/
 .vscode/
+_OLD/
 key.txt
-terraform.tfstate*
+otplan
