@@ -7,4 +7,3 @@ _OLD/
 .vscode/
 key.txt
 terraform.tfstate*
-otplan

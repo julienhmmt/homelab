@@ -11,42 +11,6 @@ output "vm_root_password" {
   sensitive = true
 }
 
-# location of iso templates
-resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest" {
-  content_type = "iso"
-  datastore_id = "local"
-  file_name    = "arch-linux-cloudimg-amd64.qcow2.img"
-  node_name    = "proxmox"
-  overwrite    = true
-  url          = "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
-}
-resource "proxmox_virtual_environment_download_file" "debian12_cloudimg_latest" {
-  content_type = "iso"
-  datastore_id = "local"
-  file_name    = "debian12-genericcloud-amd64.qcow2.img"
-  node_name    = "proxmox"
-  overwrite    = true
-  url          = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-}
-
-resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg_latest" {
-  content_type = "iso"
-  datastore_id = "local"
-  file_name    = "ubuntu-22.04-server-cloudimg-amd64.img"
-  node_name    = "proxmox"
-  overwrite    = true
-  url          = "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
-}
-
-resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" {
-  content_type = "iso"
-  datastore_id = "local"
-  file_name    = "ubuntu-24.04-server-cloudimg-amd64.img"
-  node_name    = "proxmox"
-  overwrite    = true
-  url          = "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
-}
-
 resource "proxmox_virtual_environment_vm" "debian_vm" {
   depends_on = [
     proxmox_virtual_environment_file.meta_cloud_config,
