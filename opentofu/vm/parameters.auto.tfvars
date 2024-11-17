@@ -2,10 +2,11 @@ vm = {
   "docker01" = {
     cpu_cores          = 2
     description        = "Managed by OpenTofu. Tools installed: `cockpit`, `docker`, `docker-compose`. Used for Rancher and Ghost blog (temp)."
-    disk_efi_datastore = "local-lvm"
+    disk_efi_datastore = "zfsvm"
     disk_size          = 64
-    disk_vm_datastore  = "local-lvm"
-    dns_servers        = ["192.168.1.2"]
+    disk_vm_datastore  = "zfsvm"
+    disk_vm_img        = "ubuntu24"
+    dns_servers        = ["192.168.1.2"] # ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
     domain             = "local.hommet.net"
     firewall_enabled   = false
     hostname           = "docker01"
@@ -14,7 +15,6 @@ vm = {
     net_rate_limit     = 200
     pool_id            = "prod"
     ram                = 6144
-    resource_iso       = "ubuntu24_cloudimg_latest"
     start_on_boot      = true
     started            = true
     startup_order      = "1"
@@ -25,25 +25,24 @@ vm = {
   "k3s01" = {
     cpu_cores          = 4
     description        = "Managed by OpenTofu. Tools installed: `cockpit`, `k3s`. Lightweight kubernetes cluster."
-    disk_efi_datastore = "local-nvme"
+    disk_efi_datastore = "zfsvm"
     disk_size          = 64
-    disk_vm_datastore  = "local-nvme"
-    # dns_servers        = ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
-    dns_servers      = ["192.168.1.2"]
-    domain           = "local.hommet.net"
-    firewall_enabled = false
-    hostname         = "k3s01"
-    ipv4             = "192.168.1.202/24"
-    net_mac_address  = "BC:24:11:CA:FE:02"
-    net_rate_limit   = 0
-    pool_id          = "prod"
-    ram              = 12288
-    resource_iso     = "ubuntu22_cloudimg_latest"
-    start_on_boot    = true
-    started          = true
-    startup_order    = "2"
-    tags             = ["k3s", "ubuntu22"]
-    vm_id            = 1202
+    disk_vm_datastore  = "zfsvm"
+    disk_vm_img        = "ubuntu22"
+    dns_servers        = ["192.168.1.2"] # ["192.168.1.2", "1.1.1.1", "1.0.0.1"]
+    domain             = "local.hommet.net"
+    firewall_enabled   = false
+    hostname           = "k3s01"
+    ipv4               = "192.168.1.202/24"
+    net_mac_address    = "BC:24:11:CA:FE:02"
+    net_rate_limit     = 0
+    pool_id            = "prod"
+    ram                = 12288
+    start_on_boot      = true
+    started            = true
+    startup_order      = "2"
+    tags               = ["k3s", "ubuntu22"]
+    vm_id              = 1202
   }
 }
 
@@ -59,40 +58,6 @@ meta_config_metadata = {
   EOF
 }
 
-# network_config_metadata = {
-#   "docker01" = <<-EOF
-#     network:
-#       version: 2
-#       ethernets:
-#         enp*:
-#           match:
-#             macaddress: "BC:24:11:CA:FE:01"
-#           addresses:
-#             - 192.168.1.201/24
-#           routes:
-#             - to: 0.0.0.0/0
-#               via: 192.168.1.254
-#           nameservers:
-#             addresses: [192.168.1.2, 1.1.1.1, 1.0.0.1]
-#   EOF
-
-#   "k3s01" = <<-EOF
-#     network:
-#       version: 2
-#       ethernets:
-#         enp*:
-#           match:
-#             macaddress: "BC:24:11:CA:FE:02"
-#           addresses:
-#             - 192.168.1.202/24
-#           routes:
-#             - to: 0.0.0.0/0
-#               via: 192.168.1.254
-#           nameservers:
-#             addresses: [192.168.1.2, 1.1.1.1, 1.0.0.1]
-#   EOF
-# }
-
 cloud_config_scripts = {
   "docker01" = <<-EOF
     #cloud-config
@@ -102,9 +67,9 @@ cloud_config_scripts = {
     resize_rootfs: noblock
     power_state: {mode: reboot}
 
-    ubuntu_pro:
-      enable: [fips, esm]
-      token: <ubuntu_pro_token>
+    # ubuntu_pro:
+    #   enable: [fips, esm]
+    #   token: <ubuntu_pro_token>
 
     allow_public_ssh_keys: true
     ssh_quiet_keygen: true
@@ -118,6 +83,7 @@ cloud_config_scripts = {
         shell: /bin/bash
         ssh_authorized_keys:
           - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+        plain_text_passwd: pouetpouet
 
     # Misc settings
     timezone: Europe/Paris
@@ -544,9 +510,9 @@ cloud_config_scripts = {
     resize_rootfs: noblock
     power_state: {mode: reboot}
 
-    ubuntu_pro:
-      enable: [fips, esm]
-      token: <ubuntu_pro_token>
+    # ubuntu_pro:
+    #   enable: [fips, esm]
+    #   token: <ubuntu_pro_token>
 
     allow_public_ssh_keys: true
     ssh_quiet_keygen: true
@@ -560,6 +526,7 @@ cloud_config_scripts = {
         shell: /bin/bash
         ssh_authorized_keys:
           - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+        plain_text_passwd: pouetpouet
       - name: etcd
         no_create_home: true
         shell: /dev/null

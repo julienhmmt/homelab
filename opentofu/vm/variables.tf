@@ -5,6 +5,7 @@ variable "vm" {
     disk_efi_datastore = string
     disk_size          = number
     disk_vm_datastore  = string
+    disk_vm_img        = string
     dns_servers        = list(string)
     domain             = string
     firewall_enabled   = bool
@@ -14,7 +15,6 @@ variable "vm" {
     net_rate_limit     = number
     pool_id            = string
     ram                = number
-    resource_iso       = string
     start_on_boot      = bool
     started            = bool
     startup_order      = string
@@ -26,10 +26,6 @@ variable "vm" {
 variable "meta_config_metadata" {
   type = map(string)
 }
-
-# variable "network_config_metadata" {
-#   type = map(string)
-# }
 
 variable "cloud_config_scripts" {
   type = map(string)

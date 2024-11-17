@@ -1,22 +1,53 @@
 # see https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password.html. It will download "hashicorp/random" provider
-resource "random_password" "vm_root_password" {
-  for_each         = var.vm
-  length           = 24
-  override_special = "_%@"
-  special          = true
+# resource "random_password" "vm_root_password" {
+#   for_each         = var.vm
+#   length           = 24
+#   override_special = "_%@"
+#   special          = true
+# }
+
+# output "vm_root_password" {
+#   value     = { for key, pwd in random_password.vm_root_password : key => pwd.result }
+#   sensitive = true
+# }
+
+resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg_latest" {
+  checksum           = "0ba0fd632a90d981625d842abf18453d5bf3fd7bb64e6dd61809794c6749e18b"
+  checksum_algorithm = "sha256"
+  content_type       = "iso"
+  datastore_id       = "local"
+  file_name          = "ubuntu-22.04-server-cloudimg-amd64.img"
+  node_name          = "proxmox"
+  upload_timeout     = 180
+  url                = "https://cloud-images.ubuntu.com/jammy/20241004/jammy-server-cloudimg-amd64.img"
+}
+resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" {
+  checksum           = "5dc7f9c796442a51316d8431480fbe3f62cadbfde4d58a14d34dd987c01fd655"
+  checksum_algorithm = "sha256"
+  content_type       = "iso"
+  datastore_id       = "local"
+  file_name          = "ubuntu-24.04-server-cloudimg-amd64.img"
+  node_name          = "proxmox"
+  upload_timeout     = 180
+  url                = "https://cloud-images.ubuntu.com/noble/20241106/noble-server-cloudimg-amd64.img"
 }
 
-output "vm_root_password" {
-  value     = { for key, pwd in random_password.vm_root_password : key => pwd.result }
-  sensitive = true
+locals {
+  disk_image_map = {
+    ubuntu22 = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id
+    ubuntu24 = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
+  }
 }
 
-resource "proxmox_virtual_environment_vm" "debian_vm" {
+resource "proxmox_virtual_environment_vm" "vm" {
   depends_on = [
+    # proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest,
+    proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest,
+    proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest,
     proxmox_virtual_environment_file.meta_cloud_config,
-    # proxmox_virtual_environment_file.network_cloud_config,
-    proxmox_virtual_environment_file.user_cloud_config,
-    random_password.vm_root_password
+    # proxmox_virtual_environment_file.user_cloud_config,
+    proxmox_virtual_environment_file.user_cloud_config
+    # random_password.vm_root_password
   ]
 
   for_each = var.vm
@@ -56,13 +87,9 @@ resource "proxmox_virtual_environment_vm" "debian_vm" {
   disk {
     aio          = "native"
     cache        = "none"
-    datastore_id = each.value.disk_vm_datastore
+    datastore_id = each.value.disk_vm_datastore # 'zfsvm', 'nvme' si besoin de perfs, sinon 'local'
     discard      = "on"
-    file_id      = lookup({
-      "debian12_cloudimg_latest" = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id,
-      "ubuntu22_cloudimg_latest"  = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id,
-      "ubuntu24_cloudimg_latest"  = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
-    }, each.value.resource_iso)
+    file_id      = local.disk_image_map[each.value.disk_vm_img]
     iothread     = true
     interface    = "scsi0"
     replicate    = false
@@ -91,7 +118,6 @@ resource "proxmox_virtual_environment_vm" "debian_vm" {
     }
 
     meta_data_file_id = proxmox_virtual_environment_file.meta_cloud_config[each.key].id
-    # network_data_file_id = proxmox_virtual_environment_file.network_cloud_config[each.key].id
     user_data_file_id = proxmox_virtual_environment_file.user_cloud_config[each.key].id
   }
 
@@ -138,19 +164,6 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
     file_name = "${each.key}_ci_meta-data.yml"
   }
 }
-
-# resource "proxmox_virtual_environment_file" "network_cloud_config" {
-#   for_each = var.network_config_metadata
-
-#   content_type = "snippets"
-#   datastore_id = "vm"
-#   node_name    = "proxmox"
-
-#   source_raw {
-#     data      = each.value
-#     file_name = "${each.key}_network_meta-data.yml"
-#   }
-# }
 
 resource "proxmox_virtual_environment_file" "user_cloud_config" {
   for_each = var.cloud_config_scripts
