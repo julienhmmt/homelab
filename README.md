@@ -91,5 +91,6 @@ To start some commands, do :
 ```bash
 tofu fmt -recursive -diff
 tofu plan -parallelism=5 -concise -out otplan
+tofu plan -concise -target='proxmox_virtual_environment_vm.vm["ups01"]' -out otplan
 tofu apply -parallelism=5 otplan
 ```

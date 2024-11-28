@@ -27,6 +27,8 @@ variable "meta_config_metadata" {
   type = map(string)
 }
 
-variable "cloud_config_scripts" {
-  type = map(string)
+variable "user_cloud_config" {
+  type = map(object({
+    user_data_path = string
+  }))
 }

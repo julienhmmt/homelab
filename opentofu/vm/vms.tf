@@ -11,6 +11,36 @@
 #   sensitive = true
 # }
 
+resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest" {
+  #checksum           = "7751dda44d5e5daa2d6b6a73957b0b9a4e41cbde6d6cb29fcff672b5d54133e2"
+  #checksum_algorithm = "sha256"
+  content_type   = "iso"
+  datastore_id   = "local"
+  file_name      = "archlinux-latest-cloudimg-amd64.img"
+  node_name      = "proxmox"
+  upload_timeout = 180
+  url            = "https://geo.mirror.pkgbuild.com/images/v20241001.267073/Arch-Linux-x86_64-basic.qcow2"
+}
+resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg_minimal_latest" {
+  checksum           = "a426bbf3c64132d022792cafbf50d965b0fd8d68dd33b45eb96e327e8abb857c"
+  checksum_algorithm = "sha256"
+  content_type       = "iso"
+  datastore_id       = "local"
+  file_name          = "ubuntu-22.04-server-minimal-cloudimg-amd64.img"
+  node_name          = "proxmox"
+  upload_timeout     = 180
+  url                = "https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img"
+}
+resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_minimal_latest" {
+  checksum           = "a5e583583782b9fa631165e5c66a53201fcabd58e5098424babee0674160fb54"
+  checksum_algorithm = "sha256"
+  content_type       = "iso"
+  datastore_id       = "local"
+  file_name          = "ubuntu-24.04-server-minimal-cloudimg-amd64.img"
+  node_name          = "proxmox"
+  upload_timeout     = 180
+  url                = "https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img"
+}
 resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg_latest" {
   checksum           = "0ba0fd632a90d981625d842abf18453d5bf3fd7bb64e6dd61809794c6749e18b"
   checksum_algorithm = "sha256"
@@ -34,18 +64,22 @@ resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" 
 
 locals {
   disk_image_map = {
-    ubuntu22 = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id
-    ubuntu24 = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
+    archlinux        = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
+    ubuntu22         = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id
+    ubuntu24         = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
+    ubuntu22_minimal = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest.id
+    ubuntu24_minimal = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_minimal_latest.id
   }
 }
 
 resource "proxmox_virtual_environment_vm" "vm" {
   depends_on = [
-    # proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest,
+    proxmox_virtual_environment_download_file.archlinux_cloudimg_latest,
     proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest,
+    proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest,
     proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest,
+    proxmox_virtual_environment_download_file.ubuntu24_cloudimg_minimal_latest,
     proxmox_virtual_environment_file.meta_cloud_config,
-    # proxmox_virtual_environment_file.user_cloud_config,
     proxmox_virtual_environment_file.user_cloud_config
     # random_password.vm_root_password
   ]
@@ -166,14 +200,19 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
 }
 
 resource "proxmox_virtual_environment_file" "user_cloud_config" {
-  for_each = var.cloud_config_scripts
+  for_each = var.user_cloud_config
 
   content_type = "snippets"
   datastore_id = "local"
   node_name    = "proxmox"
 
-  source_raw {
-    data      = each.value
+  source_file {
+    # path      = "cloud-init/${each.key}.yaml"
+    path      = each.value.user_data_path
     file_name = "${each.key}_ci_user-data.yml"
   }
+  # source_raw {
+  #   data      = each.value
+  #   file_name = "${each.key}_ci_user-data.yml"
+  # }
 }
