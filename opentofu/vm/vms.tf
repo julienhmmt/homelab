@@ -21,6 +21,16 @@ resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg_latest"
   upload_timeout = 180
   url            = "https://geo.mirror.pkgbuild.com/images/v20241001.267073/Arch-Linux-x86_64-basic.qcow2"
 }
+resource "proxmox_virtual_environment_download_file" "debian_cloudimg_202411" {
+  checksum           = "9792c2c5dfdb796fd7caaf0e56f61e356b36eb76032f453515072ad9e517930d55d2e6705a4fea96a2413a656e4561eb018c52bdf4f24cd88b02d19e9daad76b"
+  checksum_algorithm = "sha512"
+  content_type       = "iso"
+  datastore_id       = "local"
+  file_name          = "debian-latest-cloudimg-amd64.img"
+  node_name          = "proxmox"
+  upload_timeout     = 180
+  url                = "https://cloud.debian.org/images/cloud/bookworm/20241125-1942/debian-12-genericcloud-amd64-20241125-1942.qcow2"
+}
 resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg_minimal_latest" {
   checksum           = "a426bbf3c64132d022792cafbf50d965b0fd8d68dd33b45eb96e327e8abb857c"
   checksum_algorithm = "sha256"
@@ -65,6 +75,7 @@ resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" 
 locals {
   disk_image_map = {
     archlinux        = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
+    debian           = proxmox_virtual_environment_download_file.debian_cloudimg_202411.id
     ubuntu22         = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id
     ubuntu24         = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
     ubuntu22_minimal = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest.id
@@ -75,6 +86,7 @@ locals {
 resource "proxmox_virtual_environment_vm" "vm" {
   depends_on = [
     proxmox_virtual_environment_download_file.archlinux_cloudimg_latest,
+    proxmox_virtual_environment_download_file.debian_cloudimg_202411,
     proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest,
     proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest,
     proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest,
@@ -86,7 +98,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   for_each = var.vm
 
-  bios                = "ovmf"
+  bios                = "seabios"
   description         = each.value.description
   keyboard_layout     = "fr"
   machine             = "pc-q35-9.0"
@@ -131,9 +143,8 @@ resource "proxmox_virtual_environment_vm" "vm" {
   }
 
   efi_disk {
-    datastore_id      = each.value.disk_efi_datastore
-    pre_enrolled_keys = true
-    type              = "4m"
+    datastore_id = each.value.disk_efi_datastore
+    type         = "4m"
   }
 
   initialization {
@@ -181,8 +192,16 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   startup {
     order      = each.value.startup_order
-    up_delay   = 60
+    up_delay   = 15
     down_delay = 60
+  }
+
+  dynamic "usb" {
+    for_each = each.value.hostname == "ups01" ? [1] : []
+    content {
+      mapping = "onduleur"
+      usb3 = false
+    }
   }
 }
 
