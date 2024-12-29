@@ -12,19 +12,19 @@ output "ct_root_password" {
 }
 
 ## location of containers templates
-resource "proxmox_virtual_environment_file" "arch_container_template" {
-  content_type = "vztmpl"
-  datastore_id = "iso"
-  node_name    = "proxmox"
+# resource "proxmox_virtual_environment_file" "arch_container_template" {
+#   content_type = "vztmpl"
+#   datastore_id = "iso"
+#   node_name    = "miniquarium"
 
-  source_file {
-    path = "http://download.proxmox.com/images/system/archlinux-base_20240911-1_amd64.tar.zst"
-  }
-}
+#   source_file {
+#     path = "http://download.proxmox.com/images/system/archlinux-base_20240911-1_amd64.tar.zst"
+#   }
+# }
 resource "proxmox_virtual_environment_file" "debian_container_template" {
   content_type = "vztmpl"
   datastore_id = "iso"
-  node_name    = "proxmox"
+  node_name    = "miniquarium"
 
   source_file {
     path = "http://download.proxmox.com/images/system/debian-12-standard_12.7-1_amd64.tar.zst"
@@ -33,14 +33,14 @@ resource "proxmox_virtual_environment_file" "debian_container_template" {
 
 resource "proxmox_virtual_environment_container" "ct" {
   depends_on = [
-    proxmox_virtual_environment_file.arch_container_template,
-    # proxmox_virtual_environment_file.debian_container_template,
+    # proxmox_virtual_environment_file.arch_container_template,
+    proxmox_virtual_environment_file.debian_container_template,
     random_password.ct_root_password
   ]
   for_each = var.ct
 
   description   = each.value.description
-  node_name     = "proxmox"
+  node_name     = "miniquarium"
   pool_id       = each.value.pool_id
   start_on_boot = each.value.start_on_boot
   tags          = each.value.tags
