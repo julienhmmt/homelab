@@ -1,4 +1,4 @@
-# JHMMT Homelab v2
+# JHMMT Homelab v2.1
 
 ## Goals
 
@@ -18,7 +18,25 @@ Scripts and files given here are "as it", with no operating obligation. Please r
 
 ## Proxmox VE
 
-As the 10th of august 2024, my machine is now a Proxmox VE tower. Here's the specifications:
+As the 29th of december 2024, my machine is now a Proxmox VE tower. Here's the specifications:
+
+- *MB*: MSI B650M-Pro
+- *CPU*: AMD Ryzen 5 4500G (no O.C., no downvoltage)
+- *Air cooler*: BeQuiet! Dark Rock PRO 4
+- *RAM*: 2 x 8 Gb DDR4 2666 Mhz (Corsair) - no D.O.C.P. profile + 2 x 16 Gb DDR4 3200 Mhz (Corsair) - no D.O.C.P. profile. Total = 48 Gb
+- *GPU*: AMD APU of the Ryzen 5
+- *System disk*: 1 Tb Crucial P3 m.2 SATA
+<!-- - *Data disks*: 2 x 2 Tb Toshiba DT01ACA200 -->
+- *Data disk*: 1 Tb Transcend 220S
+- *Power supply*: Corsair RM750e
+- *Case*: Fractal Design
+
+I used the official ISO of Proxmox VE to install the system on my Crucial SSD in XFS partition. At the first boot (in UEFI). In the Proxmox webUI, I added a local storage (Datacenter > Storage > button "add" > ZFS and I wrote the ZFS pool name `local-zfs`). -->
+
+
+<!-- ## Proxmox VE - OLD -->
+
+<!-- As the 10th of august 2024, my machine is now a Proxmox VE tower. Here's the specifications:
 
 - *MB*: Asus ROG X470-F Gaming
 - *CPU*: AMD Ryzen 7 2700 (no O.C., no downvoltage)
@@ -55,7 +73,7 @@ config:
 errors: No known data errors
 ```
 
-In the Proxmox webUI, I added this ZFS storage (Datacenter > Storage > button "add" > ZFS and I wrote the ZFS pool name `local-zfs`).
+In the Proxmox webUI, I added this ZFS storage (Datacenter > Storage > button "add" > ZFS and I wrote the ZFS pool name `local-zfs`). -->
 
 ## SOPS and age
 

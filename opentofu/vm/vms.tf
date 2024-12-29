@@ -200,7 +200,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
     for_each = each.value.hostname == "ups01" ? [1] : []
     content {
       mapping = "onduleur"
-      usb3 = false
+      usb3    = false
     }
   }
 }
