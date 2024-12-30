@@ -28,6 +28,8 @@ package_upgrade: true
 packages:
   - cockpit
   - curl
+  - docker.io
+  - docker-compose-v2
   - libusb-1.0-0-dev
   - nut
   - qemu-guest-agent
@@ -44,6 +46,7 @@ runcmd:
   - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
   - systemctl enable qemu-guest-agent
   - systemctl enable cockpit.service
+  - systemctl enable docker.service
   # DEBUT // NUT configuration
   - mv /etc/nut/upsd.users /etc/nut/upsd.users.doc
   - sed -i 's/MODE=none/MODE=standalone/' /etc/nut/nut.conf
@@ -52,7 +55,12 @@ runcmd:
   - echo "MONITOR nutdev1@localhost 1 admin pouetpouet master" >> /etc/nut/upsmon.conf
   # FIN // NUT configuration
   - ufw allow 22/tcp
+  - ufw allow 8080/tcp
   - ufw allow 9090/tcp
+  # DEBUT // Docker configuration
+  - docker network create --driver=bridge frontend
+  - mkdir -p /opt/docker
+  # FIN // Docker configuration
   - ufw enable
   - echo "done" > /tmp/cloud-config.done
 
@@ -78,3 +86,78 @@ write_files:
       actions = SET
       instcmds = ALL
       upsmon master
+
+  - path: /opt/docker/.env
+    content: |
+      IPAM_DATABASE_PASS=Grooving24Depletion58Improving96Uphold6
+      MYSQL_ROOT_PASSWORD=Naturist12Rickety56Graceless26Molar
+
+  - path: /opt/docker/phpipam.yml
+    content: |
+      ---
+      services:
+        phpipam-web:
+          image: phpipam/phpipam-www:1.7x
+          ports:
+            - "8080:80/tcp"
+          environment:
+            - TZ=Europe/Paris
+            - IPAM_DATABASE_HOST=phpipam-mariadb
+            - IPAM_DATABASE_USER=phpipamdbuser
+            - IPAM_DATABASE_PASS=${IPAM_DATABASE_PASS}
+            - IPAM_DATABASE_NAME=phpipamdb
+            - IPAM_DATABASE_WEBHOST=%
+            #- IPAM_DISABLE_INSTALLER=true
+            # ** Please disable installation helper scripts by setting IPAM_DISABLE_INSTALLER = 1 after initial setup is complete.
+            - OFFLINE_MODE=true
+            #- IPAM_FOOTER_MESSAGE=""
+          restart: unless-stopped
+          networks:
+            - frontend
+            - backend
+          volumes:
+            - phpipam-data:/phpipam
+            # - phpipam-ca:/usr/local/share/ca-certificates:ro
+          depends_on:
+            - phpipam-mariadb
+
+        phpipam-cron:
+          image: phpipam/phpipam-cron:1.7x
+          environment:
+            - TZ=Europe/Paris
+            - IPAM_DATABASE_HOST=phpipam-mariadb
+            - IPAM_DATABASE_USER=phpipamdbuser
+            - IPAM_DATABASE_PASS=${IPAM_DATABASE_PASS}
+            - IPAM_DATABASE_NAME=phpipamdb
+            - SCAN_INTERVAL=1h
+          restart: unless-stopped
+          # volumes:
+            # - phpipam-ca:/usr/local/share/ca-certificates:ro
+          networks:
+            - backend
+          depends_on:
+            - phpipam-mariadb
+
+        phpipam-mariadb:
+          image: mariadb:lts-noble
+          environment:
+            - MYSQL_USER=phpipamdbuser
+            - MYSQL_PASSWORD=${IPAM_DATABASE_PASS}
+            # - MYSQL_DATABASE=phpipamdb
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+          restart: unless-stopped
+          networks:
+            - backend
+          volumes:
+            - phpipam-db-data:/var/lib/mysql
+
+      volumes:
+        phpipam-data:
+        phpipam-db-data:
+        # phpipam-logo:
+        # phpipam-ca:
+
+      networks:
+        frontend:
+          external: true
+        backend:
