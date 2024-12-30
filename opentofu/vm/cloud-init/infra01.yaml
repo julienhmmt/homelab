@@ -1,0 +1,80 @@
+#cloud-config
+
+hostname: infra01
+manage_etc_hosts: true
+# resize_rootfs: noblock
+power_state: {mode: reboot}
+
+allow_public_ssh_keys: true
+ssh_quiet_keygen: true
+
+# default password = user
+users:
+  - name: user
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: wheel
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    plain_text_passwd: pouetpouet
+
+# Misc settings
+timezone: Europe/Paris
+locale: en_US
+
+package_update: true
+package_upgrade: true
+packages:
+  - cockpit
+  - curl
+  - libusb-1.0-0-dev
+  - nut
+  - qemu-guest-agent
+  - systemd-timesyncd
+  - ufw
+apt:
+  install_recommends: false
+
+runcmd:
+  - rm -f /etc/machine-id
+  - systemd-machine-id-setup
+  - rm -f /var/lib/dbus/machine-id
+  - ln -s /etc/machine-id /var/lib/dbus/machine-id
+  - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
+  - systemctl enable qemu-guest-agent
+  - systemctl enable cockpit.service
+  # DEBUT // NUT configuration
+  - mv /etc/nut/upsd.users /etc/nut/upsd.users.doc
+  - sed -i 's/MODE=none/MODE=standalone/' /etc/nut/nut.conf
+  - echo -e "[admin]\npassword = your_password\nactions = SET\ninstcmds = ALL\nupsmon master" >> /etc/nut/upsd.users
+  - echo "NOTIFYCMD /usr/sbin/upssched" >> /etc/nut/upsmon.conf
+  - echo "MONITOR nutdev1@localhost 1 admin pouetpouet master" >> /etc/nut/upsmon.conf
+  # FIN // NUT configuration
+  - ufw allow 22/tcp
+  - ufw allow 9090/tcp
+  - ufw enable
+  - echo "done" > /tmp/cloud-config.done
+
+write_files:
+  - path: /etc/nut/ups.conf
+    content: |
+      maxretry = 3
+      [nutdev1]
+        driver = "usbhid-ups"
+        port = "auto"
+        vendorid = "0463"
+        productid = "FFFF"
+        product = "Eaton 3S"
+        vendor = "EATON"
+        bus = "009"
+        device = "002"
+        busport = "001"
+
+  - path: /etc/nut/upsd.users
+    content: |
+      [admin]
+      password = pouetpouet
+      actions = SET
+      instcmds = ALL
+      upsmon master

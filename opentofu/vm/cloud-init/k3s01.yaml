@@ -1,0 +1,55 @@
+#cloud-config
+
+hostname: k3s01
+manage_etc_hosts: true
+resize_rootfs: noblock
+power_state: {mode: reboot}
+
+# ubuntu_pro:
+#   enable: [fips, esm]
+#   token: <ubuntu_pro_token>
+
+allow_public_ssh_keys: true
+ssh_quiet_keygen: true
+
+# default password = user
+users:
+  - name: user
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: wheel
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    plain_text_passwd: pouetpouet
+  - name: etcd
+    no_create_home: true
+    shell: /dev/null
+    system: true
+
+# Misc settings
+timezone: Europe/Paris
+locale: en_US
+
+package_update: true
+package_upgrade: true
+packages:
+  - curl
+  - qemu-guest-agent
+  - systemd-timesyncd
+  - ufw
+
+runcmd:
+  - rm -f /etc/machine-id
+  - systemd-machine-id-setup
+  - rm -f /var/lib/dbus/machine-id
+  - ln -s /etc/machine-id /var/lib/dbus/machine-id
+  - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
+  - systemctl enable qemu-guest-agent
+  - ufw allow 22/tcp
+  - ufw allow 6443/tcp #apiserver
+  - ufw allow from 10.42.0.0/16 to any #pods
+  - ufw allow from 10.43.0.0/16 to any #services
+  - systemctl enable ufw
+  - echo "done" > /tmp/cloud-config.done
+  - reboot

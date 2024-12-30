@@ -63,3 +63,27 @@ resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_minimal_
   upload_timeout     = 180
   url                = "https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img"
 }
+
+output "archlinux_cloudimg_latest_file_id" {
+  value = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
+}
+
+output "debian12_cloudimg_latest_file_id" {
+  value = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id
+}
+
+output "ubuntu22_cloudimg_latest_file_id" {
+  value = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id
+}
+
+output "ubuntu22_minimal_cloudimg_latest_file_id" {
+  value = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest.id
+}
+
+output "ubuntu24_cloudimg_latest_file_id" {
+  value = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
+}
+
+output "ubuntu24_minimal_cloudimg_latest_file_id" {
+  value = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_minimal_latest.id
+}

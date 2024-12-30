@@ -47,3 +47,9 @@ resource "proxmox_virtual_environment_download_file" "debian12_iso_112024" {
   node_name          = "miniquarium"
   url                = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.8.0-amd64-netinst.iso"
 }
+
+output "archlinux_iso_122024_file_id" { value = proxmox_virtual_environment_download_file.archlinux_iso_122024.id }
+output "debian12_iso_112024_file_id" { value = proxmox_virtual_environment_download_file.debian12_iso_112024.id }
+output "pbs_122024_file_id" { value = proxmox_virtual_environment_download_file.pbs_122024.id }
+output "ubuntu22_iso_122024_file_id" { value = proxmox_virtual_environment_download_file.ubuntu22_iso_122024.id }
+output "ubuntu24_iso_112024_file_id" { value = proxmox_virtual_environment_download_file.ubuntu24_iso_112024.id }

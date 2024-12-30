@@ -210,7 +210,7 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
 
   content_type = "snippets"
   datastore_id = "local"
-  node_name    = "proxmox"
+  node_name    = "miniquarium"
 
   source_raw {
     data      = each.value
@@ -223,7 +223,7 @@ resource "proxmox_virtual_environment_file" "user_cloud_config" {
 
   content_type = "snippets"
   datastore_id = "local"
-  node_name    = "proxmox"
+  node_name    = "miniquarium"
 
   source_file {
     # path      = "cloud-init/${each.key}.yaml"
