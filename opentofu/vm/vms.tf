@@ -228,14 +228,27 @@ resource "proxmox_virtual_environment_vm" "vm" {
     down_delay = 60
   }
 
-  # dynamic "usb" {
-  #   # for_each = each.value.hostname == "infra01" ? [1] : []
-  #   for_each = var.hostname == "infra01" ? [1] : []
-  #   content {
-  #     mapping = "ups" # voir le fichier ../pve/ups-usb.tofu
-  #     usb3    = false
-  #   }
-  # }
+  # Only attach the USB device if the hostname is "infra01"
+  dynamic "usb" {
+    for_each = var.hostname == "infra01" ? [1] : []  # Only attach USB if hostname is "infra01"
+    content {
+      mapping = "ups"  # Reference the USB mapping created earlier
+      usb3    = false   # Optional setting for USB3 support
+    }
+  }
+}
+
+resource "proxmox_virtual_environment_hardware_mapping_usb" "ups" {
+  count   = var.hostname == "infra01" ? 1 : 0  # Only create this resource when hostname is "infra01"
+  comment = "UPS Eaton 3S"
+  name    = "ups"
+  map = [
+    {
+      comment = "UPS Eaton USB"
+      id      = "0463:ffff"
+      node    = "miniquarium"
+    },
+  ]
 }
 
 # resource "proxmox_virtual_environment_file" "meta_cloud_config" {
