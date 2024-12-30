@@ -2,13 +2,11 @@
 
 hostname: infra01
 manage_etc_hosts: true
-# resize_rootfs: noblock
 power_state: {mode: reboot}
 
 allow_public_ssh_keys: true
 ssh_quiet_keygen: true
 
-# default password = user
 users:
   - name: user
     lock_passwd: false
@@ -27,7 +25,6 @@ package_update: true
 package_upgrade: true
 packages:
   - cockpit
-  - curl
   - docker.io
   - docker-compose-v2
   - libusb-1.0-0-dev
@@ -35,8 +32,6 @@ packages:
   - qemu-guest-agent
   - systemd-timesyncd
   - ufw
-apt:
-  install_recommends: false
 
 runcmd:
   - rm -f /etc/machine-id
