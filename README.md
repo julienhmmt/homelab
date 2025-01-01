@@ -126,7 +126,7 @@ tofu apply -state=dodge.tfstate dodgeplan
 tofu apply -state=ram.tfstate ramplan
 tofu apply -state=viper.tfstate viperplan
 # tofu destroy -var-file=<nomDeLaVM>.tfvars
-tofu destroy -var-file=dodge.tfvars
-tofu destroy -var-file=ram.tfvars
-tofu destroy -var-file=viper.tfvars
+tofu destroy -var-file=dodge.tfvars -state=dodge.tfstate
+tofu destroy -var-file=ram.tfvars -state=ram.tfstate
+tofu destroy -var-file=viper.tfvars -state=viper.tfstate
 ```
