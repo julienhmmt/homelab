@@ -1,4 +1,4 @@
-# JHMMT Homelab v2.1
+# JHMMT Homelab v6
 
 ## Goals
 
@@ -111,8 +111,16 @@ pveum user token add opentofu@pve provider --privsep=0
 To start some commands, do :
 
 ```bash
-tofu fmt -recursive -diff
-tofu plan -parallelism=5 -concise -out otplan
-tofu plan -concise -target='proxmox_virtual_environment_vm.vm["ups01"]' -out otplan
-tofu apply -parallelism=5 otplan
+cd homelab && tofu fmt -recursive -diff
+# tofu plan -parallelism=5 -concise -out otplan
+# tofu plan -concise -target='proxmox_virtual_environment_vm.vm["ups01"]' -out otplan
+# tofu apply -parallelism=5 otplan
+
+## VM
+# tofu plan -var-file=<nomDeLaVM>.tfvars -out nomDeLaVMplan
+tofu plan -var-file=infra01.tfvars -parallelism=5 -concise -out infra01plan
+# tofu apply <nomDeLaVM>plan
+tofu apply infra01plan
+# tofu destroy -var-file=<nomDeLaVM>.tfvars
+tofu destroy -var-file=infra01.tfvars
 ```
