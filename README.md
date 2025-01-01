@@ -117,10 +117,16 @@ cd homelab && tofu fmt -recursive -diff
 # tofu apply -parallelism=5 otplan
 
 ## VM
-# tofu plan -var-file=<nomDeLaVM>.tfvars -out nomDeLaVMplan
-tofu plan -var-file=infra01.tfvars -parallelism=5 -concise -out infra01plan
+# tofu plan -var-file=<nomDeLaVM>.tfvars -concise -out nomDeLaVMplan
+tofu plan -var-file=dodge.tfvars -concise -out dodgeplan -state=dodge.tfstate
+tofu plan -var-file=ram.tfvars -concise -out ramplan -state=ram.tfstate
+tofu plan -var-file=viper.tfvars -concise -out viperplan -state=viper.tfstate
 # tofu apply <nomDeLaVM>plan
-tofu apply infra01plan
+tofu apply -state=dodge.tfstate dodgeplan
+tofu apply -state=ram.tfstate ramplan
+tofu apply -state=viper.tfstate viperplan
 # tofu destroy -var-file=<nomDeLaVM>.tfvars
-tofu destroy -var-file=infra01.tfvars
+tofu destroy -var-file=dodge.tfvars
+tofu destroy -var-file=ram.tfvars
+tofu destroy -var-file=viper.tfvars
 ```

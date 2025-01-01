@@ -1,28 +1,3 @@
-# variable "vm" {
-#   type = map(object({
-#     cpu_cores          = number
-#     description        = string
-#     disk_efi_datastore = string
-#     disk_size          = number
-#     disk_vm_datastore  = string
-#     disk_vm_img        = string
-#     dns_servers        = list(string)
-#     domain             = string
-#     firewall_enabled   = bool
-#     hostname           = string
-#     ipv4               = string
-#     net_mac_address    = string
-#     net_rate_limit     = number
-#     pool_id            = string
-#     ram                = number
-#     start_on_boot      = bool
-#     started            = bool
-#     startup_order      = string
-#     tags               = list(string)
-#     vm_id              = number
-#   }))
-# }
-
 variable "cpu_cores" {
   description = "Number of CPU cores for the VM"
   type        = number
@@ -33,10 +8,10 @@ variable "description" {
   type        = string
 }
 
-variable "disk_efi_datastore" {
-  description = "Datastore for EFI disk"
-  type        = string
-}
+# variable "disk_efi_datastore" {
+#   description = "Datastore for EFI disk"
+#   type        = string
+# }
 
 variable "disk_size" {
   description = "Size of the disk in GB"
@@ -53,15 +28,15 @@ variable "disk_vm_img" {
   type        = string
 }
 
-variable "dns_servers" {
-  description = "List of DNS servers to use for the VM"
-  type        = list(string)
-}
+# variable "dns_servers" {
+#   description = "List of DNS servers to use for the VM"
+#   type        = list(string)
+# }
 
-variable "domain" {
-  description = "Domain for the VM"
-  type        = string
-}
+# variable "domain" {
+#   description = "Domain for the VM"
+#   type        = string
+# }
 
 variable "firewall_enabled" {
   description = "Enable or disable firewall for the VM"
@@ -73,10 +48,10 @@ variable "hostname" {
   type        = string
 }
 
-variable "ipv4" {
-  description = "IPv4 address for the VM"
-  type        = string
-}
+# variable "ipv4" {
+#   description = "IPv4 address for the VM"
+#   type        = string
+# }
 
 variable "net_mac_address" {
   description = "MAC address for the network interface"
@@ -95,6 +70,11 @@ variable "pool_id" {
 
 variable "ram" {
   description = "Amount of RAM in MB"
+  type        = number
+}
+
+variable "ram_floating" {
+  description = "Amount of RAM 'floating' in MB"
   type        = number
 }
 
@@ -121,17 +101,4 @@ variable "tags" {
 variable "vm_id" {
   description = "Unique ID for the VM"
   type        = number
-}
-
-variable "meta_config_metadata" {
-  type = map(string)
-}
-
-# variable "user_cloud_config" {
-#   type = map(object({
-#     user_data_path = string
-#   }))
-# }
-variable "user_data_path" {
-  type = string
 }
