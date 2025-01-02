@@ -1,6 +1,17 @@
+variable "cloudinit_initialization" {
+  type    = bool
+  default = false
+}
+
 variable "cpu_cores" {
   description = "Number of CPU cores for the VM"
   type        = number
+}
+
+variable "create_file" {
+  description = "Whether to create or skip the upload of the Talos ISO file"
+  type        = bool
+  default     = true
 }
 
 variable "description" {
@@ -8,10 +19,15 @@ variable "description" {
   type        = string
 }
 
-# variable "disk_efi_datastore" {
-#   description = "Datastore for EFI disk"
-#   type        = string
-# }
+variable "disk_efi_creation" {
+  type    = bool
+  default = false
+}
+
+variable "disk_efi_datastore" {
+  description = "Datastore for EFI disk"
+  type        = string
+}
 
 variable "disk_size" {
   description = "Size of the disk in GB"
@@ -28,15 +44,15 @@ variable "disk_vm_img" {
   type        = string
 }
 
-# variable "dns_servers" {
-#   description = "List of DNS servers to use for the VM"
-#   type        = list(string)
-# }
+variable "dns_servers" {
+  description = "List of DNS servers to use for the VM"
+  type        = list(string)
+}
 
-# variable "domain" {
-#   description = "Domain for the VM"
-#   type        = string
-# }
+variable "domain" {
+  description = "Domain for the VM"
+  type        = string
+}
 
 variable "firewall_enabled" {
   description = "Enable or disable firewall for the VM"
@@ -48,10 +64,10 @@ variable "hostname" {
   type        = string
 }
 
-# variable "ipv4" {
-#   description = "IPv4 address for the VM"
-#   type        = string
-# }
+variable "ipv4" {
+  description = "IPv4 address for the VM"
+  type        = string
+}
 
 variable "net_mac_address" {
   description = "MAC address for the network interface"
@@ -96,6 +112,12 @@ variable "startup_order" {
 variable "tags" {
   description = "Tags for the VM"
   type        = list(string)
+}
+
+variable "talos_vm" {
+  description = "Is it Talos VM?"
+  type        = bool
+  default     = false
 }
 
 variable "vm_id" {
