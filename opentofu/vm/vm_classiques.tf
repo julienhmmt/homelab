@@ -28,15 +28,15 @@
 #   url            = "https://factory.talos.dev/image/92a068ffab7963732e0427ae609517ed71ab73fd85be0141c9676d1816c8dae5/v1.9.1/metal-amd64.qcow2"
 # }
 
-resource "proxmox_virtual_environment_download_file" "talos_iso" {
-  count          = var.create_file ? 1 : 0
-  content_type   = "iso"
-  datastore_id   = "local-nvme-vm"
-  file_name      = "talos-v1.9.1.iso"
-  node_name      = "miniquarium"
-  upload_timeout = 180
-  url            = "https://factory.talos.dev/image/698322b7ce860b1f034de6bc66315576c3b957ceff0934c8120891753f68de82/v1.9.1/metal-amd64.iso"
-}
+# resource "proxmox_virtual_environment_download_file" "talos_iso" {
+#   count          = var.create_file ? 1 : 0
+#   content_type   = "iso"
+#   datastore_id   = "local-nvme-vm"
+#   file_name      = "talos-v1.9.1.iso"
+#   node_name      = "miniquarium"
+#   upload_timeout = 180
+#   url            = "https://factory.talos.dev/image/698322b7ce860b1f034de6bc66315576c3b957ceff0934c8120891753f68de82/v1.9.1/metal-amd64.iso"
+# }
 
 data "terraform_remote_state" "cloudimg" {
   backend = "local"
@@ -52,7 +52,7 @@ locals {
     # talos_wkr_viper  = var.hostname == "viper" ? "${proxmox_virtual_environment_download_file.talos_wkr_viper[0].datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_wkr_viper[0].file_name}" : null
     # talos = var.create_file ? "${proxmox_virtual_environment_download_file.talos[0].datastore_id}:iso/${proxmox_virtual_environment_download_file.talos[0].file_name}" : null
     # talos = "${proxmox_virtual_environment_download_file.talos_iso[0].datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_iso[0].file_name}"
-    talos = var.create_file && length(proxmox_virtual_environment_download_file.talos_iso) > 0 ? "${proxmox_virtual_environment_download_file.talos_iso[0].datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_iso[0].file_name}" : null
+    # talos = var.create_file && length(proxmox_virtual_environment_download_file.talos_iso) > 0 ? "${proxmox_virtual_environment_download_file.talos_iso[0].datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_iso[0].file_name}" : null
     # ubuntu22         = data.terraform_remote_state.cloudimg.outputs.ubuntu22_cloudimg_latest_file_id
     # ubuntu22_minimal = data.terraform_remote_state.cloudimg.outputs.ubuntu22_minimal_cloudimg_latest_file_id
     ubuntu24 = data.terraform_remote_state.cloudimg.outputs.ubuntu24_cloudimg_latest_file_id
@@ -60,7 +60,8 @@ locals {
   }
 }
 
-resource "proxmox_virtual_environment_vm" "vm" {
+resource "proxmox_virtual_environment_vm" "vm_classique" {
+  for_each = !var.talos_vm ? [0] : []
   depends_on = [
     #   proxmox_virtual_environment_download_file.archlinux_cloudimg_latest,
     # data.terraform_remote_state.cloudimg
@@ -98,43 +99,17 @@ resource "proxmox_virtual_environment_vm" "vm" {
     type    = "host"
   }
 
-  # dynamic "cdrom" {
-  #   for_each  = var.talos_vm ? [1] : []
-  #   enabled   = true
-  #   file_id   = "${proxmox_virtual_environment_download_file.talos_iso.datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_iso.file_name}"
-  # }
-
-  dynamic "disk" {
-    for_each = var.talos_vm ? [1] : []
-
-    content {
-      datastore_id = var.create_file ? proxmox_virtual_environment_download_file.talos_iso[0].datastore_id : null
-      file_id      = var.create_file ? "${proxmox_virtual_environment_download_file.talos_iso[0].datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_iso[0].file_name}" : null
-      interface    = "scsi0"
-    }
+  disk {
+    datastore_id = var.disk_vm_datastore
+    interface    = "scsi0"
+    size         = var.disk_size
+    file_id      = local.disk_image_map[var.disk_vm_img]
+    aio          = "native"
+    cache        = "none"
+    discard      = "on"
+    iothread     = true
+    replicate    = false
   }
-
-  dynamic "disk" {
-    for_each = [1] # Ensures the block is always present but the content changes dynamically.
-
-    content {
-      datastore_id = var.disk_vm_datastore
-      interface    = var.talos_vm ? "scsi1" : "scsi0"
-      size         = var.disk_size
-
-      # Conditional attributes based on whether it's a Talos VM, if not, use the map
-      file_format = var.talos_vm ? "raw" : null
-      file_id     = var.talos_vm ? null : local.disk_image_map[var.disk_vm_img]
-
-      # Attributes specific to non-Talos VMs
-      aio       = var.talos_vm ? null : "native"
-      cache     = var.talos_vm ? null : "none"
-      discard   = var.talos_vm ? null : "on"
-      iothread  = var.talos_vm ? null : true
-      replicate = var.talos_vm ? null : false
-    }
-  }
-
 
   # disk {
   #   aio          = "native"
@@ -157,27 +132,23 @@ resource "proxmox_virtual_environment_vm" "vm" {
     }
   }
 
-  dynamic "initialization" {
-    for_each = var.cloudinit_initialization ? [1] : []
+  initialization {
+    datastore_id = var.disk_vm_datastore
 
-    content {
-      datastore_id = var.cloudinit_initialization ? var.disk_vm_datastore : null
-
-      dns {
-        domain  = var.cloudinit_initialization ? var.domain : null
-        servers = var.cloudinit_initialization ? var.dns_servers : null
-      }
-
-      ip_config {
-        ipv4 {
-          address = var.cloudinit_initialization ? var.ipv4 : null
-          gateway = "192.168.1.254"
-        }
-      }
-
-      meta_data_file_id = var.cloudinit_initialization ? proxmox_virtual_environment_file.meta_cloud_config.id : null
-      user_data_file_id = var.cloudinit_initialization ? proxmox_virtual_environment_file.user_cloud_config.id : null
+    dns {
+      domain  = var.domain
+      servers = var.dns_servers
     }
+
+    ip_config {
+      ipv4 {
+        address = var.ipv4
+        gateway = "192.168.1.254"
+      }
+    }
+
+    meta_data_file_id = proxmox_virtual_environment_file.meta_cloud_config[each.key].id
+    user_data_file_id = proxmox_virtual_environment_file.user_cloud_config[each.key].id
   }
 
   memory {
@@ -207,5 +178,31 @@ resource "proxmox_virtual_environment_vm" "vm" {
   tpm_state {
     datastore_id = var.disk_vm_datastore
     version      = "v2.0"
+  }
+}
+
+resource "proxmox_virtual_environment_file" "meta_cloud_config" {
+  for_each = var.talos_vm && length(try(var.user_cloud_config, {})) > 0 ? var.user_cloud_config : {}
+
+  content_type = "snippets"
+  datastore_id = "local"
+  node_name    = "miniquarium"
+
+  source_raw {
+    data      = each.value.meta_data
+    file_name = "${each.key}_ci_meta-data.yml"
+  }
+}
+
+resource "proxmox_virtual_environment_file" "user_cloud_config" {
+  for_each = var.talos_vm && length(try(var.user_cloud_config, {})) > 0 ? var.user_cloud_config : {}
+
+  content_type = "snippets"
+  datastore_id = "local"
+  node_name    = "miniquarium"
+
+  source_file {
+    path      = each.value.user_data_path
+    file_name = "${each.key}_ci_user-data.yml"
   }
 }

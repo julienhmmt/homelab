@@ -22,3 +22,16 @@ startup_order            = "1"
 tags                     = ["infra", "ubuntu"]
 talos_vm                 = false
 vm_id                    = 991199
+
+meta_config_metadata = {
+  "tesla" = <<-EOF
+    instance-id: tesla-instance
+    local-hostname: tesla
+  EOF
+}
+
+user_cloud_config = {
+  "tesla" = {
+    user_data_path = "cloud-init/tesla.yaml"
+  }
+}

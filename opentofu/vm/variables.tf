@@ -124,3 +124,13 @@ variable "vm_id" {
   description = "Unique ID for the VM"
   type        = number
 }
+
+variable "meta_config_metadata" {
+  type = map(string)
+}
+
+variable "user_cloud_config" {
+  type = map(object({
+    user_data_path = string
+  }))
+}
