@@ -80,7 +80,6 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
 
   memory {
     dedicated = 16384
-    floating  = 16384
   }
 
   network_device {

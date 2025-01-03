@@ -79,7 +79,6 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
 
   memory {
     dedicated = 8192
-    floating  = 8192
   }
 
   network_device {

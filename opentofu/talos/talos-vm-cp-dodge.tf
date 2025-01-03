@@ -47,7 +47,7 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
     size         = 64
     # file_format  = "raw"
     # file_id = "local-nvme-vm:iso/talos-v1.9.1.qcow2"
-    file_id = "${proxmox_virtual_environment_download_file.talos_img.datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_img.file_name}"
+    file_id   = "${proxmox_virtual_environment_download_file.talos_img.datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_img.file_name}"
     aio       = "native"
     cache     = "none"
     discard   = "on"
@@ -79,7 +79,6 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
 
   memory {
     dedicated = 4096
-    floating  = 4096
   }
 
   network_device {

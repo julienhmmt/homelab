@@ -5,7 +5,7 @@
 resource "talos_machine_secrets" "this" {}
 
 data "talos_machine_configuration" "controlplane" {
-  depends_on = [ proxmox_virtual_environment_vm.talos_cp_dodge ]
+  depends_on         = [proxmox_virtual_environment_vm.talos_cp_dodge]
   cluster_name       = var.cluster_name
   cluster_endpoint   = var.cluster_endpoint
   machine_type       = "controlplane"
@@ -35,7 +35,7 @@ data "talos_client_configuration" "this" {
 }
 
 resource "talos_machine_configuration_apply" "controlplane" {
-  depends_on = [ data.talos_machine_configuration.controlplane ]
+  depends_on = [data.talos_machine_configuration.controlplane]
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
@@ -51,7 +51,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
 }
 
 resource "talos_machine_configuration_apply" "worker" {
-  depends_on = [ data.talos_machine_configuration.worker ]
+  depends_on = [data.talos_machine_configuration.worker]
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
@@ -66,14 +66,14 @@ resource "talos_machine_configuration_apply" "worker" {
 }
 
 resource "talos_machine_bootstrap" "this" {
-  depends_on = [ talos_machine_configuration_apply.controlplane ]
+  depends_on = [talos_machine_configuration_apply.controlplane]
 
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = [for k, v in var.node_data.controlplanes : k][0]
 }
 
 resource "talos_cluster_kubeconfig" "this" {
-  depends_on = [ talos_machine_bootstrap.this ]
+  depends_on = [talos_machine_bootstrap.this]
 
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = [for k, v in var.node_data.controlplanes : k][0]
