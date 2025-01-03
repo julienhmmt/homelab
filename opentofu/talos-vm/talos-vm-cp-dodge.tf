@@ -1,5 +1,17 @@
+resource "proxmox_virtual_environment_download_file" "talos_img" {
+
+  node_name    = "miniquarium"
+  content_type = "iso"
+  datastore_id = "local-nvme-vm"
+  file_name    = "talos-v1.9.1.qcow2.img"
+  url          = "https://factory.talos.dev/image/698322b7ce860b1f034de6bc66315576c3b957ceff0934c8120891753f68de82/v1.9.1/metal-amd64.qcow2"
+  overwrite    = false
+}
+
 resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
-  depends_on = []
+  depends_on = [
+    proxmox_virtual_environment_download_file.talos_img
+  ]
 
   bios            = "seabios"
   description     = "Managed by OpenTofu. Talos control plane."
@@ -14,11 +26,11 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
   started             = "true"
   stop_on_destroy     = true
   tablet_device       = false
-  tags                = ["cp", "infra", "kubernetes", "talos"]
+  tags                = ["control-plane", "infra", "kubernetes", "talos"]
   timeout_create      = 180
   timeout_shutdown_vm = 30
   timeout_stop_vm     = 30
-  vm_id               = 9991200
+  vm_id               = 991200
 
   agent {
     enabled = true
@@ -33,22 +45,24 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
     type    = "host"
   }
 
-  disk {
-    datastore_id = "local-nvme-vm"
-    file_id      = "local-nvme-vm:iso/talos-1.9.1.iso"
-    interface    = "scsi0"
-  }
+  # disk {
+  #   datastore_id = "local-nvme-vm"
+  #   file_id      = "local-nvme-vm:iso/talos-1.9.1.iso"
+  #   interface    = "scsi0"
+  # }
 
   disk {
     datastore_id = "local-nvme-vm"
-    interface    = "scsi1"
+    interface    = "scsi0"
     size         = 64
-    file_format  = "raw"
-    aio          = "native"
-    cache        = "none"
-    discard      = "on"
-    iothread     = true
-    replicate    = false
+    # file_format  = "raw"
+    # file_id = "local-nvme-vm:iso/talos-v1.9.1.qcow2"
+    file_id = "${proxmox_virtual_environment_download_file.talos_img.datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_img.file_name}"
+    aio       = "native"
+    cache     = "none"
+    discard   = "on"
+    iothread  = true
+    replicate = false
   }
 
   # disk {

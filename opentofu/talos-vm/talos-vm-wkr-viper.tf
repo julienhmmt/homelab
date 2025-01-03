@@ -1,5 +1,7 @@
 resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
-  depends_on = []
+  depends_on = [
+    proxmox_virtual_environment_download_file.talos_img
+  ]
 
   bios            = "seabios"
   description     = "Managed by OpenTofu. Talos worker pour tous les services annexes."
@@ -33,22 +35,23 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
     type    = "host"
   }
 
-  disk {
-    datastore_id = "local-nvme-vm"
-    file_id      = "local-nvme-vm:iso/talos-1.9.1.iso"
-    interface    = "scsi0"
-  }
+  # disk {
+  #   datastore_id = "local-nvme-vm"
+  #   file_id      = "local-nvme-vm:iso/talos-1.9.1.iso"
+  #   interface    = "scsi0"
+  # }
 
   disk {
     datastore_id = "local-nvme-vm"
-    interface    = "scsi1"
+    interface    = "scsi0"
     size         = 128
-    file_format  = "raw"
-    aio          = "native"
-    cache        = "none"
-    discard      = "on"
-    iothread     = true
-    replicate    = false
+    # file_format  = "raw"
+    file_id   = "${proxmox_virtual_environment_download_file.talos_img.datastore_id}:iso/${proxmox_virtual_environment_download_file.talos_img.file_name}"
+    aio       = "native"
+    cache     = "none"
+    discard   = "on"
+    iothread  = true
+    replicate = false
   }
 
   # disk {
