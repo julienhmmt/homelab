@@ -20,7 +20,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
   timeout_create      = 180
   timeout_shutdown_vm = 30
   timeout_stop_vm     = 30
-  vm_id               = 9991202
+  vm_id               = 991202
 
   agent {
     enabled = true

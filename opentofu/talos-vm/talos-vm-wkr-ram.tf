@@ -20,7 +20,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
   timeout_create      = 180
   timeout_shutdown_vm = 30
   timeout_stop_vm     = 30
-  vm_id               = 9991201
+  vm_id               = 991201
 
   agent {
     enabled = true
@@ -29,7 +29,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
   }
 
   cpu {
-    cores   = 4
+    cores   = 2
     numa    = true
     sockets = 1
     type    = "host"
