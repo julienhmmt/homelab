@@ -30,6 +30,7 @@ packages:
   - qemu-guest-agent
   - systemd-timesyncd
   - ufw
+
 apt:
   install_recommends: false
 
@@ -48,8 +49,8 @@ runcmd:
   - echo "NOTIFYCMD /usr/sbin/upssched" >> /etc/nut/upsmon.conf
   - echo "MONITOR nutdev1@localhost 1 admin pouetpouet master" >> /etc/nut/upsmon.conf
   # FIN // NUT configuration
-  - ufw allow 22/tcp
-  - ufw allow 9090/tcp
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 22
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 9090
   - ufw enable
   - echo "done" > /tmp/cloud-config.done
 

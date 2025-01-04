@@ -22,10 +22,32 @@ resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" 
   url                = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
 }
 
+# resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_minimal_latest" {
+#   checksum           = "c4f9e677e3ff2f09c7f3bf17fef0ae76a9a6b3249b91d89e2b32c6f9ee1c97ed"
+#   checksum_algorithm = "sha256"
+#   content_type       = "iso"
+#   datastore_id       = "local-nvme-vm"
+#   file_name          = "ubuntu-24.04-server-minimal-cloudimg-amd64.img"
+#   node_name          = "miniquarium"
+#   upload_timeout     = 180
+#   url                = "https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img"
+# }
+
+# resource "proxmox_virtual_environment_download_file" "debian12_cloudimg_latest" {
+#   checksum           = "340cdafca262582e2ec013f2118a7daa9003436559a3e1cff637af0fc05d4c3755d43e15470bb40d7dd4430d355b44d098283fc4c7c6f640167667479eeeb0e0"
+#   checksum_algorithm = "sha512"
+#   content_type       = "iso"
+#   datastore_id       = "local-nvme-vm"
+#   file_name          = "debian-12-cloudimg-amd64.img"
+#   node_name          = "miniquarium"
+#   upload_timeout     = 180
+#   url                = "https://cdimage.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+# }
+
 locals {
   disk_image_map = {
     # archlinux        = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
-    # debian           = proxmox_virtual_environment_download_file.debian_cloudimg_202411.id
+    # debian12           = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id
     # ubuntu22         = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id
     ubuntu24 = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
     # ubuntu22_minimal = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest.id
@@ -36,7 +58,7 @@ locals {
 resource "proxmox_virtual_environment_vm" "vm" {
   depends_on = [
     # proxmox_virtual_environment_download_file.archlinux_cloudimg_latest,
-    # proxmox_virtual_environment_download_file.debian_cloudimg_202411,
+    # proxmox_virtual_environment_download_file.debian12_cloudimg_latest,
     # proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest,
     # proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest,
     proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest,
@@ -153,6 +175,11 @@ resource "proxmox_virtual_environment_vm" "vm" {
       usb3    = false
     }
   }
+
+  tpm_state {
+    datastore_id = "local-nvme-vm"
+    version      = "v2.0"
+  }
 }
 
 resource "proxmox_virtual_environment_file" "meta_cloud_config" {
@@ -176,12 +203,7 @@ resource "proxmox_virtual_environment_file" "user_cloud_config" {
   node_name    = "miniquarium"
 
   source_file {
-    # path      = "cloud-init/${each.key}.yaml"
     path      = each.value.user_data_path
     file_name = "${each.key}_ci_user-data.yml"
   }
-  # source_raw {
-  #   data      = each.value
-  #   file_name = "${each.key}_ci_user-data.yml"
-  # }
 }
