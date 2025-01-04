@@ -1,6 +1,6 @@
 resource "proxmox_virtual_environment_hardware_mapping_usb" "onduleur" {
-  comment    = "UPS Eaton 3S"
-  name       = "onduleur"
+  comment = "UPS Eaton 3S"
+  name    = "onduleur"
   map = [
     {
       comment = "UPS Eaton USB"

@@ -1,0 +1,107 @@
+#cloud-config
+
+hostname: challenger
+manage_etc_hosts: true
+power_state: {mode: reboot}
+
+allow_public_ssh_keys: true
+ssh_quiet_keygen: true
+
+users:
+  - name: user
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: wheel
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    plain_text_passwd: pouetpouet
+  - name: gitea
+    uid: 2000
+    lock_passwd: true
+    shell: /bin/bash
+    system: true
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+  # - name: vault
+  #   uid: 2001
+  #   lock_passwd: true
+  #   shell: /bin/bash
+  #   system: true
+  #   ssh_authorized_keys:
+  #     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+
+# Misc settings
+timezone: Europe/Paris
+locale: en_US
+
+package_update: true
+package_upgrade: true
+packages:
+  - cockpit
+  - docker.io
+  - docker-compose-v2
+  # - git
+  - qemu-guest-agent
+  - systemd-timesyncd
+  - ufw
+  - wget
+
+runcmd:
+  - rm -f /etc/machine-id
+  - systemd-machine-id-setup
+  - rm -f /var/lib/dbus/machine-id
+  - ln -s /etc/machine-id /var/lib/dbus/machine-id
+  - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
+  - systemctl enable qemu-guest-agent
+  - systemctl enable cockpit.service
+  - systemctl enable docker.service
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 22
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 9090
+  - ufw allow 2221/tcp
+  - ufw allow 3000/tcp
+  # DEBUT // Docker configuration
+  - usermod -aG docker user
+  - docker network create --driver=bridge frontend
+  - mkdir -p /opt/docker
+  # FIN // Docker configuration
+  # DEBUT // Gitea configuration
+  # - 'wget -O /usr/local/bin/gitea https://dl.gitea.com/gitea/1.22.6/gitea-1.22.6-linux-amd64'
+  # - chmod +x /usr/local/bin/gitea
+  # - mkdir -p /var/lib/gitea/{custom,data,log}
+  # - chown -R gitea:gitea /var/lib/gitea/
+  # - chmod -R 750 /var/lib/gitea/
+  # - mkdir /etc/gitea
+  # - chown root:gitea /etc/gitea
+  # - chmod 750 /etc/gitea
+  # FIN // Gitea configuration
+  # DEBUT // Vault configuration
+  # - mkdir -p /opt/vault
+  # FIN // Vault configuration
+  - ufw enable
+  - echo "done" > /tmp/cloud-config.done
+
+write_files:
+  - path: /opt/docker/gitea.yml
+    content: |
+      ---
+      services:
+        gitea:
+          image: docker.io/gitea/gitea:1.22.6-rootless
+          restart: unless-stopped
+          ports:
+            - "3000:3000/tcp"
+            - "2221:22/tcp"
+          environment:
+            - TZ=Europe/Paris
+            - USER_UID=2000
+            - USER_GID=2000
+          volumes:
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+            - gitea_config:/etc/gitea
+            - gitea_data:/var/lib/gitea
+
+      volumes:
+        gitea_config:
+        gitea_data:
