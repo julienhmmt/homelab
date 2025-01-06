@@ -16,20 +16,16 @@ users:
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
     plain_text_passwd: pouetpouet
-  - name: gitea
-    uid: 2000
-    lock_passwd: true
-    shell: /bin/bash
-    system: true
-    ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+  # - name: gitea
+  #   uid: 200
+  #   lock_passwd: true
+  #   shell: /bin/bash
+  #   system: true
   # - name: vault
   #   uid: 2001
   #   lock_passwd: true
   #   shell: /bin/bash
   #   system: true
-  #   ssh_authorized_keys:
-  #     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
 
 # Misc settings
 timezone: Europe/Paris
@@ -39,10 +35,13 @@ package_update: true
 package_upgrade: true
 packages:
   - cockpit
-  - docker.io
-  - docker-compose-v2
+  - cockpit-podman
+  # - docker.io
+  # - docker-compose-v2
   # - git
   - qemu-guest-agent
+  - podman
+  # - podman-compose
   - systemd-timesyncd
   - ufw
   - wget
@@ -60,48 +59,125 @@ runcmd:
   - ufw allow proto tcp from 192.168.1.0/24 to any port 9090
   - ufw allow 2221/tcp
   - ufw allow 3000/tcp
+  # DEBUT // Podman configuration
+  - mkdir -p /opt/podman
+  # - mkdir -p /home/user/podman-volumes/gitea/data
+  # - mkdir -p /home/user/podman-volumes/gitea/config
+  # - echo -e "[registries.search]\nregistries = ['docker.io', 'quay.io']" >> /etc/containers/registries.conf
+  # - mkdir -p /home/user/.config/systemd/user
+  # - chown -R user:user /home/user/.config/systemd
+  # - loginctl enable-linger user
+  # - su - user -c "systemctl --user daemon-reload"
+  # - su - user -c "systemctl --user enable podman-gitea.service"
+  # - su - user -c "systemctl --user start podman-gitea.service"
+  # - mkdir -p /opt/podman/gitea/{gitea-config,gitea-data}
+  # - chmod -R 0750 /opt/podman/gitea
+  # - chown -R user:user /opt/podman/gitea
+  # - podman volume create gitea-rootless-data
+  # - podman volume create gitea-rootless-config
+  # - podman pod create --name gitea -p 3000:3000 -p 2221:22
+  # - podman run -d --name gitea_app --pod gitea -e TZ=Europe/Paris -e USER_UID=1000 -e USER_GID=1001 -v gitea-data:/data -v /etc/localtime:/etc/localtime:ro docker.io/gitea/gitea:1-rootless
+  # - podman run --name=gitea -d --label io.podman.compose.config-hash=67ff548f3585c91ca5944902f543d39a918e2c23c4b3c6d53ba9c99cad104336 --label io.podman.compose.project=podman --label io.podman.compose.version=1.0.6 --label PODMAN_SYSTEMD_UNIT=podman-compose@podman.service --label com.docker.compose.project=podman --label com.docker.compose.project.working_dir=/opt/podman --label com.docker.compose.project.config_files=gitea-compose.yml --label com.docker.compose.container-number=1 --label com.docker.compose.service=gitea -e TZ=Europe/Paris -e USER_UID=2000 -e USER_GID=2000 -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v podman_gitea_config:/etc/gitea -v podman_gitea_data:/var/lib/gitea --net podman_default --network-alias gitea -p 3000:3000/tcp -p 2221:22/tcp --restart unless-stopped docker.io/gitea/gitea:1.22.6-rootless
+  # FIN // Podman configuration
   # DEBUT // Docker configuration
-  - usermod -aG docker user
-  - docker network create --driver=bridge frontend
-  - mkdir -p /opt/docker
+  # - usermod -aG docker user
+  # - docker network create --driver=bridge frontend
+  # - mkdir -p /opt/docker
   # FIN // Docker configuration
-  # DEBUT // Gitea configuration
-  # - 'wget -O /usr/local/bin/gitea https://dl.gitea.com/gitea/1.22.6/gitea-1.22.6-linux-amd64'
-  # - chmod +x /usr/local/bin/gitea
-  # - mkdir -p /var/lib/gitea/{custom,data,log}
-  # - chown -R gitea:gitea /var/lib/gitea/
-  # - chmod -R 750 /var/lib/gitea/
-  # - mkdir /etc/gitea
-  # - chown root:gitea /etc/gitea
-  # - chmod 750 /etc/gitea
-  # FIN // Gitea configuration
-  # DEBUT // Vault configuration
-  # - mkdir -p /opt/vault
-  # FIN // Vault configuration
+  # - systemctl daemon-reload
+  # - systemctl enable podman-gitea.service
   - ufw enable
   - echo "done" > /tmp/cloud-config.done
 
 write_files:
-  - path: /opt/docker/gitea.yml
+  - path: /opt/podman/gitea.yaml
     content: |
       ---
-      services:
-        gitea:
-          image: docker.io/gitea/gitea:1.22.6-rootless
-          restart: unless-stopped
+      # Created with podman-4.9.3
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        creationTimestamp: "2025-01-05T20:00:00Z"
+        labels:
+          app: gitea
+        name: gitea
+      spec:
+        containers:
+        - image: docker.io/gitea/gitea:1-rootless
+          name: app
+          restartPolicy: unless-stopped
           ports:
-            - "3000:3000/tcp"
-            - "2221:22/tcp"
-          environment:
-            - TZ=Europe/Paris
-            - USER_UID=2000
-            - USER_GID=2000
-          volumes:
-            - /etc/timezone:/etc/timezone:ro
-            - /etc/localtime:/etc/localtime:ro
-            - gitea_config:/etc/gitea
-            - gitea_data:/var/lib/gitea
+          - containerPort: 22
+            hostPort: 2221
+          - containerPort: 3000
+            hostPort: 3000
+          env:
+          - name: USER_GID
+            value: "1001"
+          - name: TZ
+            value: Europe/Paris
+          - name: USER_UID
+            value: "1000"
+          securityContext:
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+          volumeMounts:
+          - mountPath: /etc/localtime
+            name: etc-localtime
+            readOnly: true
+          - mountPath: /var/lib/gitea
+            name: gitea-rootless-data
+          - mountPath: /etc/gitea
+            name: gitea-rootless-config
+        volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: File
+          name: etc-localtime
+        - name: gitea-rootless-data
+          persistentVolumeClaim:
+            claimName: gitea-rootless-data
+        - name: gitea-rootless-config
+          persistentVolumeClaim:
+            claimName: gitea-rootless-config
 
-      volumes:
-        gitea_config:
-        gitea_data:
+  # - path: /etc/systemd/system/podman-gitea.service
+  #   content: |
+  #     [Unit]
+  #     Description=Podman Kube Play Service for Gitea (Non-root User)
+  #     After=network.target
+
+  #     [Service]
+  #     ExecStart=/usr/bin/podman kube play /opt/podman/gitea.yaml
+  #     ExecStop=/usr/bin/podman kube down /opt/podman/gitea.yaml
+  #     Restart=always
+  #     Environment=PODMAN_SYSTEMD_UNIT=%n
+  #     # ExecStartPre=-/usr/bin/rm -f /run/user/%U/%n.pid
+  #     # PIDFile=/run/user/%U/%n.pid
+  #     StandardOutput=journal
+  #     StandardError=journal
+
+  #     [Install]
+  #     WantedBy=default.target
+
+  # - path: /etc/systemd/system/podman-gitea.service
+  #   content: |
+  #     [Unit]
+  #     Description=Podman Kube Play Service
+  #     After=network.target
+
+  #     [Service]
+  #     ExecStart=/usr/bin/podman kube play /opt/podman/gitea.yaml
+  #     ExecStop=/usr/bin/podman kube down /opt/podman/gitea.yaml
+  #     Restart=always
+  #     User=user
+  #     Group=user
+  #     StandardOutput=journal
+  #     StandardError=journal
+
+  #     [Install]
+  #     WantedBy=multi-user.target

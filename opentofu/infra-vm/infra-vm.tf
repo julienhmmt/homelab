@@ -115,8 +115,9 @@ resource "proxmox_virtual_environment_vm" "vm" {
   }
 
   efi_disk {
-    datastore_id = each.value.disk_efi_datastore
-    type         = "4m"
+    datastore_id      = each.value.disk_efi_datastore
+    pre_enrolled_keys = false
+    type              = "4m"
   }
 
   initialization {
@@ -186,7 +187,7 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
   for_each = var.meta_config_metadata
 
   content_type = "snippets"
-  datastore_id = "local"
+  datastore_id = "local-nvme-vm"
   node_name    = "miniquarium"
 
   source_raw {
@@ -199,7 +200,7 @@ resource "proxmox_virtual_environment_file" "user_cloud_config" {
   for_each = var.user_cloud_config
 
   content_type = "snippets"
-  datastore_id = "local"
+  datastore_id = "local-nvme-vm"
   node_name    = "miniquarium"
 
   source_file {

@@ -41,7 +41,7 @@ vm = {
     start_on_boot      = true
     started            = true
     startup_order      = "1"
-    tags               = ["docker", "infra", "ubuntu24"]
+    tags               = ["infra", "podman", "ubuntu24"]
     vm_id              = 991198
   }
 }
