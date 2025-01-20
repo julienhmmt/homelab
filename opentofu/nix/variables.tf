@@ -1,0 +1,34 @@
+variable "vm" {
+  type = map(object({
+    cpu_cores          = number
+    description        = string
+    disk_efi_datastore = string
+    disk_size          = number
+    disk_vm_datastore  = string
+    # disk_vm_img        = string
+    dns_servers      = list(string)
+    domain           = string
+    firewall_enabled = bool
+    hostname         = string
+    ipv4             = string
+    net_mac_address  = string
+    net_rate_limit   = number
+    pool_id          = string
+    ram              = number
+    start_on_boot    = bool
+    started          = bool
+    startup_order    = string
+    tags             = list(string)
+    vm_id            = number
+  }))
+}
+
+# variable "meta_config_metadata" {
+#   type = map(string)
+# }
+
+# variable "user_cloud_config" {
+#   type = map(object({
+#     user_data_path = string
+#   }))
+# }
