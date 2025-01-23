@@ -11,15 +11,15 @@ output "vm_root_password" {
   sensitive = true
 }
 
-resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_latest" {
-  checksum           = "e61484705035cd64d8e79c35d6f674acccf03ef9c6939ca50dea8a4fdc7eabeb"
+resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_20250117" {
+  checksum           = "63f5e103195545a429aec2bf38330e28ab9c6d487e66b7c4b0060aa327983628"
   checksum_algorithm = "sha256"
   content_type       = "iso"
   datastore_id       = "local-nvme-vm"
-  file_name          = "ubuntu-24.04-server-cloudimg-amd64.img"
+  file_name          = "ubuntu-24.04-server-20250117-cloudimg-amd64.img"
   node_name          = "miniquarium"
   upload_timeout     = 180
-  url                = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+  url                = "https://cloud-images.ubuntu.com/noble/20250117/noble-server-cloudimg-amd64.img"
 }
 
 # resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg_minimal_latest" {
@@ -49,7 +49,7 @@ locals {
     # archlinux        = proxmox_virtual_environment_download_file.archlinux_cloudimg_latest.id
     # debian12           = proxmox_virtual_environment_download_file.debian12_cloudimg_latest.id
     # ubuntu22         = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest.id
-    ubuntu24 = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest.id
+    ubuntu24 = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_20250117.id
     # ubuntu22_minimal = proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest.id
     # ubuntu24_minimal = proxmox_virtual_environment_download_file.ubuntu24_cloudimg_minimal_latest.id
   }
@@ -61,7 +61,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
     # proxmox_virtual_environment_download_file.debian12_cloudimg_latest,
     # proxmox_virtual_environment_download_file.ubuntu22_cloudimg_latest,
     # proxmox_virtual_environment_download_file.ubuntu22_cloudimg_minimal_latest,
-    proxmox_virtual_environment_download_file.ubuntu24_cloudimg_latest,
+    proxmox_virtual_environment_download_file.ubuntu24_cloudimg_20250117,
     # proxmox_virtual_environment_download_file.ubuntu24_cloudimg_minimal_latest,
     proxmox_virtual_environment_file.meta_cloud_config,
     proxmox_virtual_environment_file.user_cloud_config
@@ -141,6 +141,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   memory {
     dedicated = each.value.ram
+    floating  = each.value.ram
   }
 
   network_device {
@@ -180,6 +181,10 @@ resource "proxmox_virtual_environment_vm" "vm" {
   tpm_state {
     datastore_id = "local-nvme-vm"
     version      = "v2.0"
+  }
+
+  vga {
+    type = "virtio"
   }
 }
 

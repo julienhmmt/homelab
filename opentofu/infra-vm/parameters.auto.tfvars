@@ -6,12 +6,12 @@ vm = {
     disk_size          = 16
     disk_vm_datastore  = "local-nvme-vm"
     disk_vm_img        = "ubuntu24"
-    dns_servers        = ["192.168.1.2"]
+    dns_servers        = ["192.168.1.254"]
     domain             = "dc.prive.local.hommet.net"
     firewall_enabled   = false
     hostname           = "tesla"
-    ipv4               = "192.168.1.199/24"
-    net_mac_address    = "BC:24:11:CA:FE:99"
+    ipv4               = "192.168.1.21/24"
+    net_mac_address    = "BC:24:11:CA:FE:21"
     net_rate_limit     = 0
     pool_id            = "prod"
     ram                = 1024
@@ -19,7 +19,7 @@ vm = {
     started            = true
     startup_order      = "1"
     tags               = ["infra", "ubuntu24"]
-    vm_id              = 991199
+    vm_id              = 991121
   }
 
   "challenger" = {
@@ -29,12 +29,12 @@ vm = {
     disk_size          = 32
     disk_vm_datastore  = "local-nvme-vm"
     disk_vm_img        = "ubuntu24"
-    dns_servers        = ["192.168.1.2"]
+    dns_servers        = ["192.168.1.254"]
     domain             = "dc.prive.local.hommet.net"
     firewall_enabled   = false
     hostname           = "challenger"
-    ipv4               = "192.168.1.198/24"
-    net_mac_address    = "BC:24:11:CA:FE:98"
+    ipv4               = "192.168.1.22/24"
+    net_mac_address    = "BC:24:11:CA:FE:22"
     net_rate_limit     = 100
     pool_id            = "prod"
     ram                = 4096
@@ -42,7 +42,7 @@ vm = {
     started            = true
     startup_order      = "1"
     tags               = ["infra", "podman", "ubuntu24"]
-    vm_id              = 991198
+    vm_id              = 991122
   }
 }
 
@@ -60,10 +60,10 @@ meta_config_metadata = {
 
 user_cloud_config = {
   "tesla" = {
-    user_data_path = "cloud-init/tesla.yaml"
+    user_data_path = "cloud-init/tesla.yml"
   }
 
   "challenger" = {
-    user_data_path = "cloud-init/challenger.yaml"
+    user_data_path = "cloud-init/challenger.yml"
   }
 }

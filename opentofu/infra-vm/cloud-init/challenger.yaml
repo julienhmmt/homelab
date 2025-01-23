@@ -16,16 +16,14 @@ users:
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
     plain_text_passwd: pouetpouet
-  # - name: gitea
-  #   uid: 200
-  #   lock_passwd: true
-  #   shell: /bin/bash
-  #   system: true
-  # - name: vault
-  #   uid: 2001
-  #   lock_passwd: true
-  #   shell: /bin/bash
-  #   system: true
+  - name: git
+    uid: 1001
+    lock_passwd: true
+    shell: /bin/bash
+  - name: vault
+    uid: 1002
+    lock_passwd: true
+    shell: /bin/bash
 
 # Misc settings
 timezone: Europe/Paris
@@ -36,12 +34,8 @@ package_upgrade: true
 packages:
   - cockpit
   - cockpit-podman
-  # - docker.io
-  # - docker-compose-v2
-  # - git
   - qemu-guest-agent
   - podman
-  # - podman-compose
   - systemd-timesyncd
   - ufw
   - wget
@@ -54,16 +48,13 @@ runcmd:
   - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
   - systemctl enable qemu-guest-agent
   - systemctl enable cockpit.service
-  - systemctl enable docker.service
   - ufw allow proto tcp from 192.168.1.0/24 to any port 22
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 2221
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 3000
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 8200
   - ufw allow proto tcp from 192.168.1.0/24 to any port 9090
-  - ufw allow 2221/tcp
-  - ufw allow 3000/tcp
   # DEBUT // Podman configuration
-  - mkdir -p /opt/podman
-  # - mkdir -p /home/user/podman-volumes/gitea/data
-  # - mkdir -p /home/user/podman-volumes/gitea/config
-  # - echo -e "[registries.search]\nregistries = ['docker.io', 'quay.io']" >> /etc/containers/registries.conf
+  - mkdir -p /opt/podman/conf
   # - mkdir -p /home/user/.config/systemd/user
   # - chown -R user:user /home/user/.config/systemd
   # - loginctl enable-linger user
@@ -78,26 +69,35 @@ runcmd:
   # - podman pod create --name gitea -p 3000:3000 -p 2221:22
   # - podman run -d --name gitea_app --pod gitea -e TZ=Europe/Paris -e USER_UID=1000 -e USER_GID=1001 -v gitea-data:/data -v /etc/localtime:/etc/localtime:ro docker.io/gitea/gitea:1-rootless
   # - podman run --name=gitea -d --label io.podman.compose.config-hash=67ff548f3585c91ca5944902f543d39a918e2c23c4b3c6d53ba9c99cad104336 --label io.podman.compose.project=podman --label io.podman.compose.version=1.0.6 --label PODMAN_SYSTEMD_UNIT=podman-compose@podman.service --label com.docker.compose.project=podman --label com.docker.compose.project.working_dir=/opt/podman --label com.docker.compose.project.config_files=gitea-compose.yml --label com.docker.compose.container-number=1 --label com.docker.compose.service=gitea -e TZ=Europe/Paris -e USER_UID=2000 -e USER_GID=2000 -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v podman_gitea_config:/etc/gitea -v podman_gitea_data:/var/lib/gitea --net podman_default --network-alias gitea -p 3000:3000/tcp -p 2221:22/tcp --restart unless-stopped docker.io/gitea/gitea:1.22.6-rootless
+  - systemctl daemon-reload
+  - systemctl enable podman-gitea.service
+  - chown -R user:user /opt/podman
+  - chown user:user /opt/podman/gitea.yaml
+  - chown user:user /opt/podman/vault.yaml
   # FIN // Podman configuration
-  # DEBUT // Docker configuration
-  # - usermod -aG docker user
-  # - docker network create --driver=bridge frontend
-  # - mkdir -p /opt/docker
-  # FIN // Docker configuration
-  # - systemctl daemon-reload
-  # - systemctl enable podman-gitea.service
   - ufw enable
   - echo "done" > /tmp/cloud-config.done
 
 write_files:
+  - path: /home/user/whattodo.txt
+    content: |
+      ##########
+      ## PODMAN
+      ##########
+      podman volume create gitea-rootless-data
+      podman volume create gitea-rootless-config
+      podman kube play /opt/podman/gitea.yaml
+      podman volume create vault-config
+      podman volume create vault-data
+      podman volume create vault-logs
+      podman kube play /opt/podman/vault.yaml
+
   - path: /opt/podman/gitea.yaml
     content: |
       ---
-      # Created with podman-4.9.3
       apiVersion: v1
       kind: Pod
       metadata:
-        creationTimestamp: "2025-01-05T20:00:00Z"
         labels:
           app: gitea
         name: gitea
@@ -113,11 +113,11 @@ write_files:
             hostPort: 3000
           env:
           - name: USER_GID
-            value: "1001"
+            value: "1002"
           - name: TZ
             value: Europe/Paris
           - name: USER_UID
-            value: "1000"
+            value: "1001"
           securityContext:
             allowPrivilegeEscalation: false
           resources:
@@ -148,25 +148,6 @@ write_files:
   # - path: /etc/systemd/system/podman-gitea.service
   #   content: |
   #     [Unit]
-  #     Description=Podman Kube Play Service for Gitea (Non-root User)
-  #     After=network.target
-
-  #     [Service]
-  #     ExecStart=/usr/bin/podman kube play /opt/podman/gitea.yaml
-  #     ExecStop=/usr/bin/podman kube down /opt/podman/gitea.yaml
-  #     Restart=always
-  #     Environment=PODMAN_SYSTEMD_UNIT=%n
-  #     # ExecStartPre=-/usr/bin/rm -f /run/user/%U/%n.pid
-  #     # PIDFile=/run/user/%U/%n.pid
-  #     StandardOutput=journal
-  #     StandardError=journal
-
-  #     [Install]
-  #     WantedBy=default.target
-
-  # - path: /etc/systemd/system/podman-gitea.service
-  #   content: |
-  #     [Unit]
   #     Description=Podman Kube Play Service
   #     After=network.target
 
@@ -181,3 +162,107 @@ write_files:
 
   #     [Install]
   #     WantedBy=multi-user.target
+
+  - path: /etc/containers/registries.conf
+    content: |
+      [registries.search]
+      registries = ['docker.io', 'quay.io']
+
+  - path: /opt/podman/vault.yaml
+    content: |
+      ---
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        labels:
+          app: vault
+        name: vault
+      spec:
+        containers:
+          - image: docker.io/hashicorp/vault:1.18
+            name: app
+            ports:
+              - containerPort: 8200
+                hostPort: 8200
+            env:
+              - name: VAULT_ADDR
+                value: http://127.0.0.1:8200
+              - name: VAULT_API_ADDR
+                value: http://0.0.0.0:8200
+              - name: VAULT_LOG_LEVEL
+                value: debug
+              - name: VAULT_LOG_FORMAT
+                value: standard
+              - name: VAULT_DISABLE_MLOCK
+                value: true
+              - name: VAULT_UI
+                value: true
+              - name: USER_GID
+                value: "1003"
+              - name: TZ
+                value: Europe/Paris
+              - name: USER_UID
+                value: "1002"
+            securityContext:
+              allowPrivilegeEscalation: false
+            command: ["vault", "server", "-config=/vault/config/vault.json"]
+            resources:
+              requests:
+                memory: "128Mi"
+              limits:
+                memory: "256Mi"
+            volumeMounts:
+              - mountPath: /etc/localtime
+                name: etc-localtime
+                readOnly: true
+              - mountPath: /vault/file
+                name: vault-data
+              - mountPath: /vault/logs
+                name: vault-logs
+              - mountPath: /vault/config
+                name: vault-config
+              - mountPath: /vault/config/vault.json
+                name: vault-config-file
+        volumes:
+          - name: etc-localtime
+            hostPath:
+              path: /etc/localtime
+              type: File
+          - name: vault-data
+            persistentVolumeClaim:
+              claimName: vault-data
+          - name: vault-logs
+            persistentVolumeClaim:
+              claimName: vault-logs
+          - name: vault-config
+            persistentVolumeClaim:
+              claimName: vault-config
+          - name: vault-config-file
+            hostPath:
+              path: /opt/podman/conf/vault.json
+              type: File
+
+  - path: /opt/podman/conf/vault.json
+    content: |
+      {
+        "listener": [
+          {
+            "tcp": {
+              "address": "0.0.0.0:8200",
+              "tls_disable": 1
+            }
+          }
+        ],
+        "storage": {
+          "file": {
+            "path": "/vault/data"
+          }
+        },
+        "default_lease_ttl": "168h",
+        "max_lease_ttl": "0h"
+      }
+
+  - path: /etc/security/limits.d/memlock.conf
+    content: |
+      * soft memlock unlimited
+      * hard memlock unlimited
