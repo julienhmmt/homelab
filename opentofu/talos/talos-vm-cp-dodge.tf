@@ -20,7 +20,7 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
   timeout_create      = 180
   timeout_shutdown_vm = 30
   timeout_stop_vm     = 30
-  vm_id               = 991200
+  vm_id               = 192168121
 
   agent {
     enabled = true
@@ -42,7 +42,7 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
   # }
 
   disk {
-    datastore_id = "local-nvme-vm"
+    datastore_id = "zfs_nvme"
     interface    = "scsi0"
     size         = 64
     # file_format  = "raw"
@@ -67,15 +67,12 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
   #   size         = var.disk_size
   # }
 
-  # dynamic "efi_disk" {
-  #   for_each = var.disk_efi_creation ? [1] : []
-
-  #   content {
-  #     datastore_id = var.disk_efi_creation ? var.disk_efi_datastore : null
-  #     type         = "4m"
-  #   }
-  # }
-
+  efi_disk {
+    datastore_id = "zfs_nvme"
+    file_format = "raw"
+    pre_enrolled_keys = false
+    type = "4m"
+  }
 
   memory {
     dedicated = 4096
@@ -84,7 +81,7 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
   network_device {
     bridge      = "vmbr0"
     firewall    = false
-    mac_address = "BC:24:11:CA:FE:00"
+    mac_address = "BC:24:11:CA:FE:01"
     rate_limit  = 0
   }
 
@@ -101,7 +98,11 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
   }
 
   tpm_state {
-    datastore_id = "local-nvme-vm"
+    datastore_id = "zfs_nvme"
     version      = "v2.0"
+  }
+
+  vga {
+    type = "virtio"
   }
 }

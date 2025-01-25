@@ -22,7 +22,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
   timeout_create      = 180
   timeout_shutdown_vm = 30
   timeout_stop_vm     = 30
-  vm_id               = 991202
+  vm_id               = 192168123
 
   agent {
     enabled = true
@@ -37,14 +37,8 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
     type    = "host"
   }
 
-  # disk {
-  #   datastore_id = "local-nvme-vm"
-  #   file_id      = "local-nvme-vm:iso/talos-1.9.1.iso"
-  #   interface    = "scsi0"
-  # }
-
   disk {
-    datastore_id = "local-nvme-vm"
+    datastore_id = "zfs_nvme"
     interface    = "scsi0"
     size         = 128
     # file_format  = "raw"
@@ -68,15 +62,12 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
   #   size         = var.disk_size
   # }
 
-  # dynamic "efi_disk" {
-  #   for_each = var.disk_efi_creation ? [1] : []
-
-  #   content {
-  #     datastore_id = var.disk_efi_creation ? var.disk_efi_datastore : null
-  #     type         = "4m"
-  #   }
-  # }
-
+  efi_disk {
+    datastore_id = "zfs_nvme"
+    file_format = "raw"
+    pre_enrolled_keys = false
+    type = "4m"
+  }
 
   memory {
     dedicated = 16384
@@ -85,7 +76,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
   network_device {
     bridge      = "vmbr0"
     firewall    = false
-    mac_address = "BC:24:11:CA:FE:02"
+    mac_address = "BC:24:11:CA:FE:03"
     rate_limit  = 0
   }
 
@@ -102,7 +93,11 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
   }
 
   tpm_state {
-    datastore_id = "local-nvme-vm"
+    datastore_id = "zfs_nvme"
     version      = "v2.0"
+  }
+
+  vga {
+    type = "virtio"
   }
 }
