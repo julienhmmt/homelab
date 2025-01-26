@@ -59,7 +59,7 @@ resource "talos_machine_configuration_apply" "worker" {
   node                        = each.key
   config_patches = [
     templatefile("${path.module}/templates/install-disk-and-hostname.yaml.tmpl", {
-      hostname     = each.value.hostname == null ? format("%s-worker-%s", var.cluster_name, index(keys(var.node_data.workers), each.key)) : each.value.hostname
+      hostname     = each.value.hostname
       install_disk = each.value.install_disk
     })
   ]
