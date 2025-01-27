@@ -10,24 +10,26 @@ data "talos_machine_configuration" "this" {
 
   cluster_endpoint   = "https://${var.talos_cluster_endpoint}:6443"
   cluster_name       = var.talos_cluster_name
-  kubernetes_version = "1.32.0"
+  kubernetes_version = var.kubernetes_version
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   machine_type       = each.value.role
   talos_version      = var.talos_version
 
-  config_patches = each.value.role == "controlplane" ? [
-    templatefile("${path.module}/files/cp-preparation.yaml", {
-      cluster_name = var.talos_cluster_name
-      hostname     = each.value.vm_name
-      node_name    = each.value.vm_name
-      node_usage   = each.value.node_usage
-    })
-    ] : [
-    templatefile("${path.module}/files/wkr-preparation.yaml", {
-      cluster_name = var.talos_cluster_name
-      hostname     = each.value.vm_name
-      node_name    = each.value.vm_name
-      node_usage   = each.value.node_usage
+  config_patches = [
+    yamlencode({
+      machine = {
+        network = {
+          hostname = each.value.vm_name
+        }
+        install = {
+          disk = each.value.vm_install_disk
+        }
+        nodeLabels = {
+          "topology.kubernetes.io/usage"  = each.value.node_usage
+          "topology.kubernetes.io/region" = var.talos_cluster_name
+          "topology.kubernetes.io/zone"   = each.value.vm_name
+        }
+      }
     })
   ]
 }
@@ -51,22 +53,50 @@ resource "talos_machine_configuration_apply" "this" {
   node                        = each.value.vm_ip
 
   config_patches = [
-    templatefile("${path.module}/templates/disk-hostname.yaml.tmpl", {
-      hostname     = each.value.vm_name
-      install_disk = each.value.vm_install_disk
-    }),
-    # Conditional file selection based on role
-    file("${path.module}/files/cp-preparation.yaml")
+    yamlencode({
+      machine = {
+        network = {
+          hostname = each.value.vm_name
+        }
+        install = {
+          disk = each.value.vm_install_disk
+        }
+        nodeLabels = {
+          "topology.kubernetes.io/usage"  = each.value.node_usage
+          "topology.kubernetes.io/region" = var.talos_cluster_name
+          "topology.kubernetes.io/zone"   = each.value.vm_name
+        }
+      }
+      cluster = each.value.role == "controlplane" ? {
+        allowSchedulingOnControlPlanes = false
+        network = {
+          cni = {
+            name = "none"
+          }
+        }
+        proxy = {
+          disabled = true
+        }
+        extraManifests = [
+          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml",
+          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_gateways.yaml",
+          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml",
+          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml",
+          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml",
+          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml"
+        ]
+      } : null
+    })
   ]
 }
 
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = [for k, v in var.nodes : k if v.role == "controlplane"][0]
+  node                 = [for _, v in var.nodes : v.vm_ip if v.role == "controlplane"][0]
 }
 
 resource "talos_cluster_kubeconfig" "this" {
   depends_on           = [talos_machine_bootstrap.this]
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = [for k, v in var.nodes : k if v.role == "controlplane"][0]
+  node                 = [for _, v in var.nodes : v.vm_ip if v.role == "controlplane"][0]
 }

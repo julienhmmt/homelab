@@ -65,7 +65,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
     datastore_id = "zfs_nvme"
     ip_config {
       ipv4 {
-        address = each.value.vm_ip
+        address = "${each.value.vm_ip}/24"
         gateway = "192.168.1.254"
       }
       ipv6 {
@@ -122,16 +122,3 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
     file_name = "${each.key}_ci_meta-data.yml"
   }
 }
-
-# resource "proxmox_virtual_environment_file" "user_cloud_config_dodge" {
-#   for_each = var.user_cloud_config
-
-#   content_type = "snippets"
-#   datastore_id = "zfs_nvme"
-#   node_name    = "miniquarium"
-
-#   source_file {
-#     path      = each.value.user_data_path
-#     file_name = "${each.key}_ci_user-data.yml"
-#   }
-# }
