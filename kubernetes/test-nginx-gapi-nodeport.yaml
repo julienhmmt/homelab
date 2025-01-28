@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: webserver-test
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: webserver-sa
+  namespace: webserver-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webserver
+  namespace: webserver-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      serviceAccountName: webserver-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: webserver
+        image: nginxinc/nginx-unprivileged:alpine
+        ports:
+        - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+      nodeSelector:
+        topology.kubernetes.io/usage: "general"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver-svc
+  namespace: webserver-test
+spec:
+  type: NodePort
+  selector:
+    app: webserver
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: webserver-gateway
+  namespace: webserver-test
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: webserver-route
+  namespace: webserver-test
+spec:
+  parentRefs:
+  - name: webserver-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: webserver-svc
+      port: 80
