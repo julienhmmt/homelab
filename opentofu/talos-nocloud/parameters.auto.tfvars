@@ -20,18 +20,6 @@ meta_config_metadata = {
   EOF
 }
 
-# user_cloud_config = {
-#   "dodge" = {
-#     user_data_path = "files/user-data-dodge.yaml"
-#   }
-#   "ram" = {
-#     user_data_path = "files/user-data-ram.yaml"
-#   }
-#   "viper" = {
-#     user_data_path = "files/user-data-viper.yaml"
-#   }
-# }
-
 nodes = {
   "dodge" = {
     node_usage   = "infra" # 'infra' or 'general' 

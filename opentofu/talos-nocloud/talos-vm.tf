@@ -1,8 +1,7 @@
 resource "proxmox_virtual_environment_vm" "talos_vm" {
   depends_on = [
     proxmox_virtual_environment_download_file.talos_nocloud_image,
-    proxmox_virtual_environment_file.meta_cloud_config,
-    # proxmox_virtual_environment_file.user_cloud_config_dodge
+    proxmox_virtual_environment_file.meta_cloud_config
   ]
   for_each = var.nodes
 

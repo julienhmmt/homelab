@@ -46,17 +46,3 @@ variable "nodes" {
 variable "meta_config_metadata" {
   type = map(string)
 }
-
-# variable "user_cloud_config" {
-#   type = map(object({
-#     user_data_path = string
-#   }))
-# }
-
-# variable "cilium" {
-#   description = "Cilium configuration"
-#   type = object({
-#     values  = string
-#     install = string
-#   })
-# }
