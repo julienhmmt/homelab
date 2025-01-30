@@ -1,6 +1,17 @@
 # README
 
-## Configuration des nodes
+## OpenTofu
+
+```bash
+tofu plan -concise -out talosvmplan
+tofu apply talosvmplan
+tofu output -raw talosconfig > ./.talosconfig
+tofu output -raw kubeconfig > ./.kubeconfig
+cp ./.talosconfig $HOME/.talos/config
+cp ./.kubeconfig $HOME/.kube/config
+```
+
+## Configuration manuelle des nodes
 
 « Dodge » est le control plane, il n’aura aucun pod. « Ram » devra avoir les pods « infra » genre Gitea, vault etc. « Viper » est le fourre-tout.
 
@@ -17,6 +28,8 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 ```
 
 ## Cilium
+
+WIP, pour le moment ce n'est pas en place
 
 ```bash
 # Suppression de kube-proxy

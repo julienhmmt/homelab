@@ -26,8 +26,6 @@ data "talos_machine_configuration" "this" {
         }
         nodeLabels = {
           "topology.kubernetes.io/usage"  = each.value.node_usage
-          "topology.kubernetes.io/region" = var.talos_cluster_name
-          "topology.kubernetes.io/zone"   = each.value.vm_name
         }
       }
     })
@@ -63,27 +61,13 @@ resource "talos_machine_configuration_apply" "this" {
         }
         nodeLabels = {
           "topology.kubernetes.io/usage"  = each.value.node_usage
-          "topology.kubernetes.io/region" = var.talos_cluster_name
-          "topology.kubernetes.io/zone"   = each.value.vm_name
         }
       }
       cluster = each.value.role == "controlplane" ? {
         allowSchedulingOnControlPlanes = false
-        network = {
-          cni = {
-            name = "none"
-          }
-        }
-        proxy = {
-          disabled = true
-        }
         extraManifests = [
-          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml",
-          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_gateways.yaml",
-          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml",
-          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml",
-          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml",
-          "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml"
+          "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
+          "https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml"
         ]
       } : null
     })
