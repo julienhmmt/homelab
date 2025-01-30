@@ -34,22 +34,16 @@ helm install \
     --set securityContext.capabilities.cleanCiliumState="{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}" \
     --set cgroup.autoMount.enabled=false \
     --set cgroup.hostRoot=/sys/fs/cgroup \
-    --set externalips.enabled=true \
+    --set envoy.enabled=false \
     --set gatewayAPI.enabled=true \
     --set gatewayAPI.enableAlpn=true \
     --set gatewayAPI.enableAppProtocol=true \
-    --set k8sServiceHost=localhost \
-    --set k8sServicePort=7445 \
     --set hubble.enabled=true \
     --set hubble.relay.enabled=true \
     --set hubble.ui.enabled=true \
-    --set hubble.ui.ingress.enabled=false \
-    --set hubble.ui.service.type=NodePort \
     --set metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,http}" \
     --set prometheus.enabled=true \
     --set operator.prometheus.enabled=true \
-    --set nodePort.enabled=true \
-    --set nodePort.mode=snat \
     --set bpf.monitorAggregation=medium \
     --set encryption.nodeEncryption=true
 

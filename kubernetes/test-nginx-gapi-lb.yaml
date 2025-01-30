@@ -56,7 +56,7 @@ spec:
       - name: webserver
         image: nginxinc/nginx-unprivileged:alpine
         ports:
-        - containerPort: 8080
+        - containerPort: 80
           name: web
         securityContext:
           allowPrivilegeEscalation: false
@@ -83,8 +83,8 @@ spec:
     app: webserver
   ports:
   - name: web
-    port: 8080
-    targetPort: web # Deployment port pod
+    port: 80
+    targetPort: 80
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
@@ -100,13 +100,10 @@ metadata:
   namespace: webserver-test-2
 spec:
   gatewayClassName: cilium
-  infrastructure:
-    annotations:
-      io.cilium/lb-ipam-ips: 192.168.1.23
   listeners:
   - name: http-listener
     protocol: HTTP
-    port: 8080
+    port: 80
     allowedRoutes:
       namespaces:
         from: All
@@ -126,8 +123,10 @@ metadata:
 spec:
   allowFirstLastIPs: "Yes"
   blocks:
-  - cidr: "192.168.1.22/32"
-  - cidr: "192.168.1.23/32"
+  - cidr: "192.168.1.22/31"
+  serviceSelector:
+    matchLabels:
+      "io.kubernetes.service.namespace": "webserver-test-2"
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -142,6 +141,9 @@ spec:
         - matchLabels:
             "k8s:io.kubernetes.pod.namespace": kube-system
             "k8s:k8s-app": kube-dns
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": kube-system
+            "k8s:k8s-app": coredns  # Added CoreDNS support
       toPorts:
         - ports:
             - port: "53"
@@ -151,3 +153,21 @@ spec:
               - matchPattern: "*"
     - toFQDNs:
         - matchName: kubernetes.io
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: webserver-route
+  namespace: webserver-test-2
+spec:
+  parentRefs:
+  - name: webserver-gateway-lb
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: webserver-svc-2
+      namespace: webserver-test-2
+      port: 80
