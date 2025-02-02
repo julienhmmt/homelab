@@ -17,8 +17,9 @@ cp ./.kubeconfig $HOME/.kube/config
 
 ```bash
 kubectl taint nodes dodge node-role.kubernetes.io/control-plane=true:NoSchedule
-kubectl label nodes ram node-role.kubernetes.io/infra=true
-kubectl label nodes viper node-role.kubernetes.io/general=true
+kubectl label nodes dodge topology.kubernetes.io/usage=infra
+kubectl label nodes ram topology.kubernetes.io/usage=infra
+kubectl label nodes viper topology.kubernetes.io/usage=general
 ```
 
 ## Cert-manager

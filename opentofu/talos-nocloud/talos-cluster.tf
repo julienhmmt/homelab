@@ -25,7 +25,7 @@ data "talos_machine_configuration" "this" {
           disk = each.value.vm_install_disk
         }
         nodeLabels = {
-          "topology.kubernetes.io/usage"  = each.value.node_usage
+          "topology.kubernetes.io/usage" = each.value.node_usage
         }
       }
     })
@@ -60,7 +60,7 @@ resource "talos_machine_configuration_apply" "this" {
           disk = each.value.vm_install_disk
         }
         nodeLabels = {
-          "topology.kubernetes.io/usage"  = each.value.node_usage
+          "topology.kubernetes.io/usage" = each.value.node_usage
         }
       }
       cluster = each.value.role == "controlplane" ? {

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv
+spec:
+  capacity:
+    storage: 10Gi  # Adjust as needed
+  accessModes:
+    - ReadWriteMany  # Allows multiple pods to use it
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storage
+  nfs:
+    path: /data/nfs-share  # Change to your actual NFS share path
+    server: 192.168.1.12
+  mountOptions:
+    - nfsvers=4
