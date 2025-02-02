@@ -12,11 +12,14 @@ variable "kubernetes_version" {
   type = string
 }
 
+variable "kubernetes_dns_domain" {
+  type = string
+}
+
 variable "talos_version" {
   type = string
 }
 
-# talos-vm-{cp-worker}.tf
 variable "nodes" {
   description = "Values of VM resources"
   type = map(object({

@@ -1,4 +1,5 @@
 kubernetes_version     = "1.32.0"
+kubernetes_dns_domain  = "k8s.local.hommet.net"
 talos_cluster_name     = "localhommetnet_k8sv1"
 talos_cluster_endpoint = "192.168.1.21"
 talos_version          = "1.9.2"

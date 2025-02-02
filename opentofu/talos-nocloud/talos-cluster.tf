@@ -24,6 +24,9 @@ data "talos_machine_configuration" "this" {
         install = {
           disk = each.value.vm_install_disk
         }
+        time = {
+          servers = ["fr.pool.ntp.org", "time.cloudflare.com"]
+        }
         nodeLabels = {
           "topology.kubernetes.io/usage" = each.value.node_usage
         }
@@ -40,8 +43,11 @@ data "talos_client_configuration" "this" {
 }
 
 resource "talos_machine_configuration_apply" "this" {
-  depends_on = [proxmox_virtual_environment_vm.talos_vm]
-  for_each   = var.nodes
+  depends_on = [
+    talos_machine_secrets.this,
+    proxmox_virtual_environment_vm.talos_vm
+  ]
+  for_each = var.nodes
   lifecycle { # re-run config apply if vm changes
     replace_triggered_by = [proxmox_virtual_environment_vm.talos_vm[each.key]]
   }
@@ -59,15 +65,28 @@ resource "talos_machine_configuration_apply" "this" {
         install = {
           disk = each.value.vm_install_disk
         }
+        time = {
+          servers = ["fr.pool.ntp.org", "time.cloudflare.com"]
+        }
         nodeLabels = {
           "topology.kubernetes.io/usage" = each.value.node_usage
         }
       }
       cluster = each.value.role == "controlplane" ? {
+        network = {
+          dnsDomain = var.kubernetes_dns_domain
+          cni = { # Cilium will replace it
+            name = "none"
+          }
+        }
+        proxy = { # Cilium will replace it
+          disabled = true
+        }
         allowSchedulingOnControlPlanes = false
         extraManifests = [
           "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
-          "https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml"
+          "https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml",
+          "https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml"
         ]
       } : null
     })
@@ -76,7 +95,8 @@ resource "talos_machine_configuration_apply" "this" {
 
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = [for _, v in var.nodes : v.vm_ip if v.role == "controlplane"][0]
+  # node                 = [for _, v in var.nodes : v.vm_ip if v.role == "controlplane"][0]
+  node = element([for _, v in var.nodes : v.vm_ip if v.role == "controlplane"], 0)
 }
 
 resource "talos_cluster_kubeconfig" "this" {
