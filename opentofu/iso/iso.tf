@@ -8,16 +8,6 @@ resource "proxmox_virtual_environment_download_file" "almalinux95_iso" { # AlmaL
   url                = "https://repo.almalinux.org/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-x86_64-minimal.iso"
 }
 
-resource "proxmox_virtual_environment_download_file" "almalinux95_qcow2" { # AlmaLinux 9.5 GenericCloud 12/2024
-  checksum           = "abddf01589d46c841f718cec239392924a03b34c4fe84929af5d543c50e37e37"
-  checksum_algorithm = "sha256"
-  content_type       = "iso"
-  datastore_id       = "local"
-  file_name          = "AlmaLinux-9-GenericCloud-9.5-20241120.x86_64.img"
-  node_name          = "miniquarium"
-  url                = "https://repo.almalinux.org/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-9.5-20241120.x86_64.qcow2"
-}
-
 resource "proxmox_virtual_environment_download_file" "alpine_standard_iso" { # Alpine Linux 3.21.2 Standard 02/2025
   checksum           = "706e9521cd21188786cb983131040ee68399e504924ea3318d600d1e04a93878"
   checksum_algorithm = "sha256"
@@ -88,6 +78,16 @@ resource "proxmox_virtual_environment_download_file" "gparted_live_iso" { # GPar
   url                = "https://downloads.sourceforge.net/project/gparted/gparted-live-stable/1.7.0-1/gparted-live-1.7.0-1-amd64.iso?ts=gAAAAABnqQ83X_6l9iUuxFutCBNvZgg_5e__pi3o08suyTK8nYB7KBmkoum1wKStiHM4sysn5z0i-vdiPQrQSPeR3CtKl-WvJw%3D%3D&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fgparted%2Ffiles%2Fgparted-live-stable%2F1.7.0-1%2Fgparted-live-1.7.0-1-amd64.iso%2Fdownload"
 }
 
+resource "proxmox_virtual_environment_download_file" "ipfire_iso" { # IPFire 2.29 Core 191
+  checksum           = "ca3d96168e7184835ad55c9a6cb9dcaa8794eb6934e58e8fb36614671b42ea74"
+  checksum_algorithm = "sha256"
+  content_type       = "iso"
+  datastore_id       = "local"
+  file_name          = "ipfire-2.29-core191-x86_64.iso"
+  node_name          = "miniquarium"
+  url                = "https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core191/ipfire-2.29-core191-x86_64.iso"
+}
+
 resource "proxmox_virtual_environment_download_file" "kali_iso" { # Kali Linux 2024.4 12/2024
   checksum           = "f07c14ff6f5a89024b2d0d0427c3bc94de86b493a0598a2377286b87478da706"
   checksum_algorithm = "sha256"
@@ -127,6 +127,7 @@ resource "proxmox_virtual_environment_download_file" "opnsense_img" { # OPNsense
   node_name               = "miniquarium"
   url                     = "https://pkg.opnsense.org/releases/25.1/OPNsense-25.1-vga-amd64.img.bz2"
   decompression_algorithm = "bz2"
+  overwrite_unmanaged     = false
 }
 
 resource "proxmox_virtual_environment_download_file" "pbs_122024" { # Proxmox Backup Server 3.3-1 12/2024
@@ -196,18 +197,8 @@ resource "proxmox_virtual_environment_download_file" "ubuntu24_iso" { # Ubuntu 2
   node_name          = "miniquarium"
   url                = "https://releases.ubuntu.com/24.04.1/ubuntu-24.04.1-live-server-amd64.iso"
 }
-resource "proxmox_virtual_environment_download_file" "ipfire_iso" { # IPFire 2.29 Core 191
-  checksum           = "ca3d96168e7184835ad55c9a6cb9dcaa8794eb6934e58e8fb36614671b42ea74"
-  checksum_algorithm = "sha256"
-  content_type       = "iso"
-  datastore_id       = "local"
-  file_name          = "ipfire-2.29-core191-x86_64.iso"
-  node_name          = "miniquarium"
-  url                = "https://downloads.ipfire.org/releases/ipfire-2.x/2.29-core191/ipfire-2.29-core191-x86_64.iso"
-}
 
 output "almalinux95_iso_file_id" { value = proxmox_virtual_environment_download_file.almalinux95_iso.id }
-output "almalinux95_qcow2_file_id" { value = proxmox_virtual_environment_download_file.almalinux95_qcow2.id }
 output "alpine_standard_iso_file_id" { value = proxmox_virtual_environment_download_file.alpine_standard_iso.id }
 output "alpine_virt_iso_file_id" { value = proxmox_virtual_environment_download_file.alpine_virt_iso.id }
 output "archlinux_iso_file_id" { value = proxmox_virtual_environment_download_file.archlinux_iso.id }
