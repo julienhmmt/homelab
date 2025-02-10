@@ -5,7 +5,6 @@ variable "vm" {
     disk_efi_datastore = string
     disk_size          = number
     disk_vm_datastore  = string
-    disk_vm_img        = string
     dns_servers        = list(string)
     domain             = string
     firewall_enabled   = bool
@@ -13,6 +12,7 @@ variable "vm" {
     ipv4               = string
     net_mac_address    = string
     net_rate_limit     = number
+    os                 = string
     pool_id            = string
     ram                = number
     start_on_boot      = bool
@@ -25,10 +25,14 @@ variable "vm" {
 
 variable "meta_config_metadata" {
   type = map(string)
+  default = {
+    "debian12" = <<-EOF
+      instance-id: debian12-instance
+      local-hostname: debian12
+    EOF
+  }
 }
 
 variable "user_cloud_config" {
-  type = map(object({
-    user_data_path = string
-  }))
+  type = map(string)
 }

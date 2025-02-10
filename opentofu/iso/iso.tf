@@ -119,8 +119,8 @@ resource "proxmox_virtual_environment_download_file" "nixos_minimal_iso" { # Nix
 }
 
 resource "proxmox_virtual_environment_download_file" "opnsense_img" { # OPNsense 25.1 12/2024
-  checksum                = "89fcf5bdb1d2ea2ea6ba4cdc1268ea0a1e22b944330d7bee0711c8630cc905af"
-  checksum_algorithm      = "sha256"
+  # checksum                = "89fcf5bdb1d2ea2ea6ba4cdc1268ea0a1e22b944330d7bee0711c8630cc905af"
+  # checksum_algorithm      = "sha256"
   content_type            = "iso"
   datastore_id            = "local"
   file_name               = "OPNsense-25.1-vga-amd64.img"

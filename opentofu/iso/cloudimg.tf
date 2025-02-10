@@ -20,11 +20,11 @@ resource "proxmox_virtual_environment_download_file" "archlinux_cloudimg" { # Ar
 }
 
 resource "proxmox_virtual_environment_download_file" "debian12_cloudimg" { # Debian 12 GenericCloud 02/2025
-  checksum           = "9d2e5968e2d0bc0a3f40d89a652516e4aa06ebbe8a4bb728737b3588f4ff11e028de2a5582309bf948a673e8dc4c1ceb47708bf6e1bb4a8953e3b577ee6eaaf2"
+  checksum           = "a58d86525d75fd8e139a2302531ce5d2ab75ef0273cfe78f9d53aada4b23efd45f8433b4806fa4570cfe981c8fae26f5e5e855cbd66ba2198862f28125fd2d45"
   checksum_algorithm = "sha512"
   content_type       = "iso"
   datastore_id       = "local"
-  file_name          = "debian-12-nocloud-amd64.img"
+  file_name          = "debian-12-genericcloud-amd64.img"
   node_name          = "miniquarium"
   upload_timeout     = 180
   url                = "https://cdimage.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
@@ -35,7 +35,7 @@ resource "proxmox_virtual_environment_download_file" "ubuntu22_cloudimg" { # Ubu
   checksum_algorithm = "sha256"
   content_type       = "iso"
   datastore_id       = "local"
-  file_name          = "ubuntu-22-minimal-amd64.img"
+  file_name          = "ubuntu-22-amd64.img"
   node_name          = "miniquarium"
   upload_timeout     = 180
   url                = "https://cloud-images.ubuntu.com/jammy/20250207/jammy-server-cloudimg-amd64.img"
@@ -46,7 +46,7 @@ resource "proxmox_virtual_environment_download_file" "ubuntu24_cloudimg" { # Ubu
   checksum_algorithm = "sha256"
   content_type       = "iso"
   datastore_id       = "local"
-  file_name          = "ubuntu-24-minimal-amd64.img"
+  file_name          = "ubuntu-24-amd64.img"
   node_name          = "miniquarium"
   upload_timeout     = 180
   url                = "https://cloud-images.ubuntu.com/noble/20250122/noble-server-cloudimg-amd64.img"

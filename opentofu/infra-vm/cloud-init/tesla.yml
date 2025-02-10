@@ -2,12 +2,18 @@
 
 hostname: tesla
 manage_etc_hosts: true
-power_state: {mode: reboot}
 
 allow_public_ssh_keys: true
 ssh_quiet_keygen: true
 
 users:
+  - name: root
+    lock_passwd: false
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+
   - name: user
     lock_passwd: false
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -15,14 +21,14 @@ users:
     shell: /bin/bash
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
-    plain_text_passwd: pouetpouet
+    passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
 
 # Misc settings
 timezone: Europe/Paris
-locale: en_US
+locale: en_US.UTF-8
 
 package_update: true
-package_upgrade: true
+package_upgrade: false
 packages:
   - cockpit
   - libusb-1.0-0-dev
@@ -31,12 +37,8 @@ packages:
   - systemd-timesyncd
   - ufw
 
-apt:
-  install_recommends: false
-
 runcmd:
   - rm -f /etc/machine-id
-  - systemd-machine-id-setup
   - rm -f /var/lib/dbus/machine-id
   - ln -s /etc/machine-id /var/lib/dbus/machine-id
   - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
@@ -76,3 +78,5 @@ write_files:
       actions = SET
       instcmds = ALL
       upsmon master
+
+final_message: "The system is finally up, after $UPTIME seconds"

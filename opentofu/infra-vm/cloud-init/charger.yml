@@ -1,0 +1,54 @@
+#cloud-config
+
+hostname: charger
+manage_etc_hosts: true
+
+allow_public_ssh_keys: true
+ssh_quiet_keygen: true
+
+users:
+  - name: root
+    lock_passwd: false
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+
+  - name: user
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: wheel
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+
+# Misc settings
+timezone: Europe/Paris
+locale: en_US.UTF-8
+
+package_update: true
+package_upgrade: false
+packages:
+  - cockpit
+  - nfs-kernel-server
+  - ufw
+
+runcmd:
+  - rm -f /etc/machine-id
+  - rm -f /var/lib/dbus/machine-id
+  - ln -s /etc/machine-id /var/lib/dbus/machine-id
+  - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
+  - mkdir -p /srv/nfs/data
+  - chown nobody:nogroup /srv/nfs/data
+  - echo "/srv/nfs/data 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+  - exportfs -a
+  - systemctl enable nfs-server
+  - systemctl enable cockpit.service
+  - systemctl start nfs-server
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 22
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 2049
+  - ufw enable
+  - echo "done" > /tmp/cloud-config.done
+
+final_message: "The system is finally up, after $UPTIME seconds"
