@@ -1,15 +1,16 @@
-resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
+resource "proxmox_virtual_environment_vm" "talos_wkr_viper" {
   depends_on = [
     proxmox_virtual_environment_download_file.talos_img,
-    proxmox_virtual_environment_vm.talos_cp_dodge
+    proxmox_virtual_environment_vm.talos_cp_dodge,
+    proxmox_virtual_environment_vm.talos_wkr_ram
   ]
 
   bios            = "seabios"
-  description     = "Managed by OpenTofu. Talos worker pour les services d'infra."
+  description     = "Managed by OpenTofu. Talos worker pour tous les services annexes."
   keyboard_layout = "fr"
   machine         = "pc-q35-9.0"
   migrate         = true
-  name            = "ram"
+  name            = "viper"
   node_name       = "miniquarium"
   on_boot         = true
   # pool_id             = data.proxmox_virtual_environment_pools.available_pools
@@ -21,7 +22,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
   timeout_create      = 180
   timeout_shutdown_vm = 30
   timeout_stop_vm     = 30
-  vm_id               = 192168122
+  vm_id               = 192168123
 
   agent {
     enabled = true
@@ -30,7 +31,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
   }
 
   cpu {
-    cores   = 2
+    cores   = 4
     numa    = true
     sockets = 1
     type    = "host"
@@ -62,20 +63,20 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
   # }
 
   efi_disk {
-    datastore_id = "zfs_nvme"
-    file_format = "raw"
+    datastore_id      = "zfs_nvme"
+    file_format       = "raw"
     pre_enrolled_keys = false
-    type = "4m"
+    type              = "4m"
   }
 
   memory {
-    dedicated = 8192
+    dedicated = 16384
   }
 
   network_device {
     bridge      = "vmbr0"
     firewall    = false
-    mac_address = "BC:24:11:CA:FE:02"
+    mac_address = "BC:24:11:CA:FE:03"
     rate_limit  = 0
   }
 
@@ -86,7 +87,7 @@ resource "proxmox_virtual_environment_vm" "talos_wkr_ram" {
   serial_device {}
 
   startup {
-    order      = "2"
+    order      = "3"
     up_delay   = 15
     down_delay = 60
   }

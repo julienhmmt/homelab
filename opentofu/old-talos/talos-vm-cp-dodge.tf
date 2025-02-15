@@ -68,10 +68,10 @@ resource "proxmox_virtual_environment_vm" "talos_cp_dodge" {
   # }
 
   efi_disk {
-    datastore_id = "zfs_nvme"
-    file_format = "raw"
+    datastore_id      = "zfs_nvme"
+    file_format       = "raw"
     pre_enrolled_keys = false
-    type = "4m"
+    type              = "4m"
   }
 
   memory {

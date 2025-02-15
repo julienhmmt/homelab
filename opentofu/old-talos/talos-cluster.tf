@@ -36,7 +36,7 @@ data "talos_client_configuration" "this" {
 
 resource "talos_machine_configuration_apply" "controlplane" {
   depends_on = [data.talos_machine_configuration.controlplane]
-  for_each                    = var.node_data.controlplanes
+  for_each   = var.node_data.controlplanes
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
