@@ -3,7 +3,7 @@
 
 provider "registry.opentofu.org/bpg/proxmox" {
   version     = "0.71.0"
-  constraints = "~> 0.70"
+  constraints = "~> 0.71"
   hashes = [
     "h1:TwA93MN0BPUidTfk2h+1JeX6HY1BTsSlYiOpESWf6qA=",
     "zh:17349fbd8a4bb2254cf63bde47b3ef451977de9619dd9b4a22d765350ebe2534",
@@ -40,8 +40,7 @@ provider "registry.opentofu.org/carlpett/sops" {
 }
 
 provider "registry.opentofu.org/hashicorp/random" {
-  version     = "3.6.3"
-  constraints = "3.6.3"
+  version = "3.6.3"
   hashes = [
     "h1:32/UZofQoXk8zPj9vpIDiSEmERA3Mx2VPvk1lHTTHvw=",
     "zh:1bfd2e54b4eee8c761a40b6d99d45880b3a71abc18a9a7a5319204da9c8363b2",

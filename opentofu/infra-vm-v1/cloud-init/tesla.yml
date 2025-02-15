@@ -32,6 +32,7 @@ package_upgrade: false
 packages:
   - cockpit
   - libusb-1.0-0-dev
+  - netdata
   - nut
   - qemu-guest-agent
   - systemd-timesyncd
@@ -53,6 +54,7 @@ runcmd:
   # FIN // NUT configuration
   - ufw allow proto tcp from 192.168.1.0/24 to any port 22
   - ufw allow proto tcp from 192.168.1.0/24 to any port 9090
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 19999
   - ufw enable
   - echo "done" > /tmp/cloud-config.done
 

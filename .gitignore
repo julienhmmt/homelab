@@ -6,4 +6,6 @@
 .vscode/
 _OLD/
 key.txt
-otplan
+*plan*
+*.tfstate
+*.tfstate.*
