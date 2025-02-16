@@ -27,7 +27,7 @@ variable "nodes" {
     role                = string
     vm_cpu_cores        = number
     vm_cpu_type         = optional(string, "x86-64-v2-AES")
-    vm_datastore_id     = optional(string, "zfs_nvme")
+    vm_datastore_id     = optional(string, "local-nvme")
     vm_description      = string
     vm_disk_size        = number
     vm_disk_format      = optional(string, "raw")

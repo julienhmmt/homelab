@@ -53,7 +53,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   dynamic "efi_disk" {
     for_each = each.value.vm_efi ? [1] : []
     content {
-      datastore_id      = "zfs_nvme"
+      datastore_id      = "local-nvme"
       file_format       = "raw"
       pre_enrolled_keys = false
       type              = "4m"
@@ -61,7 +61,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   initialization {
-    datastore_id = "zfs_nvme"
+    datastore_id = "local-nvme"
     ip_config {
       ipv4 {
         address = "${each.value.vm_ip}/24"
@@ -99,7 +99,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   dynamic "tpm_state" {
     for_each = each.value.vm_tpm ? [1] : []
     content {
-      datastore_id = "zfs_nvme"
+      datastore_id = "local-nvme"
       version      = "v2.0"
     }
   }

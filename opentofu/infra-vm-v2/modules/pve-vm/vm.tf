@@ -68,6 +68,19 @@ resource "proxmox_virtual_environment_vm" "vm" {
     size         = var.vm_disk_size
   }
 
+  dynamic "disk" {
+    for_each = { for idx, val in proxmox_virtual_environment_vm.data_vm.disk : idx => val }
+    iterator = data_disk
+    content {
+      datastore_id      = data_disk.value["datastore_id"]
+      path_in_datastore = data_disk.value["path_in_datastore"]
+      file_format       = data_disk.value["file_format"]
+      size              = data_disk.value["size"]
+      # assign from scsi1 and up
+      interface         = "scsi${data_disk.key + 1}"
+    }
+  }
+
   efi_disk {
     datastore_id      = var.vm_datastore_id
     pre_enrolled_keys = false
