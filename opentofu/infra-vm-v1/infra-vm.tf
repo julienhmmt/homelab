@@ -113,7 +113,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
       file_format       = data_disk.value["file_format"]
       size              = data_disk.value["size"]
       # assign from scsi1 and up
-      interface         = "scsi${data_disk.key + 1}"
+      interface = "scsi${data_disk.key + 1}"
     }
   }
 

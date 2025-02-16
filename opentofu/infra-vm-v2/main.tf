@@ -1,8 +1,12 @@
 terraform {
   required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = "0.71"
+    }
     sops = {
       source  = "carlpett/sops"
-      version = "~> 1.0"
+      version = "1.1.1"
     }
   }
 }
@@ -13,17 +17,56 @@ data "sops_file" "pve_secrets" {
   source_file = "pve_secrets.yaml"
 }
 
-module "charger_vm" {
+provider "proxmox" {
+  api_token = data.sops_file.pve_secrets.data["pve_api_token"]
+  endpoint  = data.sops_file.pve_secrets.data["pve_endpoint"]
+  insecure  = true # because self-signed TLS certificate is in use
+  tmp_dir   = "/var/tmp/"
+
+  ssh {
+    agent    = true
+    username = "root"
+  }
+}
+
+### VMs comportant les données statiques
+module "data_vm_charger" {
   source          = "./modules/pve-vm-data"
+
   node_name       = "miniquarium"
   vm_datastore_id = "local-nvme"
   vm_description  = "Managed by OpenTofu"
   vm_disk_size    = 128
-  vm_id           = 9999100
+  vm_id           = 99991031
   vm_name         = "data_charger"
   vm_tags         = ["NE_PAS_SUPPRIMER", "stateful"]
 }
 
+module "data_vm_ram" { # TALOS Worker
+  source          = "./modules/pve-vm-data"
+
+  node_name       = "miniquarium"
+  vm_datastore_id = "local-nvme"
+  vm_description  = "Managed by OpenTofu"
+  vm_disk_size    = 128
+  vm_id           = 99991022
+  vm_name         = "data_ram"
+  vm_tags         = ["NE_PAS_SUPPRIMER", "stateful", "talos"]
+}
+
+module "data_vm_viper" { # TALOS Worker
+  source          = "./modules/pve-vm-data"
+
+  node_name       = "miniquarium"
+  vm_datastore_id = "local-nvme"
+  vm_description  = "Managed by OpenTofu"
+  vm_disk_size    = 128
+  vm_id           = 99991023
+  vm_name         = "data_ram"
+  vm_tags         = ["NE_PAS_SUPPRIMER", "stateful", "talos"]
+}
+
+### VMs de production
 # module "tesla" {
 #   source  = "./modules/pve-vm"
 #   enabled = "1"

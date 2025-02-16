@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = "~> 0.70"
+    }
+    sops = {
+      source  = "carlpett/sops"
+      version = "~> 1.1.1"
+    }
+  }
+}
+
 resource "proxmox_virtual_environment_vm" "data_vm" {
   description = var.vm_description
   node_name   = var.node_name
@@ -14,13 +27,18 @@ resource "proxmox_virtual_environment_vm" "data_vm" {
   }
 
   memory {
-    dedicated = 16
+    dedicated = 64
   }
 
   disk {
+    cache        = "none"
+    backup       = true
     datastore_id = var.vm_datastore_id
+    discard      = "on"
     file_format  = "raw"
     interface    = "scsi0"
+    iothread     = false
+    replicate    = false
     size         = var.vm_disk_size
   }
 }

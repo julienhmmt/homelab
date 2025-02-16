@@ -4,12 +4,6 @@ variable "node_name" {
   default     = "miniquarium"
 }
 
-variable "vm_tags" {
-  description = "Tags for the VM"
-  type        = list(string)
-  default     = ["NE_PAS_SUPPRIMER"]
-}
-
 variable "vm_cpu_cores_number" {
   description = "Number of CPU cores"
   type        = number
@@ -19,7 +13,7 @@ variable "vm_cpu_cores_number" {
 variable "vm_cpu_type" {
   description = "Type of CPU"
   type        = string
-  default     = "x86-64-V2-AES"
+  default     = "x86-64-v2-AES"
 }
 
 variable "vm_datastore_id" {
@@ -48,4 +42,10 @@ variable "vm_id" {
 variable "vm_name" {
   description = "Name of the VM"
   type        = string
+}
+
+variable "vm_tags" {
+  description = "Tags for the VM"
+  type        = list(string)
+  default     = ["NE_PAS_SUPPRIMER"]
 }
