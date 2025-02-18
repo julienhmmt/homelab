@@ -21,7 +21,6 @@ variable "nodes" {
   description = "Values of VM resources"
   type = map(object({
     pve                            = string
-    node_usage                     = string
     role                           = string
     vm_cpu_cores                   = number
     vm_cpu_flags                   = optional(list(string))

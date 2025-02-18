@@ -35,7 +35,6 @@ meta_config_metadata = {
 
 nodes = {
   "dodge" = {
-    node_usage           = "infra" # 'infra' or 'general' 
     pve                  = "miniquarium"
     role                 = "controlplane"
     snippet_datastore_id = "local"
@@ -71,7 +70,6 @@ nodes = {
   }
 
   "ram" = {
-    node_usage   = "infra" # 'infra' or 'general' 
     pve          = "miniquarium"
     role         = "worker"
     vm_cpu_cores = 2
@@ -105,7 +103,6 @@ nodes = {
   }
 
   "viper" = {
-    node_usage   = "general" # 'infra' or 'general' 
     pve          = "miniquarium"
     role         = "worker"
     vm_cpu_cores = 4

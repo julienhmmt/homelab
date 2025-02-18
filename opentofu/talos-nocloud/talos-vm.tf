@@ -32,18 +32,12 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
     trim    = true
   }
 
-  audio_device {
-    device  = "intel-hda"
-    driver  = "spice"
-    enabled = false
-  }
-
   cpu {
-    cores        = each.value.vm_cpu_cores
-    flags        = each.value.vm_cpu_flags
-    numa         = true
-    sockets      = 1
-    type         = each.value.vm_cpu_type
+    cores   = each.value.vm_cpu_cores
+    flags   = each.value.vm_cpu_flags
+    numa    = true
+    sockets = 1
+    type    = each.value.vm_cpu_type
   }
 
   disk {
