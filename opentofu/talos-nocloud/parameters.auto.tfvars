@@ -5,89 +5,136 @@ talos_cluster_endpoint = "192.168.1.21"
 talos_version          = "1.9.4"
 
 meta_config_metadata = {
-  "dodge" = <<-EOF
-    instance-id: talos-dodge
-    local-hostname: dodge
-  EOF
+  "dodge" = {
+    snippet_datastore_id = "local"
+    snippet_pve          = "miniquarium"
+    data                 = <<-EOF
+      instance-id: talos-dodge
+      local-hostname: dodge
+    EOF
+  }
 
-  "ram" = <<-EOF
-    instance-id: talos-ram
-    local-hostname: ram
-  EOF
+  "ram" = {
+    snippet_datastore_id = "local"
+    snippet_pve          = "miniquarium"
+    data                 = <<-EOF
+      instance-id: talos-ram
+      local-hostname: ram
+    EOF
+  }
 
-  "viper" = <<-EOF
-    instance-id: talos-viper
-    local-hostname: viper
-  EOF
+  "viper" = {
+    snippet_datastore_id = "local"
+    snippet_pve          = "miniquarium"
+    data                 = <<-EOF
+      instance-id: talos-viper
+      local-hostname: viper
+    EOF
+  }
 }
 
 nodes = {
   "dodge" = {
-    node_usage   = "infra" # 'infra' or 'general' 
-    role         = "controlplane"
-    vm_cpu_cores = 2
-    vm_cpu_type  = "x86-64-v2-AES"
-    # vm_datastore_id     = optional(string, "zfs_nvme")
-    vm_description = "Managed by OpenTofu. Talos controlplane"
-    vm_disk_size   = 64
-    # vm_disk_format      = "raw"
-    vm_efi              = true
-    vm_eth_rate_limit   = 0
-    vm_id               = 121
-    vm_install_disk     = "/dev/sda"
-    vm_ip               = "192.168.1.21"
-    vm_name             = "dodge"
-    vm_mac_address      = "BC:24:11:CA:FE:01"
-    vm_memory_dedicated = 4096
-    vm_pool_id          = ""
-    vm_startup_order    = 2
-    vm_tags             = ["k8s", "opentofu"]
-    vm_tpm              = true
+    node_usage           = "infra" # 'infra' or 'general' 
+    pve                  = "miniquarium"
+    role                 = "controlplane"
+    snippet_datastore_id = "local"
+    snippet_pve          = "miniquarium"
+    vm_cpu_cores         = 2
+    # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
+    vm_cpu_type                    = "x86-64-v2-AES"
+    vm_datastore_id                = "local-nvme"
+    vm_datastore_id_efi_disk       = "local-nvme"
+    vm_datastore_id_initialization = "local-nvme"
+    vm_datastore_id_tpm            = "local-nvme"
+    vm_description                 = "Managed by OpenTofu. Talos controlplane"
+    vm_disk_size                   = 64
+    vm_dns                         = ["192.168.1.254", "1.1.1.1"]
+    vm_domain                      = "dc.local.hommet.net"
+    vm_efi                         = true
+    vm_eth_rate_limit              = 0
+    vm_gateway                     = "192.168.1.254"
+    vm_id                          = 10021
+    vm_install_disk                = "/dev/sda"
+    vm_ip                          = "192.168.1.21"
+    vm_kvm_args                    = ""
+    vm_mac_address                 = "BC:24:11:CA:FE:21"
+    vm_memory_dedicated            = 4096
+    vm_memory_floating             = 4096
+    vm_name                        = "dodge"
+    vm_on_boot                     = true
+    vm_pool_id                     = ""
+    vm_startup_order               = 2
+    vm_started                     = true
+    vm_tags                        = ["controlplane", "k8s", "opentofu", "talos"]
+    vm_tpm                         = true
   }
 
   "ram" = {
     node_usage   = "infra" # 'infra' or 'general' 
+    pve          = "miniquarium"
     role         = "worker"
     vm_cpu_cores = 2
-    vm_cpu_type  = "x86-64-v2-AES"
-    # vm_datastore_id     = optional(string, "zfs_nvme")
-    vm_description = "Managed by OpenTofu. Talos worker for infrastructure service"
-    vm_disk_size   = 128
-    # vm_disk_format      = "raw"
-    vm_efi              = true
-    vm_eth_rate_limit   = 0
-    vm_id               = 122
-    vm_install_disk     = "/dev/sda"
-    vm_ip               = "192.168.1.22"
-    vm_name             = "ram"
-    vm_mac_address      = "BC:24:11:CA:FE:02"
-    vm_memory_dedicated = 8192
-    vm_pool_id          = ""
-    vm_startup_order    = 3
-    vm_tags             = ["k8s", "opentofu"]
-    vm_tpm              = true
+    # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
+    vm_cpu_type                    = "x86-64-v2-AES"
+    vm_datastore_id                = "local-nvme"
+    vm_datastore_id_efi_disk       = "local-nvme"
+    vm_datastore_id_initialization = "local-nvme"
+    vm_datastore_id_tpm            = "local-nvme"
+    vm_description                 = "Managed by OpenTofu. Talos worker for infrastructure service"
+    vm_disk_size                   = 128
+    vm_dns                         = ["192.168.1.254", "1.1.1.1"]
+    vm_domain                      = "dc.local.hommet.net"
+    vm_efi                         = true
+    vm_eth_rate_limit              = 0
+    vm_gateway                     = "192.168.1.254"
+    vm_id                          = 10022
+    vm_install_disk                = "/dev/sda"
+    vm_ip                          = "192.168.1.22"
+    vm_kvm_args                    = ""
+    vm_mac_address                 = "BC:24:11:CA:FE:22"
+    vm_memory_dedicated            = 8192
+    vm_memory_floating             = 8192
+    vm_name                        = "ram"
+    vm_on_boot                     = true
+    vm_pool_id                     = ""
+    vm_started                     = true
+    vm_startup_order               = 3
+    vm_tags                        = ["k8s", "opentofu", "talos", "worker"]
+    vm_tpm                         = true
   }
 
   "viper" = {
     node_usage   = "general" # 'infra' or 'general' 
+    pve          = "miniquarium"
     role         = "worker"
     vm_cpu_cores = 4
-    vm_cpu_type  = "host"
-    # vm_datastore_id     = optional(string, "zfs_nvme")
-    vm_description = "Managed by OpenTofu. Talos worker for everything"
-    vm_disk_size   = 256
-    # vm_disk_format      = "raw"
-    vm_efi              = true
-    vm_eth_rate_limit   = 0
-    vm_id               = 123
-    vm_install_disk     = "/dev/sda"
-    vm_ip               = "192.168.1.23"
-    vm_name             = "viper"
-    vm_mac_address      = "BC:24:11:CA:FE:03"
-    vm_memory_dedicated = 16384
-    vm_pool_id          = ""
-    vm_startup_order    = 4
-    vm_tags             = ["k8s", "opentofu"]
-    vm_tpm              = true
+    # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
+    vm_cpu_type                    = "host"
+    vm_datastore_id                = "local-nvme"
+    vm_datastore_id_efi_disk       = "local-nvme"
+    vm_datastore_id_initialization = "local-nvme"
+    vm_datastore_id_tpm            = "local-nvme"
+    vm_description                 = "Managed by OpenTofu. Talos worker for everything"
+    vm_disk_size                   = 256
+    vm_dns                         = ["192.168.1.254", "1.1.1.1"]
+    vm_domain                      = "dc.local.hommet.net"
+    vm_efi                         = true
+    vm_eth_rate_limit              = 0
+    vm_gateway                     = "192.168.1.254"
+    vm_id                          = 10023
+    vm_install_disk                = "/dev/sda"
+    vm_ip                          = "192.168.1.23"
+    vm_kvm_args                    = ""
+    vm_mac_address                 = "BC:24:11:CA:FE:23"
+    vm_memory_dedicated            = 20480 # 20GB
+    vm_memory_floating             = 20480
+    vm_name                        = "viper"
+    vm_on_boot                     = true
+    vm_pool_id                     = ""
+    vm_startup_order               = 4
+    vm_started                     = true
+    vm_tags                        = ["k8s", "opentofu", "talos", "worker"]
+    vm_tpm                         = true
   }
 }

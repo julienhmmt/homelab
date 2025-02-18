@@ -5,17 +5,19 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   ]
   for_each = var.nodes
 
-  bios                = "seabios"
+  acpi                = true
+  bios                = "ovmf"
   description         = each.value.vm_description
   keyboard_layout     = "fr"
+  kvm_arguments       = each.value.vm_kvm_args
   machine             = "pc-q35-9.0"
   migrate             = true
   name                = each.value.vm_name
-  node_name           = "miniquarium"
-  on_boot             = true
+  node_name           = each.value.pve
+  on_boot             = each.value.vm_on_boot ? true : false
   pool_id             = each.value.vm_pool_id
   scsi_hardware       = "virtio-scsi-single"
-  started             = "true"
+  started             = each.value.vm_started ? "true" : "false"
   stop_on_destroy     = true
   tablet_device       = false
   tags                = each.value.vm_tags
@@ -30,11 +32,18 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
     trim    = true
   }
 
+  audio_device {
+    device  = "intel-hda"
+    driver  = "spice"
+    enabled = false
+  }
+
   cpu {
-    cores   = each.value.vm_cpu_cores
-    numa    = true
-    sockets = 1
-    type    = each.value.vm_cpu_type
+    cores        = each.value.vm_cpu_cores
+    flags        = each.value.vm_cpu_flags
+    numa         = true
+    sockets      = 1
+    type         = each.value.vm_cpu_type
   }
 
   disk {
@@ -53,7 +62,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   dynamic "efi_disk" {
     for_each = each.value.vm_efi ? [1] : []
     content {
-      datastore_id      = "local-nvme"
+      datastore_id      = each.value.vm_datastore_id_efi_disk
       file_format       = "raw"
       pre_enrolled_keys = false
       type              = "4m"
@@ -61,11 +70,15 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   initialization {
-    datastore_id = "local-nvme"
+    datastore_id = each.value.vm_datastore_id_initialization
+    dns {
+      domain  = each.value.vm_domain
+      servers = each.value.vm_dns
+    }
     ip_config {
       ipv4 {
         address = "${each.value.vm_ip}/24"
-        gateway = "192.168.1.254"
+        gateway = each.value.vm_gateway
       }
       ipv6 {
         address = "dhcp"
@@ -75,6 +88,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
 
   memory {
     dedicated = each.value.vm_memory_dedicated
+    floating  = each.value.vm_memory_floating
   }
 
   network_device {
@@ -99,13 +113,14 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   dynamic "tpm_state" {
     for_each = each.value.vm_tpm ? [1] : []
     content {
-      datastore_id = "local-nvme"
+      datastore_id = each.value.vm_datastore_id_tpm
       version      = "v2.0"
     }
   }
 
   vga {
-    type = "virtio"
+    clipboard = "" # false if empty
+    type      = "virtio"
   }
 }
 
@@ -113,11 +128,11 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config" {
   for_each = var.meta_config_metadata
 
   content_type = "snippets"
-  datastore_id = "local"
-  node_name    = "miniquarium"
+  datastore_id = each.value.snippet_datastore_id
+  node_name    = each.value.snippet_pve
 
   source_raw {
-    data      = each.value
+    data      = each.value.data
     file_name = "${each.key}_ci_meta-data.yml"
   }
 }
