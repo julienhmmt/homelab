@@ -105,7 +105,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
   }
 
   dynamic "disk" {
-    for_each = each.value.hostname == "charger" || each.value.hostname == "challenger" ? { for idx, val in proxmox_virtual_environment_vm.data_vm.disk : idx => val } : {}
+    for_each = each.value.hostname == "charger" || each.value.hostname == "challenger" ? { for idx, val in var.vm[each.key].additional_disks : idx => val } : {}
     iterator = data_disk
     content {
       datastore_id      = data_disk.value["datastore_id"]

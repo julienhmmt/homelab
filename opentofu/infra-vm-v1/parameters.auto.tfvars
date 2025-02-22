@@ -12,7 +12,7 @@ vm = {
     ipv4               = "192.168.1.31"
     net_mac_address    = "BC:24:11:CA:FE:31"
     net_rate_limit     = 100
-    os                 = "ubuntu24" # "debian12", "almalinux95", "archlinux", "ubuntu22", "ubuntu24"
+    os                 = "archlinux" # "debian12", "almalinux95", "archlinux", "ubuntu22", "ubuntu24"
     pool_id            = "prod"
     ram                = 1024
     start_on_boot      = true
@@ -86,6 +86,6 @@ meta_config_metadata = {
 }
 
 user_cloud_config = {
-  "tesla" = "cloud-init/tesla.yml"
+  "tesla" = "cloud-init/tesla_arch.yml"
   # "charger" = "cloud-init/charger.yml"
 }

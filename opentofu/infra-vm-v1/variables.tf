@@ -20,6 +20,12 @@ variable "vm" {
     startup_order      = string
     tags               = list(string)
     vm_id              = number
+    additional_disks   = optional(map(object({
+      datastore_id      = string
+      path_in_datastore = string
+      file_format       = string
+      size              = number
+    })), {})
   }))
 }
 

@@ -1,0 +1,84 @@
+#cloud-config
+
+hostname: tesla
+manage_etc_hosts: true
+
+allow_public_ssh_keys: true
+ssh_quiet_keygen: true
+
+users:
+  - name: root
+    lock_passwd: false
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+
+  - name: user
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: wheel
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+
+# Misc settings
+timezone: Europe/Paris
+locale: en_US.UTF-8
+
+runcmd:
+  - rm -f /etc/machine-id
+  - rm -f /var/lib/dbus/machine-id
+  - ln -s /etc/machine-id /var/lib/dbus/machine-id
+  - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
+  - pacman -Syu --noconfirm
+  - pacman -S --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged libusb lvm2 nano extra/netdata extra/nut qemu-guest-agent ufw vim
+
+  # DEBUT // NUT configuration
+  - mv /etc/nut/upsd.users /etc/nut/upsd.users.doc
+  - sed -i 's/MODE=none/MODE=standalone/' /etc/nut/nut.conf
+  - echo -e "[admin]\npassword = your_password\nactions = SET\ninstcmds = ALL\nupsmon master" >> /etc/nut/upsd.users
+  - echo "NOTIFYCMD /usr/sbin/upssched" >> /etc/nut/upsmon.conf
+  - echo "MONITOR nutdev1@localhost 1 admin pouetpouet master" >> /etc/nut/upsmon.conf
+  # FIN // NUT configuration
+
+  # DEBUT // UFW configuration
+  - modprobe ip_tables ip6_tables nf_contrack
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 22
+  - ufw limit SSH
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 9090
+  - ufw allow proto tcp from 192.168.1.0/24 to any port 19999
+  - ufw default deny
+  - ufw enable
+  # FIN // UFW configuration
+
+  # DEBUT // Pacman configuration
+  - sed -i 's/#Color/Color/' /etc/pacman.conf
+  - sed -i 's/#TotalDownload/TotalDownload/' /etc/pacman.conf
+  - sed -i 's/#CacheDir/\CacheDir/' /etc/pacman.conf
+  - sed -i 's/#LogFile/\LogFile/' /etc/pacman.conf
+  - sed -i 's/#VerbosePkgLists/VerbosePkgLists/' /etc/pacman.conf
+  - sed -i 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+  - sed -i 's/#CheckSpace/CheckSpace/' /etc/pacman.conf
+  - sed -i 's/#CleanMethod/CleanMethod/' /etc/pacman.conf
+  # FIN // Pacman configuration
+
+  - systemctl enable --all cockpit.service netdata.service nut-driver-enumerator.service nut-server.service
+  - echo "done" > /tmp/cloud-config.done
+  - reboot
+
+write_files:
+  - path: /etc/nut/ups.conf
+    content: |
+      maxretry = 3
+      [nutdev1]
+        driver = "usbhid-ups"
+        port = "auto"
+
+  - path: /etc/nut/upsd.users
+    content: |
+      [admin]
+      password = pouetpouet
+      actions = SET
+      instcmds = ALL
+      upsmon master
