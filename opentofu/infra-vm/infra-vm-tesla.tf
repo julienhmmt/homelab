@@ -1,7 +1,7 @@
 # see https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password.html. It will download "hashicorp/random" provider
 resource "random_password" "vm_root_password_tesla" {
-  length           = 24
-  special          = true
+  length  = 24
+  special = true
 }
 
 output "vm_root_password_tesla" {
@@ -36,16 +36,6 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
   }
 }
 
-resource "null_resource" "trigger_vm_update_tesla" {
-  triggers = {
-    user_cloud_config_checksum = filemd5("./cloud-init/tesla-arch.yml")
-  }
-
-  provisioner "local-exec" {
-    command = "echo 'User cloud config updated'"
-  }
-}
-
 resource "proxmox_virtual_environment_hardware_mapping_usb" "onduleur" {
   comment = "UPS Eaton 3S"
   name    = "onduleur"
@@ -62,19 +52,18 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
   depends_on = [
     proxmox_virtual_environment_file.meta_cloud_config_tesla,
     proxmox_virtual_environment_file.user_cloud_config_tesla,
-    random_password.vm_root_password_tesla,
-    null_resource.trigger_vm_update_tesla
+    random_password.vm_root_password_tesla
   ]
 
-  boot_order          = ["scsi0"]
-  bios                = "ovmf"
-  description         = "Tesla VM. Services installés : `cockpit`, `nut`."
-  keyboard_layout     = "fr"
-  machine             = "pc-q35-9.0"
-  migrate             = true
-  name                = "tesla"
-  node_name           = "miniquarium"
-  on_boot             = true
+  boot_order      = ["scsi0"]
+  bios            = "ovmf"
+  description     = "Tesla VM. Services installés : `cockpit`, `nut`."
+  keyboard_layout = "fr"
+  machine         = "pc-q35-9.0"
+  migrate         = true
+  name            = "tesla"
+  node_name       = "miniquarium"
+  on_boot         = true
   # pool_id             = each.value.pool_id
   reboot_after_update = false
   scsi_hardware       = "virtio-scsi-single"
@@ -106,11 +95,11 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
     cache        = "none"
     datastore_id = "local-nvme"
     discard      = "on"
-    file_id = "local:iso/Arch-Linux-x86_64-cloudimg.img"
-    iothread  = true
-    interface = "scsi0"
-    replicate = false
-    size      = 24
+    file_id      = "local:iso/Arch-Linux-x86_64-cloudimg.img"
+    iothread     = true
+    interface    = "scsi0"
+    replicate    = false
+    size         = 24
   }
 
   efi_disk {

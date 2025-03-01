@@ -30,7 +30,7 @@ runcmd:
   - rm -f /etc/machine-id
   - rm -f /var/lib/dbus/machine-id
   - ln -s /etc/machine-id /var/lib/dbus/machine-id
-  - pacman -Syu --noconfirm
+  - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
 
   # DEBUT // Installation et configuration NFS server
   - pacman -S --noconfirm nfs-utils
@@ -46,8 +46,7 @@ runcmd:
   - exportfs -arv
   # FIN // Installation et configuration NFS server
 
-  - pacman -S --noconfirm bash-completion cloud-guest-utils cockpit curl cockpit-storaged libiscsi nano netdata pcp qemu-guest-agent udisks2-btrfs vim
-  - systemctl enable --now --all cockpit.socket nfsv4-server.service
+  - systemctl enable --now --all cockpit.socket
   - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
   - echo "done" > /tmp/cloud-config.done
   - reboot
