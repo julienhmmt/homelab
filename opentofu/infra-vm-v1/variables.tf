@@ -1,6 +1,7 @@
 variable "vm" {
   type = map(object({
     cpu_cores          = number
+    cpu_type           = string
     description        = string
     disk_efi_datastore = string
     disk_size          = number
@@ -20,7 +21,7 @@ variable "vm" {
     startup_order      = string
     tags               = list(string)
     vm_id              = number
-    additional_disks   = optional(map(object({
+    additional_disks = optional(map(object({
       datastore_id      = string
       path_in_datastore = string
       file_format       = string
@@ -29,12 +30,20 @@ variable "vm" {
   }))
 }
 
+variable "vm_data" {
+  type = map(object({
+    disk_size         = number
+    disk_vm_datastore = string
+    vm_id             = number
+  }))
+}
+
 variable "meta_config_metadata" {
   type = map(string)
   default = {
-    "debian12" = <<-EOF
-      instance-id: debian12-instance
-      local-hostname: debian12
+    "cloudimg" = <<-EOF
+      instance-id: cloud-instance
+      local-hostname: cloudimg
     EOF
   }
 }

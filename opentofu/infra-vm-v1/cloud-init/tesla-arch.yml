@@ -13,7 +13,7 @@ users:
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
 
-  - name: user
+  - name: jhoadmin
     lock_passwd: false
     sudo: ALL=(ALL) NOPASSWD:ALL
     groups: wheel
@@ -30,9 +30,8 @@ runcmd:
   - rm -f /etc/machine-id
   - rm -f /var/lib/dbus/machine-id
   - ln -s /etc/machine-id /var/lib/dbus/machine-id
-  - echo '$(openssl rand -base64 32)' > /var/lib/cloud/seed/random-seed
   - pacman -Syu --noconfirm
-  - pacman -S --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged libusb lvm2 nano extra/netdata extra/nut qemu-guest-agent ufw vim
+  - pacman -S --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
 
   # DEBUT // NUT configuration
   - mv /etc/nut/upsd.users /etc/nut/upsd.users.doc
@@ -41,16 +40,6 @@ runcmd:
   - echo "NOTIFYCMD /usr/sbin/upssched" >> /etc/nut/upsmon.conf
   - echo "MONITOR nutdev1@localhost 1 admin pouetpouet master" >> /etc/nut/upsmon.conf
   # FIN // NUT configuration
-
-  # DEBUT // UFW configuration
-  - modprobe ip_tables ip6_tables nf_contrack
-  - ufw allow proto tcp from 192.168.1.0/24 to any port 22
-  - ufw limit SSH
-  - ufw allow proto tcp from 192.168.1.0/24 to any port 9090
-  - ufw allow proto tcp from 192.168.1.0/24 to any port 19999
-  - ufw default deny
-  - ufw enable
-  # FIN // UFW configuration
 
   # DEBUT // Pacman configuration
   - sed -i 's/#Color/Color/' /etc/pacman.conf
@@ -63,7 +52,8 @@ runcmd:
   - sed -i 's/#CleanMethod/CleanMethod/' /etc/pacman.conf
   # FIN // Pacman configuration
 
-  - systemctl enable --all cockpit.service netdata.service nut-driver-enumerator.service nut-server.service
+  - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nut-server.service
+  - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
   - echo "done" > /tmp/cloud-config.done
   - reboot
 

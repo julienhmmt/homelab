@@ -42,8 +42,6 @@ resource "proxmox_virtual_environment_file" "user_cloud_config" {
 
 resource "proxmox_virtual_environment_vm" "vm" {
   depends_on = [
-    # proxmox_virtual_environment_download_file.debian12_cloudimg,
-    # proxmox_virtual_environment_download_file.ubuntu24_cloudimg,
     proxmox_virtual_environment_file.meta_cloud_config,
     proxmox_virtual_environment_file.user_cloud_config,
     random_password.vm_root_password
@@ -61,6 +59,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
   node_name           = "miniquarium"
   on_boot             = each.value.start_on_boot
   pool_id             = each.value.pool_id
+  reboot_after_update = false
   scsi_hardware       = "virtio-scsi-single"
   started             = each.value.started
   stop_on_destroy     = true
@@ -82,7 +81,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
     flags   = []
     numa    = true
     sockets = 1
-    type    = "host"
+    type    = each.value.cpu_type
   }
 
   disk {
@@ -104,18 +103,16 @@ resource "proxmox_virtual_environment_vm" "vm" {
     size      = each.value.disk_size
   }
 
-  dynamic "disk" {
-    for_each = each.value.hostname == "charger" || each.value.hostname == "challenger" ? { for idx, val in var.vm[each.key].additional_disks : idx => val } : {}
-    iterator = data_disk
-    content {
-      datastore_id      = data_disk.value["datastore_id"]
-      path_in_datastore = data_disk.value["path_in_datastore"]
-      file_format       = data_disk.value["file_format"]
-      size              = data_disk.value["size"]
-      # assign from scsi1 and up
-      interface = "scsi${data_disk.key + 1}"
-    }
-  }
+  # dynamic "disk" {
+  #   for_each = each.value.hostname == "charger" ? var.vm_data : {}
+  #   content {
+  #     datastore_id      = disk.value.datastore_id
+  #     path_in_datastore = disk.value.path_in_datastore
+  #     file_format       = disk.value.file_format
+  #     size              = disk.value.size
+  #     interface         = "scsi${disk.key + 1}"
+  #   }
+  # }
 
   efi_disk {
     datastore_id      = each.value.disk_efi_datastore
@@ -139,7 +136,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
     }
 
     meta_data_file_id = proxmox_virtual_environment_file.meta_cloud_config[each.key].id
-    user_data_file_id = proxmox_virtual_environment_file.user_cloud_config[each.key].id
+    user_data_file_id = contains(keys(proxmox_virtual_environment_file.user_cloud_config), each.key) ? proxmox_virtual_environment_file.user_cloud_config[each.key].id : null
   }
 
   memory {

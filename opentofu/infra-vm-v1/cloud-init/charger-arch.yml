@@ -1,0 +1,53 @@
+#cloud-config
+
+hostname: charger
+manage_etc_hosts: true
+
+allow_public_ssh_keys: true
+ssh_quiet_keygen: true
+
+users:
+  - name: root
+    lock_passwd: false
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+
+  - name: jhoadmin
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: wheel
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+    passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+
+# Misc settings
+timezone: Europe/Paris
+locale: en_US.UTF-8
+
+runcmd:
+  - rm -f /etc/machine-id
+  - rm -f /var/lib/dbus/machine-id
+  - ln -s /etc/machine-id /var/lib/dbus/machine-id
+  - pacman -Syu --noconfirm
+
+  # DEBUT // Installation et configuration NFS server
+  - pacman -S --noconfirm nfs-utils
+  - mkdir -p /srv/nfs/gitea
+  - mkdir -p /srv/nfs/vault
+  - mkdir -p /srv/nfs/kubernetes
+  - chmod -R 750 /srv/nfs
+  - chown -R nobody:nobody /srv/nfs
+  - chown -R root:root /srv/nfs/kubernetes
+  - echo "/srv/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+  - echo "/srv/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+  - echo "/srv/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+  - exportfs -arv
+  # FIN // Installation et configuration NFS server
+
+  - pacman -S --noconfirm bash-completion cloud-guest-utils cockpit curl cockpit-storaged libiscsi nano netdata pcp qemu-guest-agent udisks2-btrfs vim
+  - systemctl enable --now --all cockpit.socket nfsv4-server.service
+  - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
+  - echo "done" > /tmp/cloud-config.done
+  - reboot
