@@ -8,7 +8,6 @@ ssh_quiet_keygen: true
 
 users:
   - name: root
-    lock_passwd: false
     shell: /bin/bash
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
@@ -26,27 +25,36 @@ users:
 timezone: Europe/Paris
 locale: en_US.UTF-8
 
+# Disk setup
+resize_rootfs: noblock
+disk_setup:
+  /dev/sdb: {table_type: mbr, layout: true, overwrite: true}
+fs_setup:
+- {device: /dev/sdb1, filesystem: ext4, label: data1}
+mounts:
+- [ /dev/sdb1, /mnt/nfs, 'ext4', 'defaults', '0', '2' ]
+
 runcmd:
   - rm -f /etc/machine-id
   - rm -f /var/lib/dbus/machine-id
   - ln -s /etc/machine-id /var/lib/dbus/machine-id
-  - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
+  - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
 
   # DEBUT // Installation et configuration NFS server
   - pacman -S --noconfirm nfs-utils
-  - mkdir -p /srv/nfs/gitea
-  - mkdir -p /srv/nfs/vault
-  - mkdir -p /srv/nfs/kubernetes
-  - chmod -R 750 /srv/nfs
-  - chown -R nobody:nobody /srv/nfs
+  - mount -a
+  - mkdir -p /mnt/nfs/gitea
+  - mkdir -p /mnt/nfs/vault
+  - mkdir -p /mnt/nfs/kubernetes
+  - chmod -R 750 /mnt/nfs
+  - chown -R nobody:nobody /srv/mnt
   - chown -R root:root /srv/nfs/kubernetes
-  - echo "/srv/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
-  - echo "/srv/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
-  - echo "/srv/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+  - echo "/mnt/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+  - echo "/mnt/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+  - echo "/mnt/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
   - exportfs -arv
   # FIN // Installation et configuration NFS server
 
-  - systemctl enable --now --all cockpit.socket
   - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
-  - echo "done" > /tmp/cloud-config.done
+  - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nfs-server.service
   - reboot

@@ -5,12 +5,11 @@ resource "random_password" "vm_root_password_charger" {
 }
 
 output "vm_root_password_charger" {
-  value     = random_password.vm_root_password_charger
+  value     = random_password.vm_root_password_charger.result
   sensitive = true
 }
 
 resource "proxmox_virtual_environment_file" "meta_cloud_config_charger" {
-
   content_type = "snippets"
   datastore_id = "local"
   node_name    = "miniquarium"
@@ -25,13 +24,96 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config_charger" {
 }
 
 resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
-
   content_type = "snippets"
   datastore_id = "local"
   node_name    = "miniquarium"
 
-  source_file {
-    path      = "./cloud-init/charger-arch.yml"
+  source_raw {
+    data      = <<-EOF
+      #cloud-config
+
+      hostname: charger
+      manage_etc_hosts: true
+
+      allow_public_ssh_keys: true
+      ssh_quiet_keygen: true
+
+      users:
+        - name: root
+          shell: /bin/bash
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+
+        - name: jhoadmin
+          lock_passwd: false
+          sudo: ALL=(ALL) NOPASSWD:ALL
+          groups: wheel
+          shell: /bin/bash
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+          passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+
+      # Misc settings
+      locale: en_US.UTF-8
+      package_update: false # because we will update the system in the runcmd section (pacman instead of apt)
+      package_upgrade: false
+      timezone: Europe/Paris
+
+      # Disk setup
+      resize_rootfs: noblock
+      disk_setup:
+        /dev/sdb:
+          table_type: gpt
+          layout: true
+          overwrite: true
+      fs_setup:
+        - cmd: mkfs -t %(filesystem)s -L %(label)s %(device)s
+          label: nfs_data
+          filesystem: btrfs
+          device: /dev/sdb1
+
+      write_files:
+        - path: /etc/systemd/system/mnt-nfs.mount
+          content: |
+            [Unit]
+            Description=Mount /mnt/nfs
+            After=network.target
+
+            [Mount]
+            What=/dev/sdb1
+            Where=/mnt/nfs
+            Type=btrfs
+            Options=defaults
+
+            [Install]
+            WantedBy=multi-user.target
+
+      runcmd:
+        - rm -f /etc/machine-id
+        - rm -f /var/lib/dbus/machine-id
+        - ln -s /etc/machine-id /var/lib/dbus/machine-id
+        - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
+
+        # DEBUT // Installation et configuration NFS server
+        - pacman -S --noconfirm nfs-utils
+        - systemctl daemon-reload
+        - systemctl enable --now mnt-nfs.mount
+        - mkdir -p /mnt/nfs/gitea
+        - mkdir -p /mnt/nfs/vault
+        - mkdir -p /mnt/nfs/kubernetes
+        - chmod -R 750 /mnt/nfs
+        - chown -R nobody:nobody /mnt/nfs
+        - chown -R root:root /mnt/nfs/kubernetes
+        - echo "/mnt/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - echo "/mnt/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - echo "/mnt/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - exportfs -arv
+        # FIN // Installation et configuration NFS server
+
+        - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
+        - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nfs-server.service
+        - reboot
+    EOF
     file_name = "charger_ci_user-data.yml"
   }
 }
@@ -59,16 +141,15 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
     random_password.vm_root_password_charger
   ]
 
-  boot_order      = ["scsi0"]
-  bios            = "ovmf"
-  description     = "Tesla VM. Services installés : `cockpit`, `nfs-server`."
-  keyboard_layout = "fr"
-  machine         = "pc-q35-9.0"
-  migrate         = true
-  name            = "charger"
-  node_name       = "miniquarium"
-  on_boot         = true
-  # pool_id             = each.value.pool_id
+  boot_order          = ["scsi0"]
+  bios                = "ovmf"
+  description         = "Tesla VM. Services installés : `cockpit`, `nfs-server`."
+  keyboard_layout     = "fr"
+  machine             = "pc-q35-9.0"
+  migrate             = true
+  name                = "charger"
+  node_name           = "miniquarium"
+  on_boot             = true
   reboot_after_update = false
   scsi_hardware       = "virtio-scsi-single"
   started             = true
@@ -161,13 +242,6 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
   }
 
   serial_device {}
-
-  smbios {
-    family       = "VM"
-    manufacturer = "QEMU"
-    product      = "virtio"
-    version      = "1.0"
-  }
 
   startup {
     order      = 1

@@ -10,7 +10,6 @@ output "vm_root_password_tesla" {
 }
 
 resource "proxmox_virtual_environment_file" "meta_cloud_config_tesla" {
-
   content_type = "snippets"
   datastore_id = "local"
   node_name    = "miniquarium"
@@ -25,13 +24,87 @@ resource "proxmox_virtual_environment_file" "meta_cloud_config_tesla" {
 }
 
 resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
-
   content_type = "snippets"
   datastore_id = "local"
   node_name    = "miniquarium"
 
-  source_file {
-    path      = "./cloud-init/tesla-arch.yml"
+  source_raw {
+    data      = <<-EOF
+      #cloud-config
+
+      hostname: tesla
+      manage_etc_hosts: true
+
+      allow_public_ssh_keys: true
+      ssh_quiet_keygen: true
+
+      users:
+        - name: root
+          shell: /bin/bash
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+
+        - name: jhoadmin
+          lock_passwd: false
+          sudo: ALL=(ALL) NOPASSWD:ALL
+          groups: wheel
+          shell: /bin/bash
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
+          passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+
+      # Misc settings
+      locale: en_US.UTF-8
+      package_update: false # because we will update the system in the runcmd section (pacman instead of apt)
+      package_upgrade: false
+      timezone: Europe/Paris
+
+      runcmd:
+        - rm -f /etc/machine-id
+        - rm -f /var/lib/dbus/machine-id
+        - ln -s /etc/machine-id /var/lib/dbus/machine-id
+        - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
+
+        # DEBUT // NUT configuration
+        - mv /etc/nut/upsd.users /etc/nut/upsd.users.doc
+        - sed -i 's/MODE=none/MODE=standalone/' /etc/nut/nut.conf
+        - echo -e "[admin]\npassword = your_password\nactions = SET\ninstcmds = ALL\nupsmon master" >> /etc/nut/upsd.users
+        - echo "NOTIFYCMD /usr/sbin/upssched" >> /etc/nut/upsmon.conf
+        - echo "MONITOR nutdev1@localhost 1 admin pouetpouet master" >> /etc/nut/upsmon.conf
+        # FIN // NUT configuration
+
+        # DEBUT // Pacman configuration
+        - sed -i 's/#Color/Color/' /etc/pacman.conf
+        - sed -i 's/#TotalDownload/TotalDownload/' /etc/pacman.conf
+        - sed -i 's/#CacheDir/\CacheDir/' /etc/pacman.conf
+        - sed -i 's/#LogFile/\LogFile/' /etc/pacman.conf
+        - sed -i 's/#VerbosePkgLists/VerbosePkgLists/' /etc/pacman.conf
+        - sed -i 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+        - sed -i 's/#CheckSpace/CheckSpace/' /etc/pacman.conf
+        - sed -i 's/#CleanMethod/CleanMethod/' /etc/pacman.conf
+        # FIN // Pacman configuration
+
+        - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nut-server.service
+        - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
+        - echo "done" > /tmp/cloud-config.done
+        - reboot
+
+      write_files:
+      - path: /etc/nut/ups.conf
+        content: |
+          maxretry = 3
+          [nutdev1]
+            driver = "usbhid-ups"
+            port = "auto"
+
+      - path: /etc/nut/upsd.users
+        content: |
+          [admin]
+          password = pouetpouet
+          actions = SET
+          instcmds = ALL
+          upsmon master
+    EOF
     file_name = "tesla_ci_user-data.yml"
   }
 }
@@ -146,13 +219,6 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
 
   serial_device {}
 
-  smbios {
-    family       = "VM"
-    manufacturer = "QEMU"
-    product      = "virtio"
-    version      = "1.0"
-  }
-
   startup {
     order      = 5
     up_delay   = 5
@@ -171,5 +237,35 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
 
   vga {
     type = "virtio"
+  }
+}
+
+resource "proxmox_virtual_environment_firewall_rules" "inbound" {
+  depends_on = [
+    proxmox_virtual_environment_vm.vm_tesla,
+    proxmox_virtual_environment_cluster_firewall_security_group.ssh,
+    proxmox_virtual_environment_cluster_firewall_security_group.monitoring,
+    proxmox_virtual_environment_cluster_firewall_security_group.cockpit
+  ]
+
+  node_name = proxmox_virtual_environment_vm.vm_tesla.node_name
+  vm_id     = proxmox_virtual_environment_vm.vm_tesla.vm_id
+
+  rule {
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.ssh.name
+    comment        = "From security group, managed by OpenTofu. Allow SSH."
+    iface          = "net0"
+  }
+
+  rule {
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.monitoring.name
+    comment        = "From security group, managed by OpenTofu. Allow MONITORING."
+    iface          = "net0"
+  }
+
+  rule {
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.cockpit.name
+    comment        = "From security group, managed by OpenTofu. Allow COCKPIT."
+    iface          = "net0"
   }
 }
