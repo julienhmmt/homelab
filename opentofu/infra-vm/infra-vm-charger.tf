@@ -59,30 +59,59 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
       package_upgrade: false
       timezone: Europe/Paris
 
+      bootcmd:
+        - pacman-key --init
+        - pacman-key --populate archlinux
+        - pacman -Sy --noconfirm archlinux-keyring reflector rsync xfsprogs
+        - reflector --country France --latest 5 --age 24 --sort rate --save /etc/pacman.d/mirrorlist
+        - pacman -Sy --noconfirm gptfdisk
+
       # Disk setup
-      resize_rootfs: noblock
       disk_setup:
         /dev/sdb:
           table_type: gpt
           layout: true
           overwrite: true
+        /dev/sdc:
+          table_type: gpt
+          layout: true
+          overwrite: true
       fs_setup:
-        - cmd: mkfs -t %(filesystem)s -L %(label)s %(device)s
-          label: nfs_data
-          filesystem: btrfs
+        - label: nfs_data
+          filesystem: xfs
           device: /dev/sdb1
+          overwrite: true
+        - label: s3_data
+          filesystem: btrfs
+          device: /dev/sdc1
+          overwrite: true
 
       write_files:
-        - path: /etc/systemd/system/mnt-nfs.mount
+        - path: /etc/systemd/system/srv-nfs.mount
           content: |
             [Unit]
-            Description=Mount /mnt/nfs
+            Description=Mount /srv/nfs
             After=network.target
 
             [Mount]
             What=/dev/sdb1
-            Where=/mnt/nfs
-            Type=btrfs
+            Where=/srv/nfs
+            Type=xfs
+            Options=defaults
+
+            [Install]
+            WantedBy=multi-user.target
+
+        - path: /etc/systemd/system/srv-minio.mount
+          content: |
+            [Unit]
+            Description=Mount /srv/minio
+            After=network.target
+
+            [Mount]
+            What=/dev/sdc1
+            Where=/srv/minio
+            Type=xfs
             Options=defaults
 
             [Install]
@@ -92,27 +121,52 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
         - rm -f /etc/machine-id
         - rm -f /var/lib/dbus/machine-id
         - ln -s /etc/machine-id /var/lib/dbus/machine-id
-        - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
+        - swapoff -a
+        - sed -i 's|^/swap/swapfile|#/swap/swapfile|' /etc/fstab
+        - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata pcp qemu-guest-agent udisks2-btrfs vim
+
+        # DEBUT // Installation et configuration MINIO
+        - systemctl enable --now srv-minio.mount
+        - pacman -S --noconfirm minio
+        - mkdir -p /srv/minio/data
+        - chown -R minio:minio /srv/minio
+        - chmod -R 750 /srv/minio
+        - sed -i 's|^# MINIO_ROOT_USER=example-user|MINIO_ROOT_USER=jhominioadmin|' /etc/minio/minio.conf
+        - sed -i 's|^# MINIO_ROOT_PASSWORD=example-password|MINIO_ROOT_PASSWORD=Maturely8-Headboard4-Proofing7-Reptilian9-Maximize5|' /etc/minio/minio.conf
+        - sed -i 's|^# MINIO_OPTS="--address :9199"|MINIO_OPTS="--address 192.168.1.32:9199 --console-address 192.168.1.32:19199"|' /etc/minio/minio.conf
+        - systemctl enable --now minio.service
 
         # DEBUT // Installation et configuration NFS server
-        - pacman -S --noconfirm nfs-utils
-        - systemctl daemon-reload
         - systemctl enable --now mnt-nfs.mount
-        - mkdir -p /mnt/nfs/gitea
-        - mkdir -p /mnt/nfs/vault
-        - mkdir -p /mnt/nfs/kubernetes
-        - chmod -R 750 /mnt/nfs
-        - chown -R nobody:nobody /mnt/nfs
-        - chown -R root:root /mnt/nfs/kubernetes
-        - echo "/mnt/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
-        - echo "/mnt/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
-        - echo "/mnt/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - pacman -S --noconfirm nfs-utils
+        - mkdir -p /srv/nfs/gitea
+        - mkdir -p /srv/nfs/vault
+        - mkdir -p /srv/nfs/kubernetes
+        - chmod -R 750 /srv/nfs
+        - chown -R nobody:nobody /srv/nfs
+        - chown -R root:root /srv/nfs/kubernetes
+        - echo "/srv/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - echo "/srv/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - echo "/srv/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
         - exportfs -arv
         # FIN // Installation et configuration NFS server
 
+        # DEBUT // Pacman configuration
+        - sed -i '/\[options\]/a ILoveCandy' /etc/pacman.conf
+        - sed -i 's/#Color/Color/' /etc/pacman.conf
+        - sed -i 's/#TotalDownload/TotalDownload/' /etc/pacman.conf
+        - sed -i 's/#CacheDir/\CacheDir/' /etc/pacman.conf
+        - sed -i 's/#VerbosePkgLists/VerbosePkgLists/' /etc/pacman.conf
+        - sed -i 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+        - sed -i 's/#CheckSpace/CheckSpace/' /etc/pacman.conf
+        - sed -i 's/#CleanMethod/CleanMethod/' /etc/pacman.conf
+        # FIN // Pacman configuration
+
         - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
         - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nfs-server.service
-        - reboot
+        - pacman -Rns --noconfirm cups
+        - systemctl stop --all
+        - reboot -f
     EOF
     file_name = "charger_ci_user-data.yml"
   }
@@ -123,14 +177,21 @@ resource "proxmox_virtual_environment_vm" "data_vm_charger" {
   on_boot    = false
   protection = true
   started    = false
-  tags       = sort(["infra", "NE_PAS_DEMARRER", "NE_PAS_SUPPRIMER"])
+  tags       = sort(["infra", "ne_pas_demarrer", "ne_pas_supprimer"])
   vm_id      = 9132
 
-  disk {
+  disk { # NFS data disk
     datastore_id = "local-nvme"
     file_format  = "raw"
     interface    = "scsi0"
-    size         = 128
+    size         = 64
+  }
+
+  disk { # Minio S3 data disk
+    datastore_id = "local-nvme"
+    file_format  = "raw"
+    interface    = "scsi1"
+    size         = 64
   }
 }
 
@@ -195,6 +256,7 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
     iterator = data_disk
     content {
       datastore_id      = data_disk.value["datastore_id"]
+      discard      = "on"
       path_in_datastore = data_disk.value["path_in_datastore"]
       file_format       = data_disk.value["file_format"]
       size              = data_disk.value["size"]
