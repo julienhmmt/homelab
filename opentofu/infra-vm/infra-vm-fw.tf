@@ -1,14 +1,16 @@
-resource "proxmox_virtual_environment_cluster_firewall_security_group" "ssh" {
-  name    = "ssh"
+resource "proxmox_virtual_environment_cluster_firewall_security_group" "cockpit" {
+  name    = "cockpit"
   comment = "Managed by OpenTofu"
+
   rule {
     action  = "ACCEPT"
-    comment = "Allow SSH"
+    comment = "Allow COCKPIT"
     dest    = "192.168.1.30-192.168.1.40"
-    dport   = "22"
+    dport   = "9090"
     enabled = true
     log     = "info"
     proto   = "tcp"
+    source  = "192.168.1.1-192.168.1.3"
     type    = "in"
   }
 }
@@ -29,18 +31,18 @@ resource "proxmox_virtual_environment_cluster_firewall_security_group" "monitori
   }
 }
 
-resource "proxmox_virtual_environment_cluster_firewall_security_group" "cockpit" {
-  name    = "cockpit"
+resource "proxmox_virtual_environment_cluster_firewall_security_group" "ssh" {
+  name    = "ssh"
   comment = "Managed by OpenTofu"
-
   rule {
     action  = "ACCEPT"
-    comment = "Allow COCKPIT"
+    comment = "Allow SSH"
     dest    = "192.168.1.30-192.168.1.40"
-    dport   = "9090"
+    dport   = "22"
     enabled = true
     log     = "info"
     proto   = "tcp"
+    source  = "192.168.1.1-192.168.1.3"
     type    = "in"
   }
 }
