@@ -63,6 +63,8 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
         - rm -f /etc/machine-id
         - rm -f /var/lib/dbus/machine-id
         - ln -s /etc/machine-id /var/lib/dbus/machine-id
+        - swapoff -a
+        - sed -i 's|^/swap/swapfile|#/swap/swapfile|' /etc/fstab
         - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
 
         # DEBUT // NUT configuration
@@ -74,10 +76,10 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
         # FIN // NUT configuration
 
         # DEBUT // Pacman configuration
+        - sed -i '/\[options\]/a ILoveCandy' /etc/pacman.conf
         - sed -i 's/#Color/Color/' /etc/pacman.conf
         - sed -i 's/#TotalDownload/TotalDownload/' /etc/pacman.conf
         - sed -i 's/#CacheDir/\CacheDir/' /etc/pacman.conf
-        - sed -i 's/#LogFile/\LogFile/' /etc/pacman.conf
         - sed -i 's/#VerbosePkgLists/VerbosePkgLists/' /etc/pacman.conf
         - sed -i 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
         - sed -i 's/#CheckSpace/CheckSpace/' /etc/pacman.conf
@@ -86,8 +88,9 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
 
         - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nut-server.service
         - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
-        - echo "done" > /tmp/cloud-config.done
-        - reboot
+        - pacman -Rns --noconfirm cups
+        - systemctl stop --all
+        - reboot -f
 
       write_files:
       - path: /etc/nut/ups.conf
