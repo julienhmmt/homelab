@@ -128,6 +128,8 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
     random_password.vm_root_password_tesla
   ]
 
+  lifecycle { ignore_changes = [] }
+
   boot_order      = ["scsi0"]
   bios            = "ovmf"
   description     = "Tesla VM. Services installés : `cockpit`, `nut`."
@@ -208,7 +210,7 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
   network_device {
     bridge       = "vmbr0"
     disconnected = false
-    firewall     = false
+    firewall     = true
     mac_address  = "BC:24:11:CA:FE:31"
     rate_limit   = 100
   }

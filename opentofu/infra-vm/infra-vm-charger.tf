@@ -123,6 +123,7 @@ resource "proxmox_virtual_environment_vm" "data_vm_charger" {
   on_boot    = false
   protection = true
   started    = false
+  tags       = sort(["infra", "NE_PAS_DEMARRER", "NE_PAS_SUPPRIMER"])
   vm_id      = 9132
 
   disk {
@@ -140,6 +141,8 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
     proxmox_virtual_environment_vm.data_vm_charger,
     random_password.vm_root_password_charger
   ]
+
+  lifecycle { ignore_changes = [] }
 
   boot_order          = ["scsi0"]
   bios                = "ovmf"
@@ -232,7 +235,7 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
   network_device {
     bridge       = "vmbr0"
     disconnected = false
-    firewall     = false
+    firewall     = true
     mac_address  = "BC:24:11:CA:FE:32"
     rate_limit   = 0
   }
