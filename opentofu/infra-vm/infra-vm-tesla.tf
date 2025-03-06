@@ -45,13 +45,13 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
 
         - name: jhoadmin
-          lock_passwd: false
-          sudo: ALL=(ALL) NOPASSWD:ALL
           groups: wheel
+          lock_passwd: false
+          passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
           shell: /bin/bash
           ssh_authorized_keys:
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
-          passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+          sudo: ALL=(ALL) NOPASSWD:ALL
 
       # Misc settings
       locale: en_US.UTF-8
@@ -88,7 +88,6 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
 
         - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nut-server.service
         - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
-        - pacman -Rns --noconfirm cups
         - systemctl stop --all
         - reboot -f
 
