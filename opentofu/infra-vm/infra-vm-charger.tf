@@ -45,13 +45,13 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
 
         - name: jhoadmin
-          lock_passwd: false
-          sudo: ALL=(ALL) NOPASSWD:ALL
           groups: wheel
+          lock_passwd: false
+          passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
           shell: /bin/bash
           ssh_authorized_keys:
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEHKEQ6FLrn8b85ClMxvu04DbAiyMZ5tf5ktL4xEpSZ mettmett@JH-LVL10
-          passwd: $6$rounds=500000$tAy4OxDkBy61IO3n$qMZ5IBOoMUvXAgIB4PYkaZzZlalE4Ez0XOb9AYP1dCyK9WsxE4ySFLd2HacSdgaPLakcks5bGmDVo/r7O0H9r1
+          sudo: ALL=(ALL) NOPASSWD:ALL
 
       # Misc settings
       locale: en_US.UTF-8
@@ -82,35 +82,35 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
           device: /dev/sdb1
           overwrite: true
         - label: s3_data
-          filesystem: btrfs
+          filesystem: xfs
           device: /dev/sdc1
           overwrite: true
 
       write_files:
-        - path: /etc/systemd/system/srv-nfs.mount
+        - path: /etc/systemd/system/mnt-nfs.mount
           content: |
             [Unit]
-            Description=Mount /srv/nfs
+            Description=Mount /mnt/nfs
             After=network.target
 
             [Mount]
             What=/dev/sdb1
-            Where=/srv/nfs
+            Where=/mnt/nfs
             Type=xfs
             Options=defaults
 
             [Install]
             WantedBy=multi-user.target
 
-        - path: /etc/systemd/system/srv-minio.mount
+        - path: /etc/systemd/system/mnt-minio.mount
           content: |
             [Unit]
-            Description=Mount /srv/minio
+            Description=Mount /mnt/minio
             After=network.target
 
             [Mount]
             What=/dev/sdc1
-            Where=/srv/minio
+            Where=/mnt/minio
             Type=xfs
             Options=defaults
 
@@ -126,11 +126,12 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
         - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata pcp qemu-guest-agent udisks2-btrfs vim
 
         # DEBUT // Installation et configuration MINIO
-        - systemctl enable --now srv-minio.mount
+        - systemctl enable --now mnt-minio.mount
+        - mkdir -p /mnt/minio/data
         - pacman -S --noconfirm minio
-        - mkdir -p /srv/minio/data
-        - chown -R minio:minio /srv/minio
-        - chmod -R 750 /srv/minio
+        - chown -R minio:minio /mnt/minio
+        - chmod -R 750 /mnt/minio
+        - sed -i 's|^MINIO_VOLUMES="/srv/minio/data"|MINIO_VOLUMES="/mnt/minio/data"|' /etc/minio/minio.conf
         - sed -i 's|^# MINIO_ROOT_USER=example-user|MINIO_ROOT_USER=jhominioadmin|' /etc/minio/minio.conf
         - sed -i 's|^# MINIO_ROOT_PASSWORD=example-password|MINIO_ROOT_PASSWORD=Maturely8-Headboard4-Proofing7-Reptilian9-Maximize5|' /etc/minio/minio.conf
         - sed -i 's|^# MINIO_OPTS="--address :9199"|MINIO_OPTS="--address 192.168.1.32:9199 --console-address 192.168.1.32:19199"|' /etc/minio/minio.conf
@@ -138,16 +139,16 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
 
         # DEBUT // Installation et configuration NFS server
         - systemctl enable --now mnt-nfs.mount
+        - mkdir -p /mnt/nfs/gitea
+        - mkdir -p /mnt/nfs/vault
+        - mkdir -p /mnt/nfs/kubernetes
+        - chmod -R 755 /mnt/nfs
         - pacman -S --noconfirm nfs-utils
-        - mkdir -p /srv/nfs/gitea
-        - mkdir -p /srv/nfs/vault
-        - mkdir -p /srv/nfs/kubernetes
-        - chmod -R 750 /srv/nfs
-        - chown -R nobody:nobody /srv/nfs
-        - chown -R root:root /srv/nfs/kubernetes
-        - echo "/srv/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
-        - echo "/srv/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
-        - echo "/srv/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - chown -R nobody:nobody /mnt/nfs
+        - chown -R root:root /mnt/nfs/kubernetes
+        - echo "/mnt/nfs/gitea 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - echo "/mnt/nfs/vault 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+        - echo "/mnt/nfs/kubernetes 192.168.1.21/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.22/24(rw,sync,no_subtree_check,no_root_squash) 192.168.1.23/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
         - exportfs -arv
         # FIN // Installation et configuration NFS server
 
@@ -163,8 +164,7 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
         # FIN // Pacman configuration
 
         - rm /etc/motd.d/cockpit /etc/issue.d/cockpit.issue
-        - systemctl enable --now --all cockpit.socket netdata.service nut-driver-enumerator.service nfs-server.service
-        - pacman -Rns --noconfirm cups
+        - systemctl enable --now --all cockpit.socket netdata.service nfs-server.service
         - systemctl stop --all
         - reboot -f
     EOF
@@ -256,7 +256,7 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
     iterator = data_disk
     content {
       datastore_id      = data_disk.value["datastore_id"]
-      discard      = "on"
+      discard           = "on"
       path_in_datastore = data_disk.value["path_in_datastore"]
       file_format       = data_disk.value["file_format"]
       size              = data_disk.value["size"]
