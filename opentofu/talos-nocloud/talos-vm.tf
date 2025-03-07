@@ -89,6 +89,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
     bridge      = "vmbr0"
     firewall    = false
     mac_address = each.value.vm_mac_address
+    model       = "virtio"
     rate_limit  = each.value.vm_eth_rate_limit
   }
 
