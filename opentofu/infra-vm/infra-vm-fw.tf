@@ -33,6 +33,31 @@ resource "proxmox_virtual_environment_firewall_alias" "charger_vm" {
   cidr    = proxmox_virtual_environment_vm.vm_charger.initialization.0.ip_config.0.ipv4[0].address
   comment = "Managed by OpenTofu. VM d'infrastructure pour le stockage."
 }
+resource "proxmox_virtual_environment_firewall_alias" "k8s_vm_cp" {
+  name    = "k8s_cp"
+  cidr    = "192.168.1.21/24"
+  comment = "Managed by OpenTofu. VM K8S ayant le rôle de maître."
+}
+resource "proxmox_virtual_environment_firewall_alias" "k8s_vm_wrk1" {
+  name    = "k8s_wrk1"
+  cidr    = "192.168.1.22/24"
+  comment = "Managed by OpenTofu. VM K8S ayant le rôle de worker."
+}
+resource "proxmox_virtual_environment_firewall_alias" "k8s_vm_wrk2" {
+  name    = "k8s_wrk2"
+  cidr    = "192.168.1.23/24"
+  comment = "Managed by OpenTofu. VM K8S ayant le rôle de worker."
+}
+resource "proxmox_virtual_environment_firewall_alias" "gw" {
+  name    = "gw"
+  cidr    = "192.168.1.254/24"
+  comment = "Managed by OpenTofu. Routeur."
+}
+resource "proxmox_virtual_environment_firewall_alias" "dns_cf" {
+  name    = "dns_cf"
+  cidr    = "1.1.1.1"
+  comment = "Managed by OpenTofu. DNS public Cloudflare."
+}
 
 # groupes de sécurité pour les vm
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "cockpit" {
