@@ -46,3 +46,19 @@ resource "proxmox_virtual_environment_cluster_firewall_security_group" "ssh" {
     type    = "in"
   }
 }
+
+resource "proxmox_virtual_environment_cluster_firewall_security_group" "k8s_api" {
+  name    = "k8s_api"
+  comment = "Managed by OpenTofu"
+  rule {
+    action  = "ACCEPT"
+    comment = "Allow K8S API"
+    dest    = "192.168.1.21"
+    dport   = "6443"
+    enabled = true
+    log     = "info"
+    proto   = "tcp"
+    source  = "192.168.1.2,192.168.1.3,192.168.1.21,192.168.1.22,192.168.1.23"
+    type    = "in"
+  }
+}
