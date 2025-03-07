@@ -243,33 +243,3 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
     type = "virtio"
   }
 }
-
-resource "proxmox_virtual_environment_firewall_rules" "inbound" {
-  depends_on = [
-    proxmox_virtual_environment_vm.vm_tesla,
-    proxmox_virtual_environment_cluster_firewall_security_group.ssh,
-    proxmox_virtual_environment_cluster_firewall_security_group.monitoring,
-    proxmox_virtual_environment_cluster_firewall_security_group.cockpit
-  ]
-
-  node_name = proxmox_virtual_environment_vm.vm_tesla.node_name
-  vm_id     = proxmox_virtual_environment_vm.vm_tesla.vm_id
-
-  rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.ssh.name
-    comment        = "From security group, managed by OpenTofu. Allow SSH."
-    iface          = "net0"
-  }
-
-  rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.monitoring.name
-    comment        = "From security group, managed by OpenTofu. Allow MONITORING."
-    iface          = "net0"
-  }
-
-  rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.cockpit.name
-    comment        = "From security group, managed by OpenTofu. Allow COCKPIT."
-    iface          = "net0"
-  }
-}
