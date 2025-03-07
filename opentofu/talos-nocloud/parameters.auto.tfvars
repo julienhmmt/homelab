@@ -35,6 +35,7 @@ meta_config_metadata = {
 
 nodes = {
   "dodge" = {
+    node_usage           = "controlplane"
     pve                  = "miniquarium"
     role                 = "controlplane"
     snippet_datastore_id = "local"
@@ -70,9 +71,12 @@ nodes = {
   }
 
   "ram" = {
-    pve          = "miniquarium"
-    role         = "worker"
-    vm_cpu_cores = 2
+    node_usage           = "infra"
+    pve                  = "miniquarium"
+    role                 = "worker"
+    snippet_datastore_id = "local"
+    snippet_pve          = "miniquarium"
+    vm_cpu_cores         = 2
     # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
     vm_cpu_type                    = "x86-64-v2-AES"
     vm_datastore_id                = "local-nvme"
@@ -91,8 +95,8 @@ nodes = {
     vm_ip                          = "192.168.1.22"
     vm_kvm_args                    = ""
     vm_mac_address                 = "BC:24:11:CA:FE:22"
-    vm_memory_dedicated            = 8192
-    vm_memory_floating             = 8192
+    vm_memory_dedicated            = 8192 # 8GB
+    vm_memory_floating             = 8192 # 8GB
     vm_name                        = "ram"
     vm_on_boot                     = true
     vm_pool_id                     = ""
@@ -103,9 +107,12 @@ nodes = {
   }
 
   "viper" = {
-    pve          = "miniquarium"
-    role         = "worker"
-    vm_cpu_cores = 4
+    node_usage           = "general"
+    pve                  = "miniquarium"
+    role                 = "worker"
+    snippet_datastore_id = "local"
+    snippet_pve          = "miniquarium"
+    vm_cpu_cores         = 4
     # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
     vm_cpu_type                    = "host"
     vm_datastore_id                = "local-nvme"
@@ -125,7 +132,7 @@ nodes = {
     vm_kvm_args                    = ""
     vm_mac_address                 = "BC:24:11:CA:FE:23"
     vm_memory_dedicated            = 20480 # 20GB
-    vm_memory_floating             = 20480
+    vm_memory_floating             = 20480 # 20GB
     vm_name                        = "viper"
     vm_on_boot                     = true
     vm_pool_id                     = ""
@@ -133,5 +140,6 @@ nodes = {
     vm_started                     = true
     vm_tags                        = ["k8s", "opentofu", "talos", "worker"]
     vm_tpm                         = true
+    node_usage                     = "general"
   }
 }

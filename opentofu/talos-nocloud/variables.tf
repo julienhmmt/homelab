@@ -51,6 +51,7 @@ variable "nodes" {
     vm_started                     = optional(bool, true)
     vm_tags                        = optional(list(string))
     vm_tpm                         = optional(bool, true)
+    node_usage                     = string
   }))
 }
 
