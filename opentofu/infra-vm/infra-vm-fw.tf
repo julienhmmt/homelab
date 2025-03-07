@@ -1,3 +1,4 @@
+# options générales du firewall, au niveau "datacenter"
 resource "proxmox_virtual_environment_cluster_firewall" "this" {
   ebtables      = false
   enabled       = true
@@ -10,6 +11,30 @@ resource "proxmox_virtual_environment_cluster_firewall" "this" {
   }
 }
 
+# alias
+resource "proxmox_virtual_environment_firewall_alias" "local_network" {
+  name    = "local_network"
+  cidr    = "192.168.1.0/24"
+  comment = "Managed by OpenTofu. Réseau local."
+}
+
+resource "proxmox_virtual_environment_firewall_alias" "pbs_vm" {
+  name    = "durango"
+  cidr    = "192.168.1.30/24"
+  comment = "Managed by OpenTofu. VM Proxmox Backup Server."
+}
+resource "proxmox_virtual_environment_firewall_alias" "tesla_vm" {
+  name    = proxmox_virtual_environment_vm.vm_tesla.name
+  cidr    = proxmox_virtual_environment_vm.vm_tesla.initialization.0.ip_config.0.ipv4[0].address
+  comment = "Managed by OpenTofu. VM qui supporte l'onduleur."
+}
+resource "proxmox_virtual_environment_firewall_alias" "charger_vm" {
+  name    = proxmox_virtual_environment_vm.vm_charger.name
+  cidr    = proxmox_virtual_environment_vm.vm_charger.initialization.0.ip_config.0.ipv4[0].address
+  comment = "Managed by OpenTofu. VM d'infrastructure pour le stockage."
+}
+
+# groupes de sécurité pour les vm
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "cockpit" {
   comment = "Managed by OpenTofu. Access to Cockpit from JH machines to infra VMs."
   name    = "cockpit"
