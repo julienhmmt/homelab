@@ -1,6 +1,18 @@
+resource "proxmox_virtual_environment_cluster_firewall" "this" {
+  ebtables      = false
+  enabled       = true
+  input_policy  = "DROP"
+  output_policy = "ACCEPT"
+  log_ratelimit {
+    enabled = false
+    burst   = 10
+    rate    = "5/second"
+  }
+}
+
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "cockpit" {
+  comment = "Managed by OpenTofu. Access to Cockpit from JH machines to infra VMs."
   name    = "cockpit"
-  comment = "Managed by OpenTofu"
 
   rule {
     action  = "ACCEPT"
@@ -16,8 +28,8 @@ resource "proxmox_virtual_environment_cluster_firewall_security_group" "cockpit"
 }
 
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "monitoring" {
+  comment = "Managed by OpenTofu. Access to monitoring tools (Netdata) from JH machines to infra VMs."
   name    = "monitoring"
-  comment = "Managed by OpenTofu"
 
   rule {
     action  = "ACCEPT"
@@ -32,8 +44,9 @@ resource "proxmox_virtual_environment_cluster_firewall_security_group" "monitori
 }
 
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "ssh" {
+  comment = "Managed by OpenTofu. Access to SSH from JH machines to infra VMs."
   name    = "ssh"
-  comment = "Managed by OpenTofu"
+
   rule {
     action  = "ACCEPT"
     comment = "Allow SSH"
@@ -48,8 +61,9 @@ resource "proxmox_virtual_environment_cluster_firewall_security_group" "ssh" {
 }
 
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "k8s_api" {
+  comment = "Managed by OpenTofu. Access to K8S API from JH machines and Kubernetes workers VM to Kubernetes control plane VM."
   name    = "k8s_api"
-  comment = "Managed by OpenTofu"
+
   rule {
     action  = "ACCEPT"
     comment = "Allow K8S API"
