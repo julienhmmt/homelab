@@ -33,12 +33,15 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 ```bash
 # Suppression de kube-proxy
 kubectl -n kube-system delete daemonset kube-proxy
+```
 
 # Installation de Cilium via helm, remplacement de kube-proxy
+
+```bash
 helm install \
     cilium \
     cilium/cilium \
-    --version 1.16.6 \
+    --version 1.17.1 \
     --namespace kube-system \
     --set ipam.mode=kubernetes \
     --set kubeProxyReplacement=true \
@@ -60,7 +63,9 @@ helm install \
     --set operator.prometheus.enabled=true \
     --set bpf.monitorAggregation=medium \
     --set encryption.nodeEncryption=true
+```
 
+```bash
 kubectl create namespace cilium-test-1
 kubectl label namespace cilium-test-1 pod-security.kubernetes.io/enforce=privileged
 
