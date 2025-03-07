@@ -86,7 +86,8 @@ resource "talos_machine_configuration_apply" "this" {
         extraManifests = [
           "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
           "https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml",
-          "https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml"
+          "https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml",
+          "https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml"
         ]
       } : null
     })
