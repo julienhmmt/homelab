@@ -123,7 +123,8 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
         - ln -s /etc/machine-id /var/lib/dbus/machine-id
         - swapoff -a
         - sed -i 's|^/swap/swapfile|#/swap/swapfile|' /etc/fstab
-        - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata pcp qemu-guest-agent udisks2-btrfs vim
+        - systemctl daemon-reload
+        - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi nano extra/netdata pcp qemu-guest-agent udisks2-btrfs vim
 
         # DEBUT // Installation et configuration MINIO
         - systemctl enable --now mnt-minio.mount
@@ -207,7 +208,7 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
 
   boot_order          = ["scsi0"]
   bios                = "ovmf"
-  description         = "Tesla VM. Services installés : `cockpit`, `nfs-server`."
+  description         = "Tesla VM. Services installés : `cockpit`, `minio`, `nfs-server`."
   keyboard_layout     = "fr"
   machine             = "pc-q35-9.0"
   migrate             = true
