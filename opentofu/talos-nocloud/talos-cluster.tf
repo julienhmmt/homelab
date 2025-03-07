@@ -105,3 +105,13 @@ resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = [for _, v in var.nodes : v.vm_ip if v.role == "controlplane"][0]
 }
+
+output "talosconfig" {
+  value     = data.talos_client_configuration.this.talos_config
+  sensitive = true
+}
+
+output "kubeconfig" {
+  value     = talos_cluster_kubeconfig.this.kubeconfig_raw
+  sensitive = true
+}
