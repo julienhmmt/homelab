@@ -342,30 +342,29 @@ resource "proxmox_virtual_environment_firewall_options" "fw_charger" {
 
 resource "proxmox_virtual_environment_firewall_rules" "fw_charger_inbound" {
   depends_on = [
-    proxmox_virtual_environment_cluster_firewall_security_group.cockpit,
-    proxmox_virtual_environment_cluster_firewall_security_group.monitoring,
-    proxmox_virtual_environment_cluster_firewall_security_group.ssh
+    proxmox_virtual_environment_cluster_firewall_security_group.security_groups["cockpit"],
+    proxmox_virtual_environment_cluster_firewall_security_group.security_groups["monitoring"],
+    proxmox_virtual_environment_cluster_firewall_security_group.security_groups["ssh"]
   ]
 
   node_name  = "miniquarium"
   vm_id      = proxmox_virtual_environment_vm.vm_charger.vm_id
 
   rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.cockpit.name
-    comment        = "Managed by OpenTofu. Allow COCKPIT from security group"
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["cockpit"].name
+    comment        = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["cockpit"].comment
     iface          = "net0"
   }
 
   rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.monitoring.name
-    comment        = "Managed by OpenTofu. Allow NETDATA from security group"
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["monitoring"].name
+    comment        = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["monitoring"].comment
     iface          = "net0"
   }
 
   rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.ssh.name
-    comment        = "Managed by OpenTofu. Allow SSH from security group."
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["ssh"].name
+    comment        = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["ssh"].comment
     iface          = "net0"
   }
-
 }
