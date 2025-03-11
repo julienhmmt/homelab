@@ -1,6 +1,7 @@
 locals {
   talos = {
     version = "v1.9.4"
+    schema  = "ca84112fe212adcded1df4faf04156b49a915b14926c43e19fc09b06be2d06ae"
   }
 }
 
@@ -9,7 +10,7 @@ resource "proxmox_virtual_environment_download_file" "talos_nocloud_image" {
   datastore_id            = "local"
   node_name               = "miniquarium"
   file_name               = "talos-${local.talos.version}-nocloud-amd64.img"
-  url                     = "https://factory.talos.dev/image/053489a0f869c320f62f07e2d9f0b3f96bc78911366666860e912003c3a20cf4/${local.talos.version}/nocloud-amd64.raw.gz"
+  url                     = "https://factory.talos.dev/image/${local.talos.schema}/${local.talos.version}/nocloud-amd64.raw.gz"
   decompression_algorithm = "gz"
   overwrite               = false
 }
