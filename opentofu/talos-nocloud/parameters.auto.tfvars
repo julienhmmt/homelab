@@ -35,11 +35,10 @@ meta_config_metadata = {
 
 nodes = {
   "dodge" = {
-    pve                  = "miniquarium"
-    role                 = "controlplane"
-    snippet_datastore_id = "local"
-    snippet_pve          = "miniquarium"
-    vm_cpu_cores         = 2
+    pve          = "miniquarium"
+    role         = "controlplane"
+    usage        = "controlplane"
+    vm_cpu_cores = 2
     # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
     vm_cpu_type                    = "x86-64-v2-AES"
     vm_datastore_id                = "local-nvme"
@@ -70,11 +69,10 @@ nodes = {
   }
 
   "ram" = {
-    pve                  = "miniquarium"
-    role                 = "worker"
-    snippet_datastore_id = "local"
-    snippet_pve          = "miniquarium"
-    vm_cpu_cores         = 2
+    pve          = "miniquarium"
+    role         = "worker"
+    usage        = "infra"
+    vm_cpu_cores = 2
     # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
     vm_cpu_type                    = "x86-64-v2-AES"
     vm_datastore_id                = "local-nvme"
@@ -105,11 +103,10 @@ nodes = {
   }
 
   "viper" = {
-    pve                  = "miniquarium"
-    role                 = "worker"
-    snippet_datastore_id = "local"
-    snippet_pve          = "miniquarium"
-    vm_cpu_cores         = 4
+    pve          = "miniquarium"
+    role         = "worker"
+    usage        = "general"
+    vm_cpu_cores = 4
     # vm_cpu_flags                   = ["+aes", "+amd-ssbd", "+amd-no-ssb"]
     vm_cpu_type                    = "host"
     vm_datastore_id                = "local-nvme"
@@ -137,6 +134,5 @@ nodes = {
     vm_started                     = true
     vm_tags                        = ["k8s", "opentofu", "talos", "worker"]
     vm_tpm                         = true
-    node_usage                     = "general"
   }
 }

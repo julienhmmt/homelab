@@ -22,6 +22,7 @@ variable "nodes" {
   type = map(object({
     pve                            = string
     role                           = string
+    usage                          = string
     vm_cpu_cores                   = number
     vm_cpu_flags                   = optional(list(string))
     vm_cpu_type                    = optional(string, "x86-64-v2-AES")
