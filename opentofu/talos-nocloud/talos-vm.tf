@@ -1,6 +1,6 @@
 resource "proxmox_virtual_environment_vm" "talos_vm" {
   depends_on = [
-    proxmox_virtual_environment_download_file.talos_nocloud_image,
+    # proxmox_virtual_environment_download_file.talos_nocloud_image,
     proxmox_virtual_environment_file.meta_cloud_config
   ]
   for_each = var.nodes
@@ -45,7 +45,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
     interface    = "scsi0"
     size         = each.value.vm_disk_size
     file_format  = each.value.vm_disk_format
-    file_id      = proxmox_virtual_environment_download_file.talos_nocloud_image.id
+    file_id      = "local:iso/talos-v1.9.4-nocloud-amd64.img"
     aio          = "native"
     cache        = "none"
     discard      = "on"
