@@ -41,8 +41,7 @@ data "talos_machine_configuration" "controlplane" {
         allowSchedulingOnControlPlanes = false
         extraManifests = [
           "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
-          "https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml",
-          "https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml",
+          "https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml"
         ]
       }
     })
@@ -56,7 +55,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane[each.key].machine_configuration
-  node                        = each.value.pve
+  node                        = each.value.vm_ip
 }
 
 data "talos_machine_configuration" "worker" {
@@ -93,7 +92,7 @@ resource "talos_machine_configuration_apply" "worker" {
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker[each.key].machine_configuration
-  node                        = each.value.pve
+  node                        = each.value.vm_ip
 }
 
 data "talos_client_configuration" "this" {
