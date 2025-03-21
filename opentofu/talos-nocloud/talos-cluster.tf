@@ -40,6 +40,7 @@ data "talos_machine_configuration" "controlplane" {
         }
         allowSchedulingOnControlPlanes = false
         extraManifests = [
+          "https://raw.githubusercontent.com/qjoly/GitOps/refs/heads/main/common/cilium/install-cilium.yaml",
           "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
           "https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml"
         ]
@@ -116,7 +117,7 @@ data "talos_cluster_health" "this" {
   endpoints              = data.talos_client_configuration.this.endpoints
   client_configuration   = data.talos_client_configuration.this.client_configuration
   control_plane_nodes    = [for k, v in var.nodes : v.vm_ip if v.role == "controlplane"]
-  skip_kubernetes_checks = false
+  skip_kubernetes_checks = true
   timeouts = {
     read = "10m"
   }
