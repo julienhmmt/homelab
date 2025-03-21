@@ -1,37 +1,77 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: victoriametrics
+  name: victoria-metrics
   namespace: monitoring
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: victoriametrics
+      app: victoria-metrics
   template:
     metadata:
       labels:
-        app: victoriametrics
+        app: victoria-metrics
     spec:
-      serviceAccountName: victoriametrics
-      nodeSelector:
-        usage: infra
-      tolerations:
-        - key: "usage"
-          operator: "Equal"
-          value: "infra"
-          effect: "NoSchedule"
+      serviceAccountName: victoria-metrics
+      securityContext:
+        # runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-        - name: victoriametrics
-          image: victoriametrics/victoria-metrics:latest
-          args:
-            - "-selfScrapeInterval=10s"
-          ports:
-            - containerPort: 8428
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
+      - name: victoria-metrics
+        image: victoriametrics/victoria-metrics:latest
+        ports:
+        - containerPort: 8428
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          # runAsUser: 1000
+          # runAsGroup: 1000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      serviceAccountName: grafana
+      securityContext:
+        # runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: grafana
+        image: grafana/grafana-oss:11.5.2
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          # runAsUser: 472  # Grafana runs as user ID 472 by default
+          # runAsGroup: 472 # Grafana runs as group ID 472 by default
