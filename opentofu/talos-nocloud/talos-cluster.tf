@@ -27,6 +27,11 @@ data "talos_machine_configuration" "controlplane" {
         time = {
           servers = ["fr.pool.ntp.org", "time.cloudflare.com"]
         }
+        kubelet = {
+          extraArgs = {
+            node-labels = "usage=${each.value.usage}"
+          }
+        }
       }
       cluster = {
         network = {
@@ -38,7 +43,7 @@ data "talos_machine_configuration" "controlplane" {
         proxy = { # Cilium will replace it
           disabled = true
         }
-        allowSchedulingOnControlPlanes = false
+        allowSchedulingOnControlPlanes = true
         extraManifests = [
           "https://raw.githubusercontent.com/qjoly/GitOps/refs/heads/main/common/cilium/install-cilium.yaml",
           "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
@@ -80,6 +85,11 @@ data "talos_machine_configuration" "worker" {
         }
         time = {
           servers = ["fr.pool.ntp.org", "time.cloudflare.com"]
+        }
+        kubelet = {
+          extraArgs = {
+            node-labels = "usage=${each.value.usage}"
+          }
         }
       }
     })
