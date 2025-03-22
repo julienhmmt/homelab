@@ -27,11 +27,6 @@ data "talos_machine_configuration" "controlplane" {
         time = {
           servers = ["fr.pool.ntp.org", "time.cloudflare.com"]
         }
-        kubelet = {
-          extraArgs = {
-            node-labels = "usage=${each.value.usage}"
-          }
-        }
       }
       cluster = {
         network = {
@@ -85,11 +80,6 @@ data "talos_machine_configuration" "worker" {
         }
         time = {
           servers = ["fr.pool.ntp.org", "time.cloudflare.com"]
-        }
-        kubelet = {
-          extraArgs = {
-            node-labels = "usage=${each.value.usage}"
-          }
         }
       }
     })
