@@ -63,7 +63,7 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_charger" {
         - pacman-key --init
         - pacman-key --populate archlinux
         - pacman -Sy --noconfirm archlinux-keyring reflector rsync xfsprogs
-        - reflector --country France --latest 5 --age 24 --sort rate --save /etc/pacman.d/mirrorlist
+        - reflector --country France --protocol https --latest 5 --age 24 --sort rate --save /etc/pacman.d/mirrorlist
         - pacman -Sy --noconfirm gptfdisk
 
       # Disk setup

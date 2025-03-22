@@ -65,6 +65,7 @@ resource "proxmox_virtual_environment_file" "user_cloud_config_tesla" {
         - ln -s /etc/machine-id /var/lib/dbus/machine-id
         - swapoff -a
         - sed -i 's|^/swap/swapfile|#/swap/swapfile|' /etc/fstab
+        - reflector --country France --protocol https --latest 5 --age 24 --sort rate --save /etc/pacman.d/mirrorlist
         - pacman -Syu --noconfirm bash-completion cloud-guest-utils extra/cockpit curl extra/cockpit-storaged less libiscsi libusb nano extra/netdata extra/nut pcp qemu-guest-agent udisks2-btrfs vim
 
         # DEBUT // NUT configuration
