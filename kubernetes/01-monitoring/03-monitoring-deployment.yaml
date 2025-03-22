@@ -1,42 +1,42 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: victoria-metrics
-  namespace: monitoring
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: victoria-metrics
-  template:
-    metadata:
-      labels:
-        app: victoria-metrics
-    spec:
-      serviceAccountName: victoria-metrics
-      securityContext:
-        # runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
-      containers:
-      - name: victoria-metrics
-        image: victoriametrics/victoria-metrics:latest
-        ports:
-        - containerPort: 8428
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
-            memory: "256Mi"
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-          # runAsUser: 1000
-          # runAsGroup: 1000
----
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: victoria-metrics
+#   namespace: monitoring
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: victoria-metrics
+#   template:
+#     metadata:
+#       labels:
+#         app: victoria-metrics
+#     spec:
+#       serviceAccountName: victoria-metrics
+#       securityContext:
+#         # runAsNonRoot: true
+#         seccompProfile:
+#           type: RuntimeDefault
+#       containers:
+#       - name: victoria-metrics
+#         image: victoriametrics/victoria-metrics:latest
+#         ports:
+#         - containerPort: 8428
+#         resources:
+#           limits:
+#             cpu: "500m"
+#             memory: "512Mi"
+#           requests:
+#             cpu: "250m"
+#             memory: "256Mi"
+#         securityContext:
+#           allowPrivilegeEscalation: false
+#           capabilities:
+#             drop: ["ALL"]
+#           # runAsUser: 1000
+#           # runAsGroup: 1000
+# ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-aws-credentials
+  namespace: monitoring
+type: Opaque
+data:
+  access_key: <base64-encoded-access-key>
+  secret_key: <base64-encoded-secret-key>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      serviceAccountName: grafana
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: grafana
+        image: grafana/grafana-oss:11.5.2
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: "admin"
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "yourpassword"
+        - name: GF_PATHS_DATA
+          value: "/var/lib/grafana"
+        - name: GF_AWS_BUCKET
+          value: "your-s3-bucket-name"
+        - name: GF_AWS_REGION
+          value: "your-aws-region"
+        - name: GF_AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: grafana-aws-credentials
+              key: access_key
+        - name: GF_AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: grafana-aws-credentials
+              key: secret_key
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsUser: 472
+          runAsGroup: 472
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+      volumes:
+      - name: grafana-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  selector:
+    app: grafana
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
