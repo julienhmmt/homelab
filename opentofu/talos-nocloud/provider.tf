@@ -2,19 +2,19 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.72"
+      version = "0.74.1"
     }
     sops = {
       source  = "carlpett/sops"
-      version = "1.1.1"
+      version = "1.2.0"
     }
     talos = {
       source  = "siderolabs/talos"
-      version = "0.7"
+      version = "0.7.1"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.6.3"
+      version = "3.7.1"
     }
   }
 }
