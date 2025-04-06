@@ -28,8 +28,4 @@ helm template cilium \
     --set operator.prometheus.enabled=true \
     --set bpf.monitorAggregation=medium \
     --set encryption.nodeEncryption=true \
-    --set l2announcement.enabled=true \
-    --set ipMasqAgent.enabled=true \
-    --set hostFirewall.enabled=true \
-    --set hostReachableServices=true > ./00-cilium.custom.yaml
-```
+    --set l2announcement.enabled=true > /Users/jh/git/homelab/kubernetes/00-cilium/00-cilium.custom.yaml
