@@ -32,7 +32,10 @@ data "talos_machine_configuration" "controlplane" {
         network = {
           dnsDomain = var.kubernetes_dns_domain
           cni = { # Cilium will replace it
-            name = "none"
+            name = "custom"
+            urls = [
+              "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium.custom.yaml"
+            ]
           }
         }
         proxy = { # Cilium will replace it
@@ -40,9 +43,8 @@ data "talos_machine_configuration" "controlplane" {
         }
         allowSchedulingOnControlPlanes = true
         extraManifests = [
-          "https://raw.githubusercontent.com/qjoly/GitOps/refs/heads/main/common/cilium/install-cilium.yaml",
-          "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
-          "https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml"
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager.custom.yaml",
+          "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml"
         ]
       }
     })
