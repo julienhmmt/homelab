@@ -18,8 +18,33 @@ data "talos_machine_configuration" "controlplane" {
   config_patches = [
     yamlencode({
       machine = {
+        kubelet = {
+          nodeIP = {
+            validSubnets = ["192.168.1.0/24"]
+          }
+        }
+        features = {
+          hostDNS = {
+            enabled              = true
+            forwardKubeDNSToHost = false
+          }
+        }
         network = {
-          hostname = each.value.vm_name
+          hostname    = each.value.vm_name
+          nameservers = each.value.vm_dns
+          interfaces = [
+            {
+              addresses = ["${each.value.vm_ip}/24"]
+              dhcp      = false
+              interface = "eth0"
+              routes = [
+                {
+                  network = "0.0.0.0/0"
+                  gateway = each.value.vm_gateway
+                }
+              ]
+            }
+          ]
         }
         install = {
           disk = each.value.vm_install_disk
@@ -29,6 +54,17 @@ data "talos_machine_configuration" "controlplane" {
         }
       }
       cluster = {
+        etcd = {
+          advertisedSubnets = ["192.168.1.0/24"]
+        }
+        discovery = {
+          enabled = false
+          registries = {
+            service = {
+              disabled = true
+            }
+          }
+        }
         network = {
           dnsDomain = var.kubernetes_dns_domain
           cni = { # Cilium will replace it
@@ -41,7 +77,7 @@ data "talos_machine_configuration" "controlplane" {
         proxy = { # Cilium will replace it
           disabled = true
         }
-        allowSchedulingOnControlPlanes = true
+        allowSchedulingOnControlPlanes = false
         extraManifests = [
           "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager.custom.yaml",
           "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml"
