@@ -65,6 +65,7 @@ nodes = {
     vm_startup_order               = 2
     vm_started                     = true
     vm_tags                        = ["controlplane", "k8s", "opentofu", "talos"]
+    vm_timeservers                 = ["fr.pool.ntp.org", "time.cloudflare.com"]
     vm_tpm                         = true
   }
 
@@ -133,6 +134,7 @@ nodes = {
     vm_startup_order               = 4
     vm_started                     = true
     vm_tags                        = ["k8s", "opentofu", "talos", "worker"]
+    vm_timeservers                 = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"]
     vm_tpm                         = true
   }
 }

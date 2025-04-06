@@ -25,7 +25,7 @@ data "talos_machine_configuration" "controlplane" {
           disk = each.value.vm_install_disk
         }
         time = {
-          servers = ["fr.pool.ntp.org", "time.cloudflare.com"]
+          servers = each.value.vm_timeservers
         }
       }
       cluster = {

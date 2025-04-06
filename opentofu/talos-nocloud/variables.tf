@@ -51,6 +51,7 @@ variable "nodes" {
     vm_startup_order               = optional(number, 1)
     vm_started                     = optional(bool, true)
     vm_tags                        = optional(list(string))
+    vm_timeservers                 = optional(list(string), ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"])
     vm_tpm                         = optional(bool, true)
   }))
 }
