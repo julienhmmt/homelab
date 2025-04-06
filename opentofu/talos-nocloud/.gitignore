@@ -1,1 +1,3 @@
 talosvmplan
+terraform.tfstate
+terraform.tfstate.backup
