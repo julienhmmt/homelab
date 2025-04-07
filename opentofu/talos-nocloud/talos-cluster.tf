@@ -27,6 +27,7 @@ data "talos_machine_configuration" "controlplane" {
           hostDNS = {
             enabled              = true
             forwardKubeDNSToHost = false
+            resolveMemberNames   = true
           }
         }
         network = {
