@@ -67,7 +67,6 @@ data "talos_machine_configuration" "controlplane" {
           }
         }
         network = {
-          dnsDomain = var.kubernetes_dns_domain
           cni = { # Cilium will replace it
             name = "custom"
             urls = [

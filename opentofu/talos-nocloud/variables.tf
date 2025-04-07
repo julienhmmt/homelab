@@ -1,6 +1,3 @@
-variable "kubernetes_dns_domain" {
-  type = string
-}
 variable "kubernetes_version" {
   type = string
 }
