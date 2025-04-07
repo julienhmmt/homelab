@@ -80,8 +80,13 @@ data "talos_machine_configuration" "controlplane" {
         }
         allowSchedulingOnControlPlanes = false
         extraManifests = [
+          # Cert Manager
           "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager.custom.yaml",
-          "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml"
+          # Gateway API
+          "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
+          # ArgoCD
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-ns.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-install.yaml"
         ]
       }
     })
