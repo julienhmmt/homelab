@@ -23,8 +23,6 @@ helm template cilium --create-namespace \
     --set gatewayAPI.enableAlpn=true \
     --set gatewayAPI.enableAppProtocol=true \
     --set hubble.enabled=true \
-    --set hubble.relay.enabled=true \
-    --set hubble.ui.enabled=true \
     --set metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,http}" \
     --set prometheus.enabled=true \
     --set operator.prometheus.enabled=true \
