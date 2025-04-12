@@ -28,5 +28,5 @@ helm template cilium \
     --set bpf.hostLegacyRouting=true \
     --set bpf.masquerade=true \
     --set bpf.monitorAggregation=medium \
-    --set l2announcement.enabled=true \
+    --set l2announcements.enabled=true \
     --set externalIPs.enabled=true > 00-cilium-custom.yaml
