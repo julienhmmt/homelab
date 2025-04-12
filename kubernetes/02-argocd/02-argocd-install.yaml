@@ -222,7 +222,7 @@ data:
   statusbadge.enabled: "false"
   timeout.hard.reconciliation: 0s
   timeout.reconciliation: 180s
-  url: https://argocd.local.prive.dc.hommet.net
+  url: https://argocd.home.arpa
 ---
 # Source: argo-cd/templates/argocd-configs/argocd-cmd-params-cm.yaml
 apiVersion: v1
@@ -268,7 +268,7 @@ data:
   server.disable.auth: "false"
   server.enable.gzip: "true"
   server.enable.proxy.extension: "false"
-  server.insecure: "false"
+  server.insecure: "true"
   server.log.format: text
   server.log.level: info
   server.repo.server.strict.tls: "false"
@@ -289,26 +289,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: argocd
     app.kubernetes.io/version: "v2.14.9"
----
-# Source: argo-cd/templates/argocd-configs/argocd-rbac-cm.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: argocd-rbac-cm
-  namespace: argocd
-  labels:
-    helm.sh/chart: argo-cd-7.8.23
-    app.kubernetes.io/name: argocd-rbac-cm
-    app.kubernetes.io/instance: argocd
-    app.kubernetes.io/component: server
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/part-of: argocd
-    app.kubernetes.io/version: "v2.14.9"
-data:
-  policy.csv: ""
-  policy.default: ""
-  policy.matchMode: glob
-  scopes: '[groups]'
 ---
 # Source: argo-cd/templates/argocd-configs/argocd-ssh-known-hosts-cm.yaml
 apiVersion: v1
@@ -24524,7 +24504,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cmd-params: 89f970f4c99f89aaac55c744d7c7286c2651f6cf073d32eb61beb3aff206b649
+        checksum/cmd-params: 1f254cc1852aa4f983482a312011c2988a5814375ac711649010f27d7fdfd125
       labels:
         helm.sh/chart: argo-cd-7.8.23
         app.kubernetes.io/name: argocd-applicationset-controller
@@ -24823,8 +24803,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cmd-params: 89f970f4c99f89aaac55c744d7c7286c2651f6cf073d32eb61beb3aff206b649
-        checksum/cm: d397f4a9ec943d077862fbc7dbf1c29ac2c41dea7593f2f294b5b66adf61bb11
+        checksum/cmd-params: 1f254cc1852aa4f983482a312011c2988a5814375ac711649010f27d7fdfd125
+        checksum/cm: ef31fb5139550cf1fb87335d0a3d573d643fd3d02491f9b9fc83adca9d31c2b9
       labels:
         helm.sh/chart: argo-cd-7.8.23
         app.kubernetes.io/name: argocd-repo-server
@@ -25227,8 +25207,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cmd-params: 89f970f4c99f89aaac55c744d7c7286c2651f6cf073d32eb61beb3aff206b649
-        checksum/cm: d397f4a9ec943d077862fbc7dbf1c29ac2c41dea7593f2f294b5b66adf61bb11
+        checksum/cmd-params: 1f254cc1852aa4f983482a312011c2988a5814375ac711649010f27d7fdfd125
+        checksum/cm: ef31fb5139550cf1fb87335d0a3d573d643fd3d02491f9b9fc83adca9d31c2b9
       labels:
         helm.sh/chart: argo-cd-7.8.23
         app.kubernetes.io/name: argocd-server
@@ -25856,8 +25836,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cmd-params: 89f970f4c99f89aaac55c744d7c7286c2651f6cf073d32eb61beb3aff206b649
-        checksum/cm: d397f4a9ec943d077862fbc7dbf1c29ac2c41dea7593f2f294b5b66adf61bb11
+        checksum/cmd-params: 1f254cc1852aa4f983482a312011c2988a5814375ac711649010f27d7fdfd125
+        checksum/cm: ef31fb5139550cf1fb87335d0a3d573d643fd3d02491f9b9fc83adca9d31c2b9
       labels:
         helm.sh/chart: argo-cd-7.8.23
         app.kubernetes.io/name: argocd-application-controller

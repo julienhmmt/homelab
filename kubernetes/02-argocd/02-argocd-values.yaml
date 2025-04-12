@@ -42,7 +42,7 @@ crds:
 global:
   # -- Default domain used by all components
   ## Used for ingresses, certificates, SSO, notifications, etc.
-  domain: argocd.local.prive.dc.hommet.net
+  domain: argocd.home.arpa
 
   # -- Runtime class name for all components
   runtimeClassName: ""
@@ -281,7 +281,7 @@ configs:
     ## Server properties
     # -- Run server without TLS
     ## NOTE: This value should be set when you generate params by other means as it changes ports used by ingress template.
-    server.insecure: false
+    server.insecure: true
     # -- Value for base href in index.html. Used if Argo CD is running behind reverse proxy under subpath different from /
     server.basehref: /
     # -- Used if Argo CD is running behind reverse proxy under subpath different from /
@@ -329,7 +329,7 @@ configs:
     # -- Create the argocd-rbac-cm configmap with ([Argo CD RBAC policy]) definitions.
     # If false, it is expected the configmap will be created by something else.
     # Argo CD will not work if there is no configmap created with the name above.
-    create: true
+    create: false
 
     # -- Annotations to be added to argocd-rbac-cm configmap
     annotations: {}
