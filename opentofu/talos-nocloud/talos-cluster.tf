@@ -70,7 +70,7 @@ data "talos_machine_configuration" "controlplane" {
           cni = { # Cilium will replace it
             name = "custom"
             urls = [
-              "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium.custom.yaml"
+              "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-custom.yaml"
             ]
           }
         }
@@ -80,7 +80,7 @@ data "talos_machine_configuration" "controlplane" {
         allowSchedulingOnControlPlanes = false
         extraManifests = [
           # Cert Manager
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager.custom.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager-custom.yaml",
           # Gateway API
           "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml",
           "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml",
