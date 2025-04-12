@@ -25,11 +25,15 @@ variable "nodes" {
     vm_cpu_type                    = optional(string, "x86-64-v2-AES")
     vm_datastore_id                = string
     vm_datastore_id_efi_disk       = string
+    vm_datastore_id_boot_disk      = string
+    vm_datastore_id_data_disk      = string
     vm_datastore_id_initialization = string
     vm_datastore_id_tpm            = string
     vm_description                 = string
-    vm_disk_size                   = number
-    vm_disk_format                 = optional(string, "raw")
+    vm_boot_disk_size              = number
+    vm_boot_disk_format            = optional(string, "raw")
+    vm_data_disk_size              = number
+    vm_data_disk_format            = optional(string, "raw")
     vm_dns                         = list(string)
     vm_domain                      = string
     vm_efi                         = optional(bool, true)

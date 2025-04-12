@@ -40,17 +40,31 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
     type    = each.value.vm_cpu_type
   }
 
-  disk {
-    datastore_id = each.value.vm_datastore_id
-    interface    = "scsi0"
-    size         = each.value.vm_disk_size
-    file_format  = each.value.vm_disk_format
-    file_id      = "local:iso/talos-v1.9.4-nocloud-amd64.img"
+  disk { # boot disk
     aio          = "native"
+    backup       = false
     cache        = "none"
+    datastore_id = each.value.vm_datastore_id_boot_disk
     discard      = "on"
+    file_format  = each.value.vm_boot_disk_format
+    file_id      = "local:iso/talos-v1.9.4-nocloud-amd64.img"
+    interface    = "scsi0"
     iothread     = true
     replicate    = false
+    size         = each.value.vm_boot_disk_size
+  }
+
+  disk { # data disk
+    aio          = "native"
+    backup       = true
+    cache        = "none"
+    datastore_id = each.value.vm_datastore_id_data_disk
+    discard      = "on"
+    file_format  = each.value.vm_data_disk_format
+    interface    = "scsi1"
+    iothread     = true
+    replicate    = false
+    size         = each.value.vm_data_disk_size
   }
 
   dynamic "efi_disk" {
