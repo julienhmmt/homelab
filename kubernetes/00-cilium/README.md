@@ -30,3 +30,4 @@ helm template cilium \
     --set bpf.monitorAggregation=medium \
     --set l2announcements.enabled=true \
     --set externalIPs.enabled=true > 00-cilium-custom.yaml
+```
