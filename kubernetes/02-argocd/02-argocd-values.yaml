@@ -1754,7 +1754,7 @@ redisSecretInit:
 ## Server
 server:
   # -- Argo CD server name
-  name: argocd-server
+  name: server
 
   # -- The number of server pods to run
   replicas: 1
