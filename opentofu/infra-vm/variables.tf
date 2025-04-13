@@ -10,7 +10,7 @@ variable "firewall_security_groups" {
   description = "List of firewall security groups"
   type = map(object({
     comment = string
-    rules   = list(object({
+    rules = list(object({
       action  = string
       comment = string
       dest    = string
