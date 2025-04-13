@@ -79,6 +79,11 @@ data "talos_machine_configuration" "controlplane" {
         }
         allowSchedulingOnControlPlanes = false
         extraManifests = [
+          # Cilium
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-gapi.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-l2announcement.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-lbip-internal.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-lbip-external.yaml",
           # Cert Manager
           "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager-custom.yaml",
           # Gateway API
