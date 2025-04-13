@@ -275,8 +275,8 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
     datastore_id = "local-nvme"
 
     dns {
-      domain  = "dc.local.hommet.net"
-      servers = ["192.168.1.254", "1.1.1.1"]
+      domain  = "dc.garage.hommet.net"
+      servers = ["192.168.1.250"]
     }
 
     ip_config {
@@ -326,7 +326,7 @@ resource "proxmox_virtual_environment_vm" "vm_charger" {
 }
 
 resource "proxmox_virtual_environment_firewall_options" "fw_charger" {
-  depends_on    = [ proxmox_virtual_environment_vm.vm_charger ]
+  depends_on    = [proxmox_virtual_environment_vm.vm_charger]
   dhcp          = false
   enabled       = true
   input_policy  = "ACCEPT"
@@ -347,8 +347,8 @@ resource "proxmox_virtual_environment_firewall_rules" "fw_charger_inbound" {
     proxmox_virtual_environment_cluster_firewall_security_group.security_groups["ssh"]
   ]
 
-  node_name  = "miniquarium"
-  vm_id      = proxmox_virtual_environment_vm.vm_charger.vm_id
+  node_name = "miniquarium"
+  vm_id     = proxmox_virtual_environment_vm.vm_charger.vm_id
 
   rule {
     security_group = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["cockpit"].name

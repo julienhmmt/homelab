@@ -190,8 +190,8 @@ resource "proxmox_virtual_environment_vm" "vm_tesla" {
     datastore_id = "local-nvme"
 
     dns {
-      domain  = "dc.local.hommet.net"
-      servers = ["192.168.1.254", "1.1.1.1"]
+      domain  = "dc.garage.hommet.net"
+      servers = ["192.168.1.250"]
     }
 
     ip_config {
@@ -252,8 +252,8 @@ resource "proxmox_virtual_environment_firewall_rules" "fw_tesla_inbound" {
     proxmox_virtual_environment_cluster_firewall_security_group.security_groups["ssh"]
   ]
 
-  node_name  = "miniquarium"
-  vm_id      = proxmox_virtual_environment_vm.vm_tesla.vm_id
+  node_name = "miniquarium"
+  vm_id     = proxmox_virtual_environment_vm.vm_tesla.vm_id
 
   rule {
     security_group = proxmox_virtual_environment_cluster_firewall_security_group.security_groups["cockpit"].name
