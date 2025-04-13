@@ -1,3 +1,38 @@
+# Machines pour le stockage de données statiques pour Talos
+resource "proxmox_virtual_environment_vm" "talos_vm_data" {
+  description = "Managed by OpenTofu. Talos data disks."
+  name        = "k8s-data"
+  node_name   = "miniquarium"
+  on_boot     = false
+  protection  = true
+  started     = false
+  tags        = sort(["infra", "ne_pas_demarrer", "ne_pas_supprimer"])
+  vm_id       = 9000
+
+  disk { # control plane data disk 1
+    backup       = true
+    datastore_id = "local-nvme"
+    file_format  = "raw"
+    interface    = "scsi10"
+    size         = 48
+  }
+  disk { # worker 1 data disk 1
+    backup       = true
+    datastore_id = "local-nvme"
+    file_format  = "raw"
+    interface    = "scsi11"
+    size         = 64
+  }
+  disk { # worker 2 data disk 1
+    backup       = true
+    datastore_id = "local-nvme"
+    file_format  = "raw"
+    interface    = "scsi12"
+    size         = 64
+  }
+}
+
+# Déclaration de machine virtuelle pour Talos
 resource "proxmox_virtual_environment_vm" "talos_vm" {
   depends_on = [
     # proxmox_virtual_environment_download_file.talos_nocloud_image,
@@ -54,17 +89,16 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
     size         = each.value.vm_boot_disk_size
   }
 
-  disk { # data disk
-    aio          = "native"
-    backup       = true
-    cache        = "none"
-    datastore_id = each.value.vm_datastore_id_data_disk
-    discard      = "on"
-    file_format  = each.value.vm_data_disk_format
-    interface    = "scsi1"
-    iothread     = true
-    replicate    = false
-    size         = each.value.vm_data_disk_size
+  dynamic "disk" { # data disk
+    for_each = { for idx, disk in proxmox_virtual_environment_vm.talos_vm_data.disk : idx => disk if disk.interface == each.value.data_vm_interface_disk }
+    iterator = data_disk
+    content {
+      datastore_id = data_disk.value.datastore_id
+      discard      = "on"
+      file_format  = data_disk.value.file_format
+      size         = data_disk.value.size
+      interface    = each.value.vm_data_disk_interface
+    }
   }
 
   dynamic "efi_disk" {
