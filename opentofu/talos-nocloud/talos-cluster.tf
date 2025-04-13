@@ -79,13 +79,6 @@ data "talos_machine_configuration" "controlplane" {
         }
         allowSchedulingOnControlPlanes = false
         extraManifests = [
-          # Cilium
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-gapi.yaml",
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-l2announcement.yaml",
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-lbip-internal.yaml",
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-lbip-external.yaml",
-          # Cert Manager
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager-custom.yaml",
           # Gateway API
           "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml",
           "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml",
@@ -93,10 +86,17 @@ data "talos_machine_configuration" "controlplane" {
           "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml",
           "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml",
           "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml",
-
+          # Cilium
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-gapi.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-l2announcement.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-lbip-internal.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/00-cilium/00-cilium-lbip-external.yaml",
+          # Cert Manager
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/01-cert-manager/01-cert-manager-custom.yaml",
           # ArgoCD
           "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-ns.yaml",
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-install.yaml"
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-install.yaml",
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-httproute.yaml"
         ]
       }
     })
