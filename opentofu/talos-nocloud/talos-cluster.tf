@@ -96,7 +96,9 @@ data "talos_machine_configuration" "controlplane" {
           # ArgoCD
           "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-ns.yaml",
           "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-install.yaml",
-          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-httproute.yaml"
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/02-argocd/02-argocd-httproute.yaml",
+          # Monitoring
+          "https://raw.githubusercontent.com/julienhmmt/homelab/refs/heads/main/kubernetes/04-monitoring/01-monitoring-ns.yaml"
         ]
       }
     })
