@@ -1,0 +1,72 @@
+global:
+  domain: argocd.your.domain
+  securityContext:
+    runAsUser: 11999
+    runAsGroup: 11999
+    fsGroup: 11999
+
+configs:
+  secret:
+    argocdServerAdminPassword: "$2a$10$unCwF3jzMPXWNVaQ30xYQukT4B5OrOT2/Wjlm.DRGfHbI79RhZGQS" # `htpasswd -nbBC 10 "" argocd | tr -d ':\n' | sed 's/$2y/$2a/'`
+    argocdServerAdminPasswordMtime: "2025-04-25T00:00:00Z"
+
+controller:
+  emptyDir:
+    sizeLimit: "1Gi"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+dex:
+  enabled: false
+
+redis:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+
+server:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  emptyDir:
+    sizeLimit: "1Gi"
+
+repoServer:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+
+applicationSet:
+  emptyDir:
+    sizeLimit: "1Gi"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  readinessProbe:
+    enabled: true
+  livenessProbe:
+    enabled: true
+
+notifications:
+  enabled: false
