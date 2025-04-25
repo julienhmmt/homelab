@@ -1,6 +1,7 @@
 kubernetes_version     = "1.31.6"
 talos_cluster_name     = "talosclustername"
 talos_cluster_endpoint = "172.16.1.1"
+talos_pve_server       = "pvename"
 talos_version          = "1.9.5"
 
 meta_config_metadata = {

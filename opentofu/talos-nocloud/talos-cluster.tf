@@ -23,6 +23,10 @@ data "talos_machine_configuration" "controlplane" {
             validSubnets = ["192.168.1.0/24"]
           }
         }
+        nodeLabels = {
+          "topology.kubernetes.io/region" = var.talos_pve_server
+          "topology.kubernetes.io/zone"   = var.talos_pve_server
+        }
         features = {
           hostDNS = {
             enabled              = true
@@ -130,6 +134,10 @@ data "talos_machine_configuration" "worker" {
       machine = {
         network = {
           hostname = each.value.vm_name
+        }
+        nodeLabels = {
+          "topology.kubernetes.io/region" = var.talos_pve_server
+          "topology.kubernetes.io/zone"   = var.talos_pve_server
         }
         install = {
           disk = each.value.vm_install_disk

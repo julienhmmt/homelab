@@ -10,6 +10,10 @@ variable "talos_cluster_name" {
   description = "A name to provide for the Talos cluster"
   type        = string
 }
+variable "talos_pve_server" {
+  description = "The Proxmox server where the Talos VMs are hosted"
+  type        = string
+}
 variable "talos_version" {
   type = string
 }
