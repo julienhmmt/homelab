@@ -2,7 +2,7 @@
 resource "proxmox_virtual_environment_vm" "talos_vm_data" {
   description = "Managed by OpenTofu. Talos data disks."
   name        = "k8s-data"
-  node_name   = "miniquarium"
+  node_name   = "pvename"
   on_boot     = false
   protection  = true
   started     = false
@@ -11,21 +11,21 @@ resource "proxmox_virtual_environment_vm" "talos_vm_data" {
 
   disk { # control plane data disk 1
     backup       = true
-    datastore_id = "local-nvme"
+    datastore_id = "local"
     file_format  = "raw"
     interface    = "scsi10"
     size         = 48
   }
   disk { # worker 1 data disk 1
     backup       = true
-    datastore_id = "local-nvme"
+    datastore_id = "local"
     file_format  = "raw"
     interface    = "scsi11"
     size         = 64
   }
   disk { # worker 2 data disk 1
     backup       = true
-    datastore_id = "local-nvme"
+    datastore_id = "local"
     file_format  = "raw"
     interface    = "scsi12"
     size         = 64
