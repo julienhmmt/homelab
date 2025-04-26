@@ -1,0 +1,27 @@
+# source : https://github.com/sergelogvinov/proxmox-csi-plugin/blob/main/charts/proxmox-csi-plugin/values.talos.yaml
+
+createNamespace: true
+
+config:
+  clusters:
+    - url: https://ipOUfqdnproxmox:8006/api2/json
+      insecure: true
+      token_id: "kubernetes-csi@pve!csi"
+      token_secret: "token-recupere-lors-de-la-commande-pveum user token add"
+      region: nom_du_cluster_proxmox
+
+storageClass:
+  - name: proxmox-fast
+    storage: nom_stockge # en SSH dans proxmox faire `vgs` pour voir le nom du groupe de volume et le nom de du VG souhaité
+    reclaimPolicy: Delete # Retain possible pour garder les volumes
+    fstype: ext4 # ou xfs
+    cache: none # none, writeback, writethrough
+    ssd: true # true ou false selon si le stockage est SSD ou HDD
+    extraParameters:
+      csi.storage.k8s.io/node-stage-secret-name: "proxmox-csi-plugin"
+      csi.storage.k8s.io/node-stage-secret-namespace: "csi-proxmox"
+      csi.storage.k8s.io/node-expand-secret-name: "proxmox-csi-plugin"
+      csi.storage.k8s.io/node-expand-secret-namespace: "csi-proxmox"
+    annotations:
+      storageclass.kubernetes.io/is-default-class: "true" # true ou false selon le besoin, un seul storage class peut être par défaut
+    volumeBindingMode: WaitForFirstConsumer # ou Immediate si vous voulez que le PV soit créé immédiatement sans attendre un pod

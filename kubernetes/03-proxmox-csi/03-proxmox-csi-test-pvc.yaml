@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc-fast
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: proxmox-fast
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-test
+  namespace: default
+spec:
+  containers:
+    - name: alpine
+      image: alpine
+      command: [ "sleep","1d" ]
+      volumeMounts:
+        - name: ephemeral-volume
+          mountPath: /mnt
+  volumes:
+    - name: ephemeral-volume
+      ephemeral:
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            storageClassName: proxmox-fast
+            resources:
+              requests:
+                storage: 2Gi
