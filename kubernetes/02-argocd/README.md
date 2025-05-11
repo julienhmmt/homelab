@@ -4,7 +4,13 @@
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 helm search repo argo/argo-cd --versions | head -n10
+
+# installation via helm 
+helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace --version 7.8.28 -f 02-argocd-custom-values.yaml
+
+# installation manuelle par kubectl ou de façon unattended au démarrage de talos
 helm template argocd argo/argo-cd --namespace argocd --create-namespace --version 7.8.28 -f 02-argocd-custom-values.yaml > 02-argocd-install.yaml
+kubectl apply -f 02-argocd-install.yaml
 ```
 
 Le namespace ne semble pas se créer lors du déploiement de l'application. Il faut soit le créer à la main (`kubectl create ns argocd`) sinon copier le contenu du fichier '02-argocd-ns.yaml' au début du fichier '02-argocd-install.yaml'.
